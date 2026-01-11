@@ -155,6 +155,56 @@
                         </div>
                     </div>
                 ),
+                pihole: (
+                    <div className="space-y-4">
+                        <h2 className="text-2xl font-bold text-slate-800">Pi-hole Distribution</h2>
+                        
+                        <div className="grid gap-6">
+                            {/* Local Config */}
+                            <div className="p-6 bg-amber-50 border border-amber-200 rounded-xl">
+                                <p className="text-amber-800 font-bold text-sm flex items-center mb-2">
+                                    <Icon name="home" className="mr-2 w-4 h-4" /> Local Network Blocking
+                                </p>
+                                <p className="text-sm text-amber-700 mb-2">
+                                    Primary ad-blocking for devices on the home Wi-Fi/LAN.
+                                </p>
+                                <ul className="list-disc ml-5 text-xs text-amber-900 space-y-1">
+                                    <li>Pi-hole runs on a dedicated Pi Zero.</li>
+                                    <li>Router DHCP settings point DNS to Pi Zero IP.</li>
+                                    <li>All home traffic is filtered automatically.</li>
+                                </ul>
+                            </div>
+
+                            {/* Remote Config */}
+                            <div className="p-6 bg-indigo-50 border border-indigo-200 rounded-xl">
+                                <p className="text-indigo-800 font-bold text-sm flex items-center mb-2">
+                                    <Icon name="smartphone" className="mr-2 w-4 h-4" /> Remote Ad Blocking (Tailscale)
+                                </p>
+                                <p className="text-sm text-indigo-700 mb-2">
+                                    Enables ad-blocking on mobile devices anywhere in the world via VPN.
+                                </p>
+                                <div className="space-y-3 mt-3">
+                                    <div className="bg-white p-3 rounded border border-indigo-100">
+                                        <p className="text-xs font-semibold text-indigo-900 mb-1">Step 1: Pi-hole Settings</p>
+                                        <p className="text-[10px] text-slate-500">
+                                            Go to <span className="font-mono bg-slate-100 px-1 rounded">Settings > DNS > Interface Settings</span> and select 
+                                            <span className="font-bold text-indigo-600"> "Permit all origins"</span>. 
+                                            (Required because VPN traffic appears to come from a different subnet).
+                                        </p>
+                                    </div>
+                                    <div className="bg-white p-3 rounded border border-indigo-100">
+                                        <p className="text-xs font-semibold text-indigo-900 mb-1">Step 2: Tailscale Admin Console</p>
+                                        <p className="text-[10px] text-slate-500">
+                                            Navigate to <span className="font-mono bg-slate-100 px-1 rounded">DNS</span> settings in Tailscale.
+                                            Add the <strong>Tailscale IP</strong> of your Pi Zero as a "Global Nameserver".
+                                            Enable <strong>"Override Local DNS"</strong> to force all mobile traffic through the Pi-hole.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ),
                 commands: (
                     <div className="space-y-6">
                         <h2 className="text-2xl font-bold text-slate-800">Linux Command Reference</h2>
@@ -214,19 +264,6 @@
                                     <code className="block bg-slate-100 p-2 rounded text-xs font-mono text-slate-600">sudo netstat -tulpn # Active Ports</code>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                ),
-                pihole: (
-                    <div className="space-y-4">
-                        <h2 className="text-2xl font-bold text-slate-800">Pi-hole Distribution</h2>
-                        <div className="p-6 bg-amber-50 border border-amber-200 rounded-xl">
-                            <p className="text-amber-800 font-medium text-sm">Remote Node & SSL Parity:</p>
-                            <ul className="list-disc ml-5 mt-3 text-sm text-amber-900 space-y-2">
-                                <li>NPM on Pi 4 handles SSL termination via proxy.</li>
-                                <li>Local DNS in Pi-hole points domain to Pi 4 IP.</li>
-                                <li>Internal traffic is served securely over Tailscale.</li>
-                            </ul>
                         </div>
                     </div>
                 ),
