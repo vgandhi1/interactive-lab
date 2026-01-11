@@ -66,6 +66,7 @@
                 { id: 'docker', name: 'Docker Stack', icon: 'hard-drive' },
                 { id: 'networking', name: 'Networking & SSL', icon: 'globe' },
                 { id: 'pihole', name: 'Pi-hole (Remote)', icon: 'shield' },
+                { id: 'sensornode', name: 'Sensor Node (Pi-hat)', icon: 'thermometer' },
                 { id: 'commands', name: 'Linux Commands', icon: 'command' },
                 { id: 'guides', name: 'Setup Guides', icon: 'book-open' },
             ];
@@ -93,6 +94,7 @@
                                     <li>• Home Assistant (Host Mode)</li>
                                     <li>• Nextcloud & Tailscale Node</li>
                                     <li>• Portainer CE Management</li>
+                                    <li>• InfluxDB (Sensor Data) & Grafana</li>
                                 </ul>
                             </div>
                         </div>
@@ -111,6 +113,13 @@
                                     <div>
                                         <p className="font-bold">DNS Server (Pi Zero)</p>
                                         <p className="text-xs text-slate-300">Pi-hole | Tailscale Node</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-3">
+                                    <Icon name="thermometer" className="text-slate-400" />
+                                    <div>
+                                        <p className="font-bold">Sensor Node (Remote Pi)</p>
+                                        <p className="text-xs text-slate-300">Sense HAT | Python Script | InfluxDB Writer</p>
                                     </div>
                                 </div>
                             </div>
@@ -187,7 +196,7 @@
                                     <div className="bg-white p-3 rounded border border-indigo-100">
                                         <p className="text-xs font-semibold text-indigo-900 mb-1">Step 1: Pi-hole Settings</p>
                                         <p className="text-[10px] text-slate-500">
-                                            Go to <span className="font-mono bg-slate-100 px-1 rounded">Settings > DNS > Interface Settings</span> and select 
+                                            Go to <span className="font-mono bg-slate-100 px-1 rounded">Settings &gt; DNS &gt; Interface Settings</span> and select 
                                             <span className="font-bold text-indigo-600"> "Permit all origins"</span>. 
                                             (Required because VPN traffic appears to come from a different subnet).
                                         </p>
@@ -201,6 +210,76 @@
                                         </p>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                ),
+                sensornode: (
+                    <div className="space-y-6">
+                        <h2 className="text-2xl font-bold text-slate-800">Sensor Node Architecture</h2>
+                        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 className="text-sm font-bold text-purple-600 mb-4 flex items-center uppercase tracking-wider">
+                                <Icon name="activity" className="mr-2 w-4 h-4" /> Environmental Monitoring
+                            </h3>
+                            <div className="space-y-4">
+                                <p className="text-sm text-slate-600">
+                                    A separate Raspberry Pi (Sensor Node) equipped with a Sense HAT collects environmental data and pushes it to the central InfluxDB database on the Main Server. Grafana then visualizes this data.
+                                </p>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                    <div className="p-3 bg-purple-50 rounded border border-purple-100 text-center">
+                                        <Icon name="thermometer" className="mx-auto text-purple-500 mb-2" />
+                                        <p className="text-xs font-bold text-purple-900">Source</p>
+                                        <p className="text-[10px] text-purple-700">Pi + Sense HAT</p>
+                                        <p className="text-[10px] text-purple-600 mt-1">Temp, Pressure, Humidity</p>
+                                    </div>
+                                    <div className="flex items-center justify-center">
+                                        <div className="h-0.5 w-full bg-slate-200 relative">
+                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] text-slate-400 bg-white px-2">Writes To</div>
+                                        </div>
+                                    </div>
+                                    <div className="p-3 bg-emerald-50 rounded border border-emerald-100 text-center">
+                                        <Icon name="database" className="mx-auto text-emerald-500 mb-2" />
+                                        <p className="text-xs font-bold text-emerald-900">Destination</p>
+                                        <p className="text-[10px] text-emerald-700">InfluxDB (Main Server)</p>
+                                        <p className="text-[10px] text-emerald-600 mt-1">Port 8086</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-800 rounded-xl p-5 text-white shadow-lg">
+                            <h3 className="text-sm font-bold text-emerald-400 mb-4 flex items-center uppercase tracking-wider">
+                                <Icon name="terminal" className="mr-2 w-4 h-4" /> Python Script (Sensor Node)
+                            </h3>
+                            <div className="font-mono text-xs overflow-x-auto">
+<pre>{`from sense_hat import SenseHat
+from influxdb_client import InfluxDBClient, Point
+from influxdb_client.client.write_api import SYNCHRONOUS
+import time
+
+# Configuration
+INFLUX_URL = "http://192.168.100.100:8086" # IP of Main Server
+INFLUX_TOKEN = "your-super-secret-auth-token"
+INFLUX_ORG = "myorg"
+INFLUX_BUCKET = "mybucket"
+
+sense = SenseHat()
+client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG)
+write_api = client.write_api(write_options=SYNCHRONOUS)
+
+while True:
+    temp = sense.get_temperature()
+    pressure = sense.get_pressure()
+    humidity = sense.get_humidity()
+    
+    point = Point("environment") \\
+        .field("temperature", temp) \\
+        .field("pressure", pressure) \\
+        .field("humidity", humidity)
+        
+    write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
+    time.sleep(60) # Send every minute`}</pre>
                             </div>
                         </div>
                     </div>
