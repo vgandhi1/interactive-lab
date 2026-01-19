@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Architect: Complete Reference Guide</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --card-bg: #252526;
+            --text-main: #d4d4d4;
+            --text-accent: #569cd6; /* Blue for keywords */
+            --text-func: #dcdcaa; /* Yellow for functions */
+            --highlight: #c586c0; /* Purple for control flow */
+            --border: #3e3e42;
+            --success: #4ec9b0;
+            --warning: #ce9178;
+            --info: #4fc1ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--success);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 { 
+            color: var(--success); 
+            margin-bottom: 5px; 
+            font-size: 2.5em;
+        }
+        h2 { 
+            color: var(--text-accent); 
+            border-left: 4px solid var(--success); 
+            padding-left: 15px; 
+            margin-top: 40px;
+            margin-bottom: 15px;
+        }
+        h3 { 
+            color: var(--text-func); 
+            margin-top: 20px; 
+            margin-bottom: 10px;
+        }
+        h4 {
+            color: var(--info);
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        p { color: #cccccc; }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #3e3e42;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        .complexity {
+            font-family: 'Courier New', monospace;
+            color: var(--warning);
+            background: rgba(0,0,0,0.3);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .tip-box {
+            background-color: rgba(78, 201, 176, 0.1);
+            border-left: 4px solid var(--success);
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background-color: rgba(206, 145, 120, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        /* Code Block Styling */
+        pre {
+            background-color: #101010;
+            padding: 18px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border-left: 3px solid var(--highlight);
+            margin: 15px 0;
+        }
+        code { 
+            font-family: 'Consolas', 'Monaco', monospace; 
+            color: #9cdcfe; 
+            font-size: 0.95em;
+        }
+        
+        /* Syntax Highlighting */
+        .kw { color: var(--text-accent); } /* Keyword */
+        .fn { color: var(--text-func); } /* Function */
+        .cf { color: var(--highlight); } /* Control Flow */
+        .cmt { color: #6a9955; font-style: italic; } /* Comment */
+        .str { color: var(--warning); } /* String */
+        .num { color: #b5cea8; } /* Number */
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid var(--border);
+            padding: 12px;
+            text-align: left;
+        }
+        .comparison-table th { 
+            background-color: #333; 
+            color: var(--text-accent);
+            font-weight: bold;
+        }
+        .comparison-table tr:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+        
+        .toc {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .toc h3 {
+            color: var(--success);
+            margin-top: 0;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin: 8px 0;
+        }
+        
+        .toc a {
+            color: var(--text-accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .toc a:hover {
+            color: var(--success);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        ul, ol {
+            padding-left: 25px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🚀 DSA Architect</h1>
+        <p>Complete Data Structures & Algorithms Reference Guide</p>
+        <p style="color: #888; font-size: 0.9em;">Master the fundamentals and advanced techniques</p>
+    </header>
+
+    <div class="toc">
+        <h3>📚 Table of Contents</h3>
+        <ul>
+            <li><a href="#arrays">1. Arrays & Strings</a></li>
+            <li><a href="#two-pointers">2. Two Pointers Technique</a></li>
+            <li><a href="#sliding-window">3. Sliding Window</a></li>
+            <li><a href="#hash-tables">4. Hash Tables & Hash Maps</a></li>
+            <li><a href="#linked-lists">5. Linked Lists</a></li>
+            <li><a href="#stacks-queues">6. Stacks & Queues</a></li>
+            <li><a href="#binary-search">7. Binary Search</a></li>
+            <li><a href="#sorting">8. Sorting Algorithms</a></li>
+            <li><a href="#trees">9. Trees & Binary Search Trees</a></li>
+            <li><a href="#bfs-dfs">10. Graph Traversals (BFS & DFS)</a></li>
+            <li><a href="#dp">11. Dynamic Programming</a></li>
+            <li><a href="#greedy">12. Greedy Algorithms</a></li>
+            <li><a href="#backtracking">13. Backtracking</a></li>
+            <li><a href="#heap">14. Heap & Priority Queue</a></li>
+            <li><a href="#trie">15. Trie (Prefix Tree)</a></li>
+            <li><a href="#brute-force">16. Brute Force</a></li>
+        </ul>
+    </div>
+
+    <!-- ARRAYS & STRINGS -->
+    <section id="arrays">
+        <h2>1. Arrays & Strings</h2>
+        <div class="card">
+            <p>Arrays are the most fundamental data structure. They store elements in contiguous memory locations, allowing O(1) access by index.</p>
+            
+            <h3>Key Characteristics</h3>
+            <ul>
+                <li><strong>Access:</strong> <span class="complexity">O(1)</span> - Direct access by index</li>
+                <li><strong>Search:</strong> <span class="complexity">O(n)</span> - May need to check all elements</li>
+                <li><strong>Insertion/Deletion:</strong> <span class="complexity">O(n)</span> - Need to shift elements</li>
+                <li><strong>Space:</strong> <span class="complexity">O(n)</span></li>
+            </ul>
+
+            <h3>Common Operations</h3>
+            <pre><code><span class="cmt"># Python array operations</span>
+arr = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+
+<span class="cmt"># Access: O(1)</span>
+first = arr[<span class="num">0</span>]  <span class="cmt"># 1</span>
+
+<span class="cmt"># Search: O(n)</span>
+<span class="cf">if</span> <span class="num">3</span> <span class="cf">in</span> arr:
+    <span class="fn">print</span>(<span class="str">"Found"</span>)
+
+<span class="cmt"># Insertion: O(n) - shifts elements</span>
+arr.insert(<span class="num">2</span>, <span class="num">99</span>)  <span class="cmt"># [1, 2, 99, 3, 4, 5]</span>
+
+<span class="cmt"># Deletion: O(n)</span>
+arr.remove(<span class="num">99</span>)  <span class="cmt"># [1, 2, 3, 4, 5]</span>
+
+<span class="cmt"># String operations</span>
+s = <span class="str">"hello"</span>
+reversed_s = s[::<span class="num">-1</span>]  <span class="cmt"># "olleh"</span>
+substring = s[<span class="num">1</span>:<span class="num">4</span>]  <span class="cmt"># "ell"</span></code></pre>
+
+            <div class="tip-box">
+                <strong>💡 Tip:</strong> Arrays are perfect when you need fast random access. Use them when you know the size in advance and don't need frequent insertions/deletions in the middle.
+            </div>
+        </div>
+    </section>
+
+    <!-- TWO POINTERS -->
+    <section id="two-pointers">
+        <h2>2. Two Pointers Technique</h2>
+        <div class="card">
+            <p>Use two pointers moving through the array (usually from both ends or at different speeds) to solve problems efficiently.</p>
+            
+            <h3>When to Use</h3>
+            <ul>
+                <li>Sorted arrays</li>
+                <li>Finding pairs that meet a condition</li>
+                <li>Reversing arrays/strings</li>
+                <li>Removing duplicates</li>
+            </ul>
+
+            <h3>Example: Two Sum (Optimized)</h3>
+            <pre><code><span class="cmt"># Problem: Find two numbers in sorted array that sum to target</span>
+<span class="kw">def</span> <span class="fn">two_sum</span>(arr, target):
+    left, right = <span class="num">0</span>, <span class="fn">len</span>(arr) - <span class="num">1</span>
+    
+    <span class="cf">while</span> left < right:
+        current_sum = arr[left] + arr[right]
+        <span class="cf">if</span> current_sum == target:
+            <span class="cf">return</span> [left, right]
+        <span class="cf">elif</span> current_sum < target:
+            left += <span class="num">1</span>  <span class="cmt"># Need larger sum</span>
+        <span class="cf">else</span>:
+            right -= <span class="num">1</span>  <span class="cmt"># Need smaller sum</span>
+    
+    <span class="cf">return</span> <span class="kw">None</span>
+
+<span class="cmt"># Time: O(n), Space: O(1)</span></code></pre>
+
+            <h3>Example: Reverse String</h3>
+            <pre><code><span class="kw">def</span> <span class="fn">reverse_string</span>(s):
+    s = <span class="fn">list</span>(s)  <span class="cmt"># Strings are immutable</span>
+    left, right = <span class="num">0</span>, <span class="fn">len</span>(s) - <span class="num">1</span>
+    
+    <span class="cf">while</span> left < right:
+        s[left], s[right] = s[right], s[left]  <span class="cmt"># Swap</span>
+        left += <span class="num">1</span>
+        right -= <span class="num">1</span>
+    
+    <span class="cf">return</span> <span class="str">''</span>.<span class="fn">join</span>(s)</code></pre>
+        </div>
+    </section>
+
+    <!-- SLIDING WINDOW -->
+    <section id="sliding-window">
+        <h2>3. Sliding Window</h2>
+        <div class="card">
+            <p>Maintain a "window" of elements and slide it through the array. Perfect for substring/subarray problems.</p>
+            
+            <h3>Types</h3>
+            <ul>
+                <li><strong>Fixed Window:</strong> Window size is constant</li>
+                <li><strong>Variable Window:</strong> Window size changes based on condition</li>
+            </ul>
+
+            <h3>Example: Maximum Sum Subarray of Size K</h3>
+            <pre><code><span class="kw">def</span> <span class="fn">max_sum_subarray</span>(arr, k):
+    <span class="cmt"># Fixed window size</span>
+    window_sum = <span class="fn">sum</span>(arr[:k])
+    max_sum = window_sum
+    
+    <span class="cf">for</span> i <span class="cf">in</span> <span class="fn">range</span>(k, <span class="fn">len</span>(arr)):
+        <span class="cmt"># Slide window: remove left, add right</span>
+        window_sum = window_sum - arr[i - k] + arr[i]
+        max_sum = <span class="fn">max</span>(max_sum, window_sum)
+    
+    <span class="cf">return</span> max_sum
+
+<span class="cmt"># Time: O(n), Space: O(1)</span></code></pre>
+
+            <h3>Example: Longest Substring Without Repeating Characters</h3>
+            <pre><code><span class="kw">def</span> <span class="fn">longest_unique_substring</span>(s):
+    <span class="cmt"># Variable window</span>
+    char_map = {}
+    left = <span class="num">0</span>
+    max_len = <span class="num">0</span>
+    
+    <span class="cf">for</span> right <span class="cf">in</span> <span class="fn">range</span>(<span class="fn">len</span>(s)):
+        <span class="cmt"># Shrink window if duplicate found</span>
+        <span class="cf">if</span> s[right] <span class="cf">in</span> char_map:
+            left = <span class="fn">max</span>(left, char_map[s[right]] + <span class="num">1</span>)
+        
+        char_map[s[right]] = right
+        max_len = <span class="fn">max</span>(max_len, right - left + <span class="num">1</span>)
+    
+    <span class="cf">return</span> max_len</code></pre>
+        </div>
+    </section>
+
+    <!-- HASH TABLES -->
+    <section id="hash-tables">
+        <h2>4. Hash Tables & Hash Maps</h2>
+        <div class="card">
+            <p>Store key-value pairs with average O(1) access time. Uses a hash function to map keys to array indices.</p>
+            
+            <h3>Complexity</h3>
+            <ul>
+                <li><strong>Insert:</strong> <span class="complexity">O(1)</span> average, <span class="complexity">O(n)</span> worst case</li>
+                <li><strong>Search:</strong> <span class="complexity">O(1)</span> average, <span class="complexity">O(n)</span> worst case</li>
+                <li><strong>Delete:</strong> <span class="complexity">O(1)</span> average, <span class="complexity">O(n)</span> worst case</li>
+            </ul>
+
+            <h3>Common Use Cases</h3>
+            <ul>
+                <li>Frequency counting</li>
+                <li>Lookup tables</li>
+                <li>Caching (memoization)</li>
+                <li>Removing duplicates</li>
+            </ul>
+
+            <h3>Example: Two Sum (Hash Map Solution)</h3>
+            <pre><code><span class="kw">def</span> <span class="fn">two_sum_hash</span>(arr, target):
+    <span class="cmt"># Store complement -> index</span>
+    seen = {}
+    
+    <span class="cf">for</span> i, num <span class="cf">in</span> <span class="fn">enumerate</span>(arr):
+        complement = target - num
+        <span class="cf">if</span> complement <span class="cf">in</span> seen:
+            <span class="cf">return</span> [seen[complement], i]
+        seen[num] = i
+    
+    <span class="cf">return</span> <span class="kw">None</span>
+
+<span class="cmt"># Time: O(n), Space: O(n)</span></code></pre>
+
+            <div class="tip-box">
+                <strong>💡 Tip:</strong> Hash tables trade space for time. Use when you need fast lookups and can afford extra memory.
+            </div>
+        </div>
+    </section>
+
+    <!-- LINKED LISTS -->
+    <section id="linked-lists">
+        <h2>5. Linked Lists</h2>
+        <div class="card">
+            <p>A linear data structure where elements are stored in nodes, each pointing to the next node.</p>
+            
+            <h3>Types</h3>
+            <ul>
+                <li><strong>Singly Linked List:</strong> Each node points to next only</li>
+                <li><strong>Doubly Linked List:</strong> Each node points to both next and previous</li>
+                <li><strong>Circular Linked List:</strong> Last node points back to first</li>
+            </ul>
+
+            <h3>Complexity</h3>
+            <ul>
+                <li><strong>Access:</strong> <span class="complexity">O(n)</span> - Must traverse from head</li>
+                <li><strong>Insert at head:</strong> <span class="complexity">O(1)</span></li>
+                <li><strong>Insert at tail:</strong> <span class="complexity">O(1)</span> if tail pointer maintained</li>
+                <li><strong>Delete:</strong> <span class="complexity">O(1)</span> if node reference given</li>
+            </ul>
+
+            <h3>Implementation</h3>
+            <pre><code><span class="kw">class</span> ListNode:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, val=<span class="num">0</span>, next=<span class="kw">None</span>):
+        <span class="kw">self</span>.val = val
+        <span class="kw">self</span>.next = next
+
+<span class="cmt"># Example: Reverse Linked List</span>
+<span class="kw">def</span> <span class="fn">reverse_list</span>(head):
+    prev = <span class="kw">None</span>
+    current = head
+    
+    <span class="cf">while</span> current:
+        next_node = current.next  <span class="cmt"># Store next</span>
+        current.next = prev       <span class="cmt"># Reverse link</span>
+        prev = current            <span class="cmt"># Move prev</span>
+        current = next_node       <span class="cmt"># Move current</span>
+    
+    <span class="cf">return</span> prev  <span class="cmt"># New head</span></code></pre>
+        </div>
+    </section>
+
+    <!-- STACKS & QUEUES -->
+    <section id="stacks-queues">
+        <h2>6. Stacks & Queues</h2>
+        <div class="card">
+            <h3>Stack (LIFO - Last In, First Out)</h3>
+            <ul>
+                <li><strong>Operations:</strong> push(), pop(), peek(), isEmpty()</li>
+                <li><strong>All operations:</strong> <span class="complexity">O(1)</span></li>
+                <li><strong>Use cases:</strong> Expression evaluation, backtracking, undo operations</li>
+            </ul>
+
+            <pre><code><span class="cmt"># Stack implementation</span>
+<span class="kw">class</span> Stack:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>):
+        <span class="kw">self</span>.items = []
+    
+    <span class="kw">def</span> <span class="fn">push</span>(<span class="kw">self</span>, item):
+        <span class="kw">self</span>.items.append(item)
+    
+    <span class="kw">def</span> <span class="fn">pop</span>(<span class="kw">self</span>):
+        <span class="cf">return</span> <span class="kw">self</span>.items.pop()
+    
+    <span class="kw">def</span> <span class="fn">peek</span>(<span class="kw">self</span>):
+        <span class="cf">return</span> <span class="kw">self</span>.items[-<span class="num">1</span>] <span class="cf">if</span> <span class="kw">self</span>.items <span class="cf">else</span> <span class="kw">None</span>
+
+<span class="cmt"># Example: Valid Parentheses</span>
+<span class="kw">def</span> <span class="fn">is_valid</span>(s):
+    stack = []
+    pairs = {<span class="str">')'</span>: <span class="str">'('</span>, <span class="str">'}'</span>: <span class="str">'{'</span>, <span class="str">']'</span>: <span class="str">'['</span>}
+    
+    <span class="cf">for</span> char <span class="cf">in</span> s:
+        <span class="cf">if</span> char <span class="cf">in</span> pairs:
+            <span class="cf">if</span> <span class="cf">not</span> stack <span class="cf">or</span> stack.pop() != pairs[char]:
+                <span class="cf">return</span> <span class="kw">False</span>
+        <span class="cf">else</span>:
+            stack.append(char)
+    
+    <span class="cf">return</span> <span class="cf">not</span> stack</code></pre>
+
+            <h3>Queue (FIFO - First In, First Out)</h3>
+            <ul>
+                <li><strong>Operations:</strong> enqueue(), dequeue(), front(), isEmpty()</li>
+                <li><strong>All operations:</strong> <span class="complexity">O(1)</span></li>
+                <li><strong>Use cases:</strong> BFS, task scheduling, buffering</li>
+            </ul>
+
+            <pre><code><span class="cmt"># Queue implementation</span>
+<span class="kw">from</span> collections <span class="kw">import</span> deque
+
+<span class="kw">class</span> Queue:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>):
+        <span class="kw">self</span>.items = deque()
+    
+    <span class="kw">def</span> <span class="fn">enqueue</span>(<span class="kw">self</span>, item):
+        <span class="kw">self</span>.items.append(item)
+    
+    <span class="kw">def</span> <span class="fn">dequeue</span>(<span class="kw">self</span>):
+        <span class="cf">return</span> <span class="kw">self</span>.items.popleft()</code></pre>
+        </div>
+    </section>
+
+    <!-- BINARY SEARCH -->
+    <section id="binary-search">
+        <h2>7. Binary Search</h2>
+        <div class="card">
+            <p>Efficiently search in a <strong>sorted</strong> array by repeatedly dividing the search space in half.</p>
+            
+            <h3>Key Requirements</h3>
+            <ul>
+                <li>Array must be sorted</li>
+                <li>Can access any element by index</li>
+            </ul>
+
+            <h3>Complexity</h3>
+            <ul>
+                <li><strong>Time:</strong> <span class="complexity">O(log n)</span></li>
+                <li><strong>Space:</strong> <span class="complexity">O(1)</span> iterative, <span class="complexity">O(log n)</span> recursive</li>
+            </ul>
+
+            <h3>Standard Binary Search</h3>
+            <pre><code><span class="kw">def</span> <span class="fn">binary_search</span>(arr, target):
+    left, right = <span class="num">0</span>, <span class="fn">len</span>(arr) - <span class="num">1</span>
+    
+    <span class="cf">while</span> left <= right:
+        mid = (left + right) // <span class="num">2</span>
+        
+        <span class="cf">if</span> arr[mid] == target:
+            <span class="cf">return</span> mid
+        <span class="cf">elif</span> arr[mid] < target:
+            left = mid + <span class="num">1</span>
+        <span class="cf">else</span>:
+            right = mid - <span class="num">1</span>
+    
+    <span class="cf">return</span> -<span class="num">1</span>  <span class="cmt"># Not found</span></code></pre>
+
+            <div class="warning-box">
+                <strong>⚠️ Common Mistake:</strong> Using binary search on unsorted arrays. Always verify the array is sorted first!
+            </div>
+        </div>
+    </section>
+
+    <!-- SORTING -->
+    <section id="sorting">
+        <h2>8. Sorting Algorithms</h2>
+        <div class="card">
+            <p>Comparison of common sorting algorithms:</p>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Best</th>
+                        <th>Average</th>
+                        <th>Worst</th>
+                        <th>Space</th>
+                        <th>Stable?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Quick Sort</strong></td>
+                        <td><span class="complexity">O(n log n)</span></td>
+                        <td><span class="complexity">O(n log n)</span></td>
+                        <td><span class="complexity">O(n²)</span></td>
+                        <td><span class="complexity">O(log n)</span></td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Merge Sort</strong></td>
+                        <td><span class="complexity">O(n log n)</span></td>
+                        <td><span class="complexity">O(n log n)</span></td>
+                        <td><span class="complexity">O(n log n)</span></td>
+                        <td><span class="complexity">O(n)</span></td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Heap Sort</strong></td>
+                        <td><span class="complexity">O(n log n)</span></td>
+                        <td><span class="complexity">O(n log n)</span></td>
+                        <td><span class="complexity">O(n log n)</span></td>
+                        <td><span class="complexity">O(1)</span></td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bubble Sort</strong></td>
+                        <td><span class="complexity">O(n)</span></td>
+                        <td><span class="complexity">O(n²)</span></td>
+                        <td><span class="complexity">O(n²)</span></td>
+                        <td><span class="complexity">O(1)</span></td>
+                        <td>Yes</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Quick Sort (Most Common)</h3>
+            <pre><code><span class="kw">def</span> <span class="fn">quicksort</span>(arr):
+    <span class="cf">if</span> <span class="fn">len</span>(arr) <= <span class="num">1</span>:
+        <span class="cf">return</span> arr
+    
+    pivot = arr[<span class="fn">len</span>(arr) // <span class="num">2</span>]
+    left = [x <span class="cf">for</span> x <span class="cf">in</span> arr <span class="cf">if</span> x < pivot]
+    middle = [x <span class="cf">for</span> x <span class="cf">in</span> arr <span class="cf">if</span> x == pivot]
+    right = [x <span class="cf">for</span> x <span class="cf">in</span> arr <span class="cf">if</span> x > pivot]
+    
+    <span class="cf">return</span> <span class="fn">quicksort</span>(left) + middle + <span class="fn">quicksort</span>(right)</code></pre>
+
+            <h3>Merge Sort (Stable, Guaranteed O(n log n))</h3>
+            <pre><code><span class="kw">def</span> <span class="fn">merge_sort</span>(arr):
+    <span class="cf">if</span> <span class="fn">len</span>(arr) <= <span class="num">1</span>:
+        <span class="cf">return</span> arr
+    
+    mid = <span class="fn">len</span>(arr) // <span class="num">2</span>
+    left = <span class="fn">merge_sort</span>(arr[:mid])
+    right = <span class="fn">merge_sort</span>(arr[mid:])
+    
+    <span class="cf">return</span> <span class="fn">merge</span>(left, right)
+
+<span class="kw">def</span> <span class="fn">merge</span>(left, right):
+    result = []
+    i = j = <span class="num">0</span>
+    
+    <span class="cf">while</span> i < <span class="fn">len</span>(left) <span class="cf">and</span> j < <span class="fn">len</span>(right):
+        <span class="cf">if</span> left[i] <= right[j]:
+            result.append(left[i])
+            i += <span class="num">1</span>
+        <span class="cf">else</span>:
+            result.append(right[j])
+            j += <span class="num">1</span>
+    
+    result.extend(left[i:])
+    result.extend(right[j:])
+    <span class="cf">return</span> result</code></pre>
+        </div>
+    </section>
+
+    <!-- TREES -->
+    <section id="trees">
+        <h2>9. Trees & Binary Search Trees</h2>
+        <div class="card">
+            <p>A tree is a hierarchical data structure. A Binary Search Tree (BST) maintains order: left < root < right.</p>
+            
+            <h3>Tree Terminology</h3>
+            <ul>
+                <li><strong>Node:</strong> Element containing data and references</li>
+                <li><strong>Root:</strong> Topmost node</li>
+                <li><strong>Leaf:</strong> Node with no children</li>
+                <li><strong>Height:</strong> Longest path from root to leaf</li>
+                <li><strong>Depth:</strong> Distance from root to node</li>
+            </ul>
+
+            <h3>BST Operations</h3>
+            <ul>
+                <li><strong>Search:</strong> <span class="complexity">O(log n)</span> average, <span class="complexity">O(n)</span> worst (unbalanced)</li>
+                <li><strong>Insert:</strong> <span class="complexity">O(log n)</span> average, <span class="complexity">O(n)</span> worst</li>
+                <li><strong>Delete:</strong> <span class="complexity">O(log n)</span> average, <span class="complexity">O(n)</span> worst</li>
+            </ul>
+
+            <h3>Tree Traversal</h3>
+            <pre><code><span class="kw">class</span> TreeNode:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, val=<span class="num">0</span>, left=<span class="kw">None</span>, right=<span class="kw">None</span>):
+        <span class="kw">self</span>.val = val
+        <span class="kw">self</span>.left = left
+        <span class="kw">self</span>.right = right
+
+<span class="cmt"># Inorder: Left -> Root -> Right</span>
+<span class="kw">def</span> <span class="fn">inorder</span>(root):
+    <span class="cf">if</span> <span class="cf">not</span> root:
+        <span class="cf">return</span>
+    <span class="fn">inorder</span>(root.left)
+    <span class="fn">print</span>(root.val)
+    <span class="fn">inorder</span>(root.right)
+
+<span class="cmt"># Preorder: Root -> Left -> Right</span>
+<span class="kw">def</span> <span class="fn">preorder</span>(root):
+    <span class="cf">if</span> <span class="cf">not</span> root:
+        <span class="cf">return</span>
+    <span class="fn">print</span>(root.val)
+    <span class="fn">preorder</span>(root.left)
+    <span class="fn">preorder</span>(root.right)
+
+<span class="cmt"># Postorder: Left -> Right -> Root</span>
+<span class="kw">def</span> <span class="fn">postorder</span>(root):
+    <span class="cf">if</span> <span class="cf">not</span> root:
+        <span class="cf">return</span>
+    <span class="fn">postorder</span>(root.left)
+    <span class="fn">postorder</span>(root.right)
+    <span class="fn">print</span>(root.val)</code></pre>
+        </div>
+    </section>
+
+    <!-- BFS & DFS -->
+    <section id="bfs-dfs">
+        <h2>10. Graph Traversals (BFS & DFS)</h2>
+        <div class="card">
+            <p>The two fundamental ways to explore nodes in a graph or tree. Choosing the right one depends entirely on the problem structure.</p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>BFS (Breadth-First)</th>
+                        <th>DFS (Depth-First)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Data Structure</strong></td>
+                        <td><span class="tag">Queue</span> (FIFO)</td>
+                        <td><span class="tag">Stack</span> (LIFO) or Recursion</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Movement</strong></td>
+                        <td>Level by level (ripples)</td>
+                        <td>Deep branch exploration</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Best For</strong></td>
+                        <td>Shortest path in unweighted graphs</td>
+                        <td>Maze solving, Cycle detection</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Complexity</strong></td>
+                        <td><span class="complexity">O(V + E)</span></td>
+                        <td><span class="complexity">O(V + E)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>BFS Implementation</h3>
+            <pre><code><span class="kw">from</span> collections <span class="kw">import</span> deque
+
+<span class="kw">def</span> <span class="fn">bfs</span>(graph, start_node):
+    queue = <span class="fn">deque</span>([start_node])
+    visited = <span class="fn">set</span>([start_node])
+
+    <span class="cf">while</span> queue:
+        vertex = queue.<span class="fn">popleft</span>() <span class="cmt"># Dequeue (First In, First Out)</span>
+        <span class="fn">print</span>(vertex)
+
+        <span class="cf">for</span> neighbor <span class="cf">in</span> graph[vertex]:
+            <span class="cf">if</span> neighbor <span class="cf">not in</span> visited:
+                visited.<span class="fn">add</span>(neighbor)
+                queue.<span class="fn">append</span>(neighbor)</code></pre>
+
+            <h3>DFS Implementation (Recursive)</h3>
+            <pre><code><span class="kw">def</span> <span class="fn">dfs</span>(graph, node, visited=<span class="kw">None</span>):
+    <span class="cf">if</span> visited <span class="cf">is</span> <span class="kw">None</span>:
+        visited = <span class="fn">set</span>()
+    
+    visited.<span class="fn">add</span>(node)
+    <span class="fn">print</span>(node)
+    
+    <span class="cf">for</span> neighbor <span class="cf">in</span> graph[node]:
+        <span class="cf">if</span> neighbor <span class="cf">not in</span> visited:
+            <span class="fn">dfs</span>(graph, neighbor, visited)</code></pre>
+
+            <h3>DFS Implementation (Iterative)</h3>
+            <pre><code><span class="kw">def</span> <span class="fn">dfs_iterative</span>(graph, start_node):
+    stack = [start_node]
+    visited = <span class="fn">set</span>([start_node])
+
+    <span class="cf">while</span> stack:
+        vertex = stack.<span class="fn">pop</span>() <span class="cmt"># Pop from stack (Last In, First Out)</span>
+        <span class="fn">print</span>(vertex)
+
+        <span class="cf">for</span> neighbor <span class="cf">in</span> graph[vertex]:
+            <span class="cf">if</span> neighbor <span class="cf">not in</span> visited:
+                visited.<span class="fn">add</span>(neighbor)
+                stack.<span class="fn">append</span>(neighbor)</code></pre>
+        </div>
+    </section>
+
+    <!-- DYNAMIC PROGRAMMING -->
+    <section id="dp">
+        <h2>11. Dynamic Programming (DP)</h2>
+        <div class="card">
+            <p>An optimization technique. It is essentially <strong>Recursion + Memory</strong>. It stores results of expensive function calls and reuses them.</p>
+
+            <h3>The Core Requirements</h3>
+            <ol>
+                <li><strong>Overlapping Subproblems:</strong> The problem can be broken down into smaller problems which are reused several times.</li>
+                <li><strong>Optimal Substructure:</strong> The optimal solution to the problem can be constructed from optimal solutions of its subproblems.</li>
+            </ol>
+
+            <h3>Approach 1: Top-Down (Memoization)</h3>
+            <p>Start from the big problem and break it down. Store results in a dictionary/map.</p>
+            <pre><code><span class="kw">def</span> <span class="fn">fib_memo</span>(n, memo={}):
+    <span class="cf">if</span> n <span class="cf">in</span> memo: <span class="cf">return</span> memo[n] <span class="cmt"># Return cached result</span>
+    <span class="cf">if</span> n <= <span class="num">1</span>: <span class="cf">return</span> n
+    
+    <span class="cmt"># Store result before returning</span>
+    memo[n] = <span class="fn">fib_memo</span>(n-<span class="num">1</span>, memo) + <span class="fn">fib_memo</span>(n-<span class="num">2</span>, memo)
+    <span class="cf">return</span> memo[n]
+
+<span class="cmt"># Time: O(n), Space: O(n)</span></code></pre>
+
+            <h3>Approach 2: Bottom-Up (Tabulation)</h3>
+            <p>Start from the smallest subproblem and iteratively build up the table. Often saves memory (no recursion stack).</p>
+            <pre><code><span class="kw">def</span> <span class="fn">fib_tab</span>(n):
+    <span class="cf">if</span> n <= <span class="num">1</span>: <span class="cf">return</span> n
+    table = [<span class="num">0</span>] * (n + <span class="num">1</span>)
+    table[<span class="num">1</span>] = <span class="num">1</span>
+    
+    <span class="cf">for</span> i <span class="cf">in</span> <span class="fn">range</span>(<span class="num">2</span>, n + <span class="num">1</span>):
+        <span class="cmt"># Current depends on previous two</span>
+        table[i] = table[i-<span class="num">1</span>] + table[i-<span class="num">2</span>]
+        
+    <span class="cf">return</span> table[n]
+
+<span class="cmt"># Time: O(n), Space: O(n)</span></code></pre>
+
+            <h3>Example: Climbing Stairs</h3>
+            <pre><code><span class="cmt"># Problem: You can climb 1 or 2 steps. How many ways to reach top?</span>
+<span class="kw">def</span> <span class="fn">climb_stairs</span>(n):
+    <span class="cf">if</span> n <= <span class="num">2</span>:
+        <span class="cf">return</span> n
+    
+    dp = [<span class="num">0</span>] * (n + <span class="num">1</span>)
+    dp[<span class="num">1</span>] = <span class="num">1</span>
+    dp[<span class="num">2</span>] = <span class="num">2</span>
+    
+    <span class="cf">for</span> i <span class="cf">in</span> <span class="fn">range</span>(<span class="num">3</span>, n + <span class="num">1</span>):
+        dp[i] = dp[i-<span class="num">1</span>] + dp[i-<span class="num">2</span>]
+    
+    <span class="cf">return</span> dp[n]</code></pre>
+        </div>
+    </section>
+
+    <!-- GREEDY -->
+    <section id="greedy">
+        <h2>12. Greedy Algorithms</h2>
+        <div class="card">
+            <p>Make the locally optimal choice at each step, hoping it leads to a globally optimal solution.</p>
+            
+            <h3>When to Use</h3>
+            <ul>
+                <li>Optimization problems</li>
+                <li>Problems with greedy choice property</li>
+                <li>Problems with optimal substructure</li>
+            </ul>
+
+            <div class="warning-box">
+                <strong>⚠️ Warning:</strong> Greedy doesn't always give optimal solution. Verify the problem has greedy choice property!
+            </div>
+
+            <h3>Example: Activity Selection</h3>
+            <pre><code><span class="cmt"># Problem: Select maximum non-overlapping activities</span>
+<span class="kw">def</span> <span class="fn">activity_selection</span>(activities):
+    <span class="cmt"># Sort by end time</span>
+    activities.sort(key=<span class="kw">lambda</span> x: x[<span class="num">1</span>])
+    
+    selected = [activities[<span class="num">0</span>]]
+    last_end = activities[<span class="num">0</span>][<span class="num">1</span>]
+    
+    <span class="cf">for</span> start, end <span class="cf">in</span> activities[<span class="num">1</span>:]:
+        <span class="cf">if</span> start >= last_end:
+            selected.append((start, end))
+            last_end = end
+    
+    <span class="cf">return</span> selected
+
+<span class="cmt"># activities = [(start, end), ...]</span></code></pre>
+
+            <h3>Example: Coin Change (Greedy - when it works)</h3>
+            <pre><code><span class="cmt"># Works for standard coin systems (1, 5, 10, 25)</span>
+<span class="kw">def</span> <span class="fn">coin_change_greedy</span>(coins, amount):
+    coins.sort(reverse=<span class="kw">True</span>)
+    result = []
+    
+    <span class="cf">for</span> coin <span class="cf">in</span> coins:
+        <span class="cf">while</span> amount >= coin:
+            result.append(coin)
+            amount -= coin
+    
+    <span class="cf">return</span> result <span class="cf">if</span> amount == <span class="num">0</span> <span class="cf">else</span> <span class="kw">None</span></code></pre>
+        </div>
+    </section>
+
+    <!-- BACKTRACKING -->
+    <section id="backtracking">
+        <h2>13. Backtracking</h2>
+        <div class="card">
+            <p>Systematically explore all possibilities by building solutions incrementally and abandoning paths that can't lead to a solution.</p>
+            
+            <h3>Key Characteristics</h3>
+            <ul>
+                <li>Build solution step by step</li>
+                <li>Abandon (backtrack) when path is invalid</li>
+                <li>Try all possibilities</li>
+            </ul>
+
+            <h3>Example: N-Queens Problem</h3>
+            <pre><code><span class="kw">def</span> <span class="fn">solve_n_queens</span>(n):
+    result = []
+    board = [<span class="str">'.'</span> * n <span class="cf">for</span> _ <span class="cf">in</span> <span class="fn">range</span>(n)]
+    
+    <span class="kw">def</span> <span class="fn">is_safe</span>(row, col):
+        <span class="cmt"># Check column</span>
+        <span class="cf">for</span> i <span class="cf">in</span> <span class="fn">range</span>(row):
+            <span class="cf">if</span> board[i][col] == <span class="str">'Q'</span>:
+                <span class="cf">return</span> <span class="kw">False</span>
+        
+        <span class="cmt"># Check diagonals</span>
+        <span class="cf">for</span> i, j <span class="cf">in</span> <span class="fn">zip</span>(<span class="fn">range</span>(row-<span class="num">1</span>, -<span class="num">1</span>, -<span class="num">1</span>), 
+                          <span class="fn">range</span>(col-<span class="num">1</span>, -<span class="num">1</span>, -<span class="num">1</span>)):
+            <span class="cf">if</span> board[i][j] == <span class="str">'Q'</span>:
+                <span class="cf">return</span> <span class="kw">False</span>
+        
+        <span class="cf">for</span> i, j <span class="cf">in</span> <span class="fn">zip</span>(<span class="fn">range</span>(row-<span class="num">1</span>, -<span class="num">1</span>, -<span class="num">1</span>), 
+                          <span class="fn">range</span>(col+<span class="num">1</span>, n)):
+            <span class="cf">if</span> board[i][j] == <span class="str">'Q'</span>:
+                <span class="cf">return</span> <span class="kw">False</span>
+        
+        <span class="cf">return</span> <span class="kw">True</span>
+    
+    <span class="kw">def</span> <span class="fn">backtrack</span>(row):
+        <span class="cf">if</span> row == n:
+            result.append([row[:] <span class="cf">for</span> row <span class="cf">in</span> board])
+            <span class="cf">return</span>
+        
+        <span class="cf">for</span> col <span class="cf">in</span> <span class="fn">range</span>(n):
+            <span class="cf">if</span> <span class="fn">is_safe</span>(row, col):
+                board[row] = board[row][:col] + <span class="str">'Q'</span> + board[row][col+<span class="num">1</span>:]
+                <span class="fn">backtrack</span>(row + <span class="num">1</span>)
+                board[row] = board[row][:col] + <span class="str">'.'</span> + board[row][col+<span class="num">1</span>:]  <span class="cmt"># Backtrack</span>
+    
+    <span class="fn">backtrack</span>(<span class="num">0</span>)
+    <span class="cf">return</span> result</code></pre>
+        </div>
+    </section>
+
+    <!-- HEAP -->
+    <section id="heap">
+        <h2>14. Heap & Priority Queue</h2>
+        <div class="card">
+            <p>A complete binary tree that maintains heap property: parent nodes are always greater (max-heap) or smaller (min-heap) than children.</p>
+            
+            <h3>Operations</h3>
+            <ul>
+                <li><strong>Insert:</strong> <span class="complexity">O(log n)</span></li>
+                <li><strong>Extract Min/Max:</strong> <span class="complexity">O(log n)</span></li>
+                <li><strong>Peek:</strong> <span class="complexity">O(1)</span></li>
+            </ul>
+
+            <h3>Python Implementation</h3>
+            <pre><code><span class="kw">import</span> heapq
+
+<span class="cmt"># Min-heap (default)</span>
+heap = []
+heapq.heappush(heap, <span class="num">3</span>)
+heapq.heappush(heap, <span class="num">1</span>)
+heapq.heappush(heap, <span class="num">2</span>)
+
+min_val = heapq.heappop(heap)  <span class="cmt"># 1</span>
+
+<span class="cmt"># Max-heap (negate values)</span>
+max_heap = []
+heapq.heappush(max_heap, -<span class="num">3</span>)
+heapq.heappush(max_heap, -<span class="num">1</span>)
+max_val = -heapq.heappop(max_heap)  <span class="cmt"># 3</span>
+
+<span class="cmt"># Example: Find K largest elements</span>
+<span class="kw">def</span> <span class="fn">k_largest</span>(arr, k):
+    <span class="cf">return</span> heapq.nlargest(k, arr)</code></pre>
+        </div>
+    </section>
+
+    <!-- TRIE -->
+    <section id="trie">
+        <h2>15. Trie (Prefix Tree)</h2>
+        <div class="card">
+            <p>A tree-like data structure for storing strings. Each node represents a character, and paths from root to leaf represent words.</p>
+            
+            <h3>Use Cases</h3>
+            <ul>
+                <li>Autocomplete</li>
+                <li>Spell checker</li>
+                <li>IP routing</li>
+                <li>Prefix matching</li>
+            </ul>
+
+            <h3>Complexity</h3>
+            <ul>
+                <li><strong>Insert:</strong> <span class="complexity">O(m)</span> where m is word length</li>
+                <li><strong>Search:</strong> <span class="complexity">O(m)</span></li>
+                <li><strong>Prefix Search:</strong> <span class="complexity">O(m)</span></li>
+            </ul>
+
+            <h3>Implementation</h3>
+            <pre><code><span class="kw">class</span> TrieNode:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>):
+        <span class="kw">self</span>.children = {}
+        <span class="kw">self</span>.is_end = <span class="kw">False</span>
+
+<span class="kw">class</span> Trie:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>):
+        <span class="kw">self</span>.root = TrieNode()
+    
+    <span class="kw">def</span> <span class="fn">insert</span>(<span class="kw">self</span>, word):
+        node = <span class="kw">self</span>.root
+        <span class="cf">for</span> char <span class="cf">in</span> word:
+            <span class="cf">if</span> char <span class="cf">not in</span> node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end = <span class="kw">True</span>
+    
+    <span class="kw">def</span> <span class="fn">search</span>(<span class="kw">self</span>, word):
+        node = <span class="kw">self</span>.root
+        <span class="cf">for</span> char <span class="cf">in</span> word:
+            <span class="cf">if</span> char <span class="cf">not in</span> node.children:
+                <span class="cf">return</span> <span class="kw">False</span>
+            node = node.children[char]
+        <span class="cf">return</span> node.is_end
+    
+    <span class="kw">def</span> <span class="fn">starts_with</span>(<span class="kw">self</span>, prefix):
+        node = <span class="kw">self</span>.root
+        <span class="cf">for</span> char <span class="cf">in</span> prefix:
+            <span class="cf">if</span> char <span class="cf">not in</span> node.children:
+                <span class="cf">return</span> <span class="kw">False</span>
+            node = node.children[char]
+        <span class="cf">return</span> <span class="kw">True</span></code></pre>
+        </div>
+    </section>
+
+    <!-- BRUTE FORCE -->
+    <section id="brute-force">
+        <h2>16. Brute Force Algorithms</h2>
+        <div class="card">
+            <p>The "Try Everything" approach. While rarely the most efficient, it is the foundation for verifying correctness and benchmarking optimized solutions.</p>
+            
+            <h3>The Concept</h3>
+            <ul>
+                <li><strong>Mechanism:</strong> Enumerate all possible candidates for the solution and check whether each candidate satisfies the problem's statement.</li>
+                <li><strong>Time Complexity:</strong> Typically <span class="complexity">O(n²)</span> (Quadratic) or <span class="complexity">O(2^n)</span> (Exponential).</li>
+                <li><strong>When to use:</strong> When input size (n) is very small, or as a starting point in an interview.</li>
+            </ul>
+
+            <h3>Example: Two Sum (Naive)</h3>
+            <pre><code><span class="cmt"># Problem: Find two numbers in arr that sum to target</span>
+<span class="kw">def</span> <span class="fn">brute_force_two_sum</span>(arr, target):
+    n = <span class="fn">len</span>(arr)
+    <span class="cmt"># Nested loops check every pair</span>
+    <span class="cf">for</span> i <span class="cf">in</span> <span class="fn">range</span>(n):
+        <span class="cf">for</span> j <span class="cf">in</span> <span class="fn">range</span>(i + <span class="num">1</span>, n):
+            <span class="cf">if</span> arr[i] + arr[j] == target:
+                <span class="cf">return</span> [i, j]
+    <span class="cf">return</span> <span class="kw">None</span>
+
+<span class="cmt"># Time: O(n²), Space: O(1)</span></code></pre>
+
+            <div class="tip-box">
+                <strong>💡 Tip:</strong> Always start with brute force to understand the problem, then optimize. It's better to have a working solution than no solution!
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>DSA Architect • Complete Reference Guide • Master the fundamentals</p>
+        <p style="color: #555; margin-top: 10px;">Practice regularly and understand the trade-offs between time and space complexity!</p>
+    </footer>
+</div>
+
+</body>
+</html>
