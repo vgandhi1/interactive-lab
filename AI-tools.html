@@ -1,127 +1,147 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>AI / ML Tools Glossary</title>
-</head>
-<body>
+<hr>
 
-<h1>AI / ML / GenAI Tools – Brief Definitions</h1>
+<h2>Model Architecture & Capacity</h2>
 
-<h2>Model & Inference Tools</h2>
+<p><b>Model Parameters</b>: Trainable numerical values (weights and biases) inside a model that encode learned knowledge.</p>
 
-<p><b>OpenAI API</b>: Cloud API providing access to large language models for text, vision, embeddings, and tool calling.</p>
+<p><b>Parameter Count</b>: Total number of trainable parameters in a model, often used as a proxy for model capacity.</p>
 
-<p><b>Ollama</b>: Local model runner that allows running LLMs on personal machines with simple CLI and API support.</p>
+<p><b>Overparameterization</b>: Condition where a model has more parameters than strictly needed, enabling better generalization in deep learning.</p>
 
-<p><b>LM Studio</b>: Desktop application for running and testing local LLMs with a GUI.</p>
+<p><b>Model Capacity</b>: Ability of a model to fit complex functions, influenced by depth, width, and parameters.</p>
 
-<p><b>Hugging Face Transformers</b>: Library providing pre-trained models and tools for NLP, vision, and multimodal tasks.</p>
-
-<p><b>vLLM</b>: High-throughput LLM inference engine optimized for serving models efficiently.</p>
-
-<p><b>Triton Inference Server</b>: NVIDIA framework for scalable deployment of ML models on GPUs.</p>
+<p><b>Scaling Laws</b>: Empirical relationships showing that performance improves predictably with more data, parameters, and compute.</p>
 
 <hr>
 
-<h2>Embeddings & Vector Databases</h2>
+<h2>Model Types & Categories</h2>
 
-<p><b>FAISS</b>: Library for efficient similarity search over high-dimensional vectors.</p>
+<p><b>Foundation Model</b>: Large pre-trained model adaptable to many downstream tasks through prompting or fine-tuning.</p>
 
-<p><b>Pinecone</b>: Fully managed vector database for large-scale semantic search.</p>
+<p><b>Frontier Model</b>: State-of-the-art large-scale models at the cutting edge of performance, cost, and capability.</p>
 
-<p><b>Weaviate</b>: Open-source vector database with hybrid search capabilities.</p>
+<p><b>Base Model</b>: Pre-trained model without task-specific alignment or instruction tuning.</p>
 
-<p><b>Chroma</b>: Lightweight vector database optimized for local and small-scale RAG systems.</p>
+<p><b>Instruction-Tuned Model</b>: Model fine-tuned to follow human instructions and prompts.</p>
 
-<p><b>Milvus</b>: Open-source vector database designed for large-scale embedding storage.</p>
-
-<hr>
-
-<h2>RAG & LLM Orchestration Frameworks</h2>
-
-<p><b>LangChain</b>: Framework for building LLM applications using chains, tools, and agents.</p>
-
-<p><b>LlamaIndex</b>: Data framework focused on connecting LLMs with structured and unstructured data sources.</p>
-
-<p><b>Haystack</b>: Framework for building search and RAG pipelines with modular components.</p>
+<p><b>Chat Model</b>: Instruction-tuned model optimized for conversational interactions.</p>
 
 <hr>
 
-<h2>Agent & Workflow Tools</h2>
+<h2>Training & Adaptation Techniques</h2>
 
-<p><b>AutoGen</b>: Framework for building multi-agent conversational systems.</p>
+<p><b>Pretraining</b>: Initial large-scale training phase where a model learns general language patterns.</p>
 
-<p><b>CrewAI</b>: Agent orchestration framework emphasizing role-based agent collaboration.</p>
+<p><b>Fine-Tuning</b>: Additional training on task- or domain-specific data.</p>
 
-<p><b>Semantic Kernel</b>: Microsoft framework for integrating LLMs with plugins and memory.</p>
+<p><b>Instruction Tuning</b>: Fine-tuning using prompt–response pairs to improve usability.</p>
 
-<hr>
+<p><b>Alignment</b>: Process of shaping model behavior to align with human intent and values.</p>
 
-<h2>Model Training & Fine-Tuning</h2>
+<p><b>RLHF (Reinforcement Learning from Human Feedback)</b>: Training method using human preferences as reward signals.</p>
 
-<p><b>PyTorch</b>: Deep learning framework for building and training neural networks.</p>
+<p><b>LoRA (Low-Rank Adaptation)</b>: Parameter-efficient fine-tuning technique updating low-rank matrices.</p>
 
-<p><b>TensorFlow</b>: End-to-end ML framework for training and deployment.</p>
-
-<p><b>PEFT</b>: Library for parameter-efficient fine-tuning techniques such as LoRA.</p>
-
-<p><b>LoRA</b>: Fine-tuning method that updates low-rank matrices instead of full model weights.</p>
+<p><b>PEFT (Parameter-Efficient Fine-Tuning)</b>: Methods that adapt models while updating minimal parameters.</p>
 
 <hr>
 
-<h2>MLOps & Monitoring</h2>
+<h2>Inference & Performance Optimization</h2>
 
-<p><b>MLflow</b>: Platform for experiment tracking, model versioning, and deployment.</p>
+<p><b>Inference</b>: Running a trained model to generate predictions or outputs.</p>
 
-<p><b>Weights & Biases</b>: Tool for experiment tracking, visualization, and model monitoring.</p>
+<p><b>Latency</b>: Time taken for a model to return a response.</p>
 
-<p><b>Prometheus</b>: Monitoring system for metrics collection and alerting.</p>
+<p><b>Throughput</b>: Number of requests processed per unit time.</p>
 
-<p><b>Grafana</b>: Visualization platform for monitoring dashboards.</p>
+<p><b>Batching</b>: Grouping multiple requests to improve GPU utilization.</p>
 
-<hr>
-
-<h2>Backend & Serving</h2>
-
-<p><b>FastAPI</b>: High-performance Python framework for building ML and AI APIs.</p>
-
-<p><b>Docker</b>: Containerization tool for packaging applications and dependencies.</p>
-
-<p><b>Kubernetes</b>: Container orchestration system for scalable deployments.</p>
-
-<p><b>NGINX</b>: Web server and reverse proxy often used in AI system deployments.</p>
+<p><b>KV Cache</b>: Cached key-value attention tensors to speed up autoregressive generation.</p>
 
 <hr>
 
-<h2>Data Processing</h2>
+<h2>Quantization & Efficiency</h2>
 
-<p><b>Pandas</b>: Python library for data manipulation and analysis.</p>
+<p><b>Quantization</b>: Reducing numerical precision of model weights to improve speed and reduce memory usage.</p>
 
-<p><b>NumPy</b>: Core numerical computing library in Python.</p>
+<p><b>FP32 / FP16 / BF16</b>: Floating-point precision formats used during training and inference.</p>
 
-<p><b>Apache Kafka</b>: Distributed event streaming platform for real-time data pipelines.</p>
+<p><b>INT8 / INT4</b>: Low-precision integer formats used in quantized models.</p>
 
-<p><b>Apache Airflow</b>: Workflow orchestration tool for batch data pipelines.</p>
+<p><b>Post-Training Quantization</b>: Quantization applied after model training.</p>
 
-<hr>
+<p><b>Quantization-Aware Training</b>: Training process that accounts for quantization effects.</p>
 
-<h2>Evaluation & Safety</h2>
-
-<p><b>Ragas</b>: Evaluation framework for RAG systems focusing on faithfulness and relevance.</p>
-
-<p><b>Guardrails AI</b>: Tool for enforcing structured output and safety constraints on LLMs.</p>
-
-<p><b>Pydantic</b>: Data validation library commonly used to enforce structured LLM outputs.</p>
+<p><b>Model Compression</b>: Techniques to reduce model size, including quantization and pruning.</p>
 
 <hr>
 
-<h2>Visualization & UI</h2>
+<h2>Memory & Context Management</h2>
 
-<p><b>Streamlit</b>: Python framework for building interactive ML and AI dashboards.</p>
+<p><b>Context Window</b>: Maximum number of tokens a model can process at once.</p>
 
-<p><b>Gradio</b>: Tool for creating simple web interfaces for ML models.</p>
+<p><b>Prompt Truncation</b>: Removal of older tokens when context exceeds window limit.</p>
+
+<p><b>Long-Context Model</b>: Models designed to handle very large context windows.</p>
+
+<p><b>Sliding Window Attention</b>: Attention mechanism that limits computation to nearby tokens.</p>
 
 <hr>
 
-</body>
-</html>
+<h2>Generation & Decoding</h2>
+
+<p><b>Autoregressive Generation</b>: Generating tokens one at a time based on previous outputs.</p>
+
+<p><b>Temperature</b>: Controls randomness of generated outputs.</p>
+
+<p><b>Top-K Sampling</b>: Limits token selection to top K most probable tokens.</p>
+
+<p><b>Top-P (Nucleus Sampling)</b>: Selects tokens whose cumulative probability exceeds P.</p>
+
+<p><b>Beam Search</b>: Deterministic decoding strategy exploring multiple candidate sequences.</p>
+
+<hr>
+
+<h2>Reliability, Safety & Evaluation</h2>
+
+<p><b>Hallucination</b>: Confident but incorrect model output.</p>
+
+<p><b>Faithfulness</b>: Degree to which generated content is grounded in provided context.</p>
+
+<p><b>Ground Truth</b>: Correct reference data used for evaluation.</p>
+
+<p><b>Guardrails</b>: Constraints ensuring safe and correct model behavior.</p>
+
+<p><b>Evaluation Harness</b>: Framework for systematically testing model outputs.</p>
+
+<hr>
+
+<h2>Deployment & Operations</h2>
+
+<p><b>Model Serving</b>: Infrastructure for deploying models as APIs.</p>
+
+<p><b>Cold Start</b>: Initial latency when a model is first loaded.</p>
+
+<p><b>Autoscaling</b>: Automatically adjusting resources based on load.</p>
+
+<p><b>Observability</b>: Monitoring inputs, outputs, latency, errors, and drift.</p>
+
+<p><b>Prompt Versioning</b>: Tracking changes to prompts over time.</p>
+
+<hr>
+
+<h2>Advanced & Emerging Concepts</h2>
+
+<p><b>Chain-of-Thought (CoT)</b>: Intermediate reasoning steps generated by a model.</p>
+
+<p><b>Self-Consistency</b>: Generating multiple reasoning paths and selecting the best answer.</p>
+
+<p><b>Tool-Augmented LLM</b>: LLM that can invoke external tools during inference.</p>
+
+<p><b>Agentic AI</b>: Systems composed of autonomous agents coordinating actions.</p>
+
+<p><b>Synthetic Data</b>: Artificially generated data used for training or evaluation.</p>
+
+<p><b>Model Distillation</b>: Training a smaller model to mimic a larger one.</p>
+
+<hr>
