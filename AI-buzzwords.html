@@ -1057,7 +1057,80 @@
             );
         };
 
+        // --- SEARCH COMPONENT ---
+        const SearchBar = ({ searchQuery, setSearchQuery }) => {
+            const concepts = [
+                { id: 'transformer', keywords: ['transformer', 'architecture', 'attention', 'self-attention', 'encoder', 'decoder'], component: 'TransformerVisualizer' },
+                { id: 'temperature', keywords: ['temperature', 'randomness', 'creativity', 'sampling', 'generation'], component: 'TemperatureVisualizer' },
+                { id: 'learning', keywords: ['zero-shot', 'few-shot', 'learning', 'examples', 'prompting'], component: 'LearningComparison' },
+                { id: 'tokens', keywords: ['tokens', 'tokenization', 'context window', 'token limit'], component: 'TokensVisualizer' },
+                { id: 'context', keywords: ['context engineering', 'context window', 'attention budget', 'rag', 'retrieval'], component: 'ContextEngineering' },
+                { id: 'rag', keywords: ['rag', 'retrieval augmented generation', 'vector', 'embedding', 'semantic search'], component: 'RAGVisualizer' },
+                { id: 'agents', keywords: ['agents', 'agentic', 'autonomous', 'reactive', 'deliberative', 'multi-agent'], component: 'AIAgentsVisualizer' }
+            ];
+
+            const getMatchingConcepts = (query) => {
+                if (!query.trim()) return concepts.map(c => c.id);
+                const q = query.toLowerCase();
+                return concepts.filter(c => 
+                    c.keywords.some(kw => kw.includes(q) || q.includes(kw))
+                ).map(c => c.id);
+            };
+
+            const matchingConcepts = getMatchingConcepts(searchQuery);
+            const matchCount = matchingConcepts.length;
+
+            return (
+                <div className="glass-card rounded-2xl p-6 mb-8 animate-fade-in animate-delay-100">
+                    <div className="flex flex-col sm:flex-row gap-4 items-center">
+                        <div className="flex-1 w-full">
+                            <input 
+                                type="text" 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search concepts... (e.g., 'transformer', 'temperature', 'RAG', 'agents')"
+                                className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-slate-800"
+                            />
+                        </div>
+                        <button 
+                            onClick={() => setSearchQuery('')}
+                            className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition-all"
+                        >
+                            Clear
+                        </button>
+                    </div>
+                    {searchQuery && (
+                        <div className="mt-4 text-sm text-slate-600">
+                            Found {matchCount} concept{matchCount !== 1 ? 's' : ''} matching "{searchQuery}"
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         const App = () => {
+            const [searchQuery, setSearchQuery] = useState('');
+            
+            const concepts = [
+                { id: 'transformer', keywords: ['transformer', 'architecture', 'attention'], component: <TransformerVisualizer key="transformer" /> },
+                { id: 'temperature', keywords: ['temperature', 'randomness', 'creativity'], component: <TemperatureVisualizer key="temperature" /> },
+                { id: 'learning', keywords: ['zero-shot', 'few-shot', 'learning'], component: <LearningComparison key="learning" /> },
+                { id: 'tokens', keywords: ['tokens', 'tokenization', 'context'], component: <TokensVisualizer key="tokens" /> },
+                { id: 'context', keywords: ['context engineering', 'context window'], component: <ContextEngineering key="context" /> },
+                { id: 'rag', keywords: ['rag', 'retrieval', 'vector'], component: <RAGVisualizer key="rag" /> },
+                { id: 'agents', keywords: ['agents', 'agentic', 'autonomous'], component: <AIAgentsVisualizer key="agents" /> }
+            ];
+
+            const getMatchingConcepts = (query) => {
+                if (!query.trim()) return concepts;
+                const q = query.toLowerCase();
+                return concepts.filter(c => 
+                    c.keywords.some(kw => kw.includes(q) || q.includes(kw))
+                );
+            };
+
+            const visibleConcepts = getMatchingConcepts(searchQuery);
+
             return (
                 <div className="content-wrapper max-w-7xl mx-auto py-8 lg:py-12 px-4 lg:px-8">
                     <header className="mb-10 lg:mb-16 text-center animate-fade-in">
@@ -1074,13 +1147,17 @@
                         </p>
                     </header>
 
-                    <TransformerVisualizer />
-                    <TemperatureVisualizer />
-                    <LearningComparison />
-                    <TokensVisualizer />
-                    <ContextEngineering />
-                    <RAGVisualizer />
-                    <AIAgentsVisualizer />
+                    <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
+                    {visibleConcepts.length > 0 ? (
+                        visibleConcepts.map(c => c.component)
+                    ) : (
+                        <div className="glass-card rounded-2xl p-8 text-center">
+                            <div className="text-4xl mb-4">🔍</div>
+                            <h3 className="text-xl font-bold text-slate-800 mb-2">No matches found</h3>
+                            <p className="text-slate-600">Try searching for: transformer, temperature, RAG, agents, tokens, or context</p>
+                        </div>
+                    )}
 
                     <footer className="text-center text-slate-500 text-sm mt-12 py-6 border-t border-slate-200/50">
                         <div className="glass-card rounded-2xl p-4 max-w-2xl mx-auto">
