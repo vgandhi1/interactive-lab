@@ -33,7 +33,7 @@ A setup guide for the homelab enthusiastic to have Nexcloud (cloud services loca
 
 ### 4. Weather WebApp (External)
 A robust application for real-time weather tracking and forecasting.
-* **Live Link:** [Weather WebApp](#) *(Replace with your link)*
+* **Live Link:** [Weather WebApp](https://vgandhi1.github.io/weather-WebApp/)
 * **Note:** This project is hosted in a separate repository but is integrated into this collection's main hub.
 
 ---
