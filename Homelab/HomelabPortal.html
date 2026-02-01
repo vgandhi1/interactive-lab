@@ -9,7 +9,10 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Use specific version of lucide for stability -->
+    <script src="https://unpkg.com/lucide@0.263.1"></script>
+    <!-- Mermaid JS for Diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -27,39 +30,85 @@
             from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* Mermaid styling adjustment */
+        .mermaid { 
+            display: flex; 
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .mermaid-container {
+            overflow-x: auto;
+            overflow-y: auto;
+            padding: 1.5rem;
+            width: 100%;
+        }
+        
+        .mermaid svg {
+            max-width: 100% !important;
+            height: auto !important;
+        }
     </style>
 </head>
-<body>
+<body class="bg-slate-50">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        /**
-         * Icon component that wraps the <i> tag in a span.
-         * This isolates the Lucide DOM manipulation from React's virtual DOM
-         * to prevent the "removeChild" error.
-         */
-        const Icon = ({ name, className = "w-5 h-5" }) => {
-            return (
-                <span className="inline-flex items-center justify-center pointer-events-none">
-                    <i data-lucide={name} className={className}></i>
-                </span>
-            );
+        // Initialize Mermaid
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            fontFamily: 'Inter',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 80,
+                rankSpacing: 100
+            },
+            themeVariables: {
+                fontSize: '20px',
+                fontFamily: 'Inter, sans-serif',
+                primaryColor: '#e0e7ff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#6366f1',
+                lineColor: '#475569',
+                secondaryColor: '#f1f5f9',
+                tertiaryColor: '#ffffff',
+                nodeTextColor: '#1e293b',
+                mainBkgColor: '#ffffff',
+                defaultLinkColor: '#475569'
+            }
+        });
+
+        // Icon Component to handle Lucide Icons in React without a build step
+        const Icon = ({ name, className }) => {
+            // In the browser CDN version, icons are often at lucide.icons[name]
+            // We use dangerouslySetInnerHTML because the library gives us SVG data
+            // Alternatively, we let lucide.createIcons() handle it via data attributes
+            
+            return <i data-lucide={name} className={className}></i>;
         };
 
         const App = () => {
             const [activeSection, setActiveSection] = useState('overview');
 
-            /**
-             * Trigger Lucide to scan the DOM and replace <i> with <svg>.
-             * We run this after every render to ensure new sections get icons.
-             */
+            // Re-run lucide.createIcons() whenever the active section changes
             useEffect(() => {
                 if (window.lucide) {
                     window.lucide.createIcons();
                 }
-            });
+                if (window.mermaid) {
+                    // Slight delay to ensure DOM is ready for mermaid
+                    setTimeout(() => {
+                        window.mermaid.contentLoaded();
+                    }, 100);
+                }
+            }, [activeSection]); // Add activeSection as dependency
 
             const navigation = [
                 { id: 'overview', name: 'Architecture', icon: 'layout' },
@@ -74,57 +123,123 @@
             const sections = {
                 overview: (
                     <div className="space-y-6">
-                        <h2 className="text-2xl font-bold text-slate-800">Homelab Architecture Overview</h2>
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-2xl font-bold text-slate-800">Homelab Architecture</h2>
+                            <span className="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">LIVE</span>
+                        </div>
+
+                        {/* Mermaid Diagram Container */}
+                        <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl border border-slate-200 shadow-sm mermaid-container">
+                            <div className="mermaid">
+{`flowchart LR
+    User["🌐 User Device"]
+    
+    subgraph Access["🌐 Access Methods"]
+        CF["☁️ Cloudflare Edge"]
+        TS["🔐 Tailscale VPN"]
+    end
+    
+    subgraph MainServer["🖥️ Main Server - Pi 4B"]
+        direction TB
+        Tunnel["🔒 Cloudflared Tunnel"]
+        NPM["⚙️ Nginx Proxy Manager"]
+        
+        subgraph PublicApps["🌍 Public Apps"]
+            Static["🌤️ WeatherApp"]
+        end
+        
+        subgraph PrivateApps["🔒 Private Apps"]
+            direction TB
+            Nextcloud["☁️ Nextcloud"]
+            Portainer["🐳 Portainer"]
+        end
+        
+        subgraph MonitoringData["📊 Monitoring & Data"]
+            direction TB
+            Grafana["📊 Grafana"]
+            HA["🏠 Home Assistant"]
+            Influx["📈 InfluxDB"]
+        end
+        
+        subgraph Storage["💾 Storage"]
+            direction TB
+            MariaDB["🗄️ MariaDB"]
+            HDD[("💿 External HDD")]
+        end
+    end
+    
+    subgraph Remote["🌍 Remote Nodes"]
+        direction TB
+        PiZero["🛡️ Pi-hole"]
+        Sensor["🌡️ Sensor Node"]
+    end
+    
+    %% Public Flow - Cloudflare Tunnel
+    User -->|HTTPS| CF
+    CF -->|Tunnel| Tunnel
+    Tunnel --> NPM
+    NPM -->|Route| Static
+    
+    %% Private Flow - Tailscale VPN
+    User -->|VPN| TS
+    TS -->|Private| NPM
+    NPM -->|Route| Nextcloud
+    NPM -->|Route| Portainer
+    NPM -->|Route| Grafana
+    NPM -->|Route| HA
+    
+    %% Data Connections - Clean Layout
+    Nextcloud --> MariaDB
+    Nextcloud --> HDD
+    Influx -->|Read| Grafana
+    HA -->|Write| Influx
+    Sensor -->|Write| Influx
+    NPM -.->|Proxy| PiZero
+    
+    %% Styling
+    classDef internet fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#000
+    classDef public fill:#fef3c7,stroke:#f59e0b,stroke-width:3px,color:#000
+    classDef private fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#000
+    classDef vpn fill:#e0e7ff,stroke:#6366f1,stroke-width:2px,color:#000
+    classDef router fill:#ede9fe,stroke:#7c3aed,stroke-width:3px,color:#000
+    classDef data fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#000
+    classDef remote fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#000
+    
+    class User,CF internet
+    class Tunnel,PublicApps public
+    class TS,PrivateApps vpn
+    class NPM router
+    class Influx,MariaDB,HDD data
+    class PiZero,Sensor remote`}
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                                <h3 className="flex items-center font-semibold text-blue-700 mb-2">
-                                    <Icon name="globe" className="mr-2" /> Public Zone
+                            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                                <h3 className="flex items-center font-semibold text-amber-700 mb-2">
+                                    <Icon name="globe" className="mr-2" /> Public Zone - Cloudflare Tunnel
                                 </h3>
-                                <ul className="text-sm text-blue-900 space-y-1">
+                                <p className="text-xs text-amber-600 mb-2">Accessible via Cloudflare Tunnel (public internet)</p>
+                                <ul className="text-sm text-amber-900 space-y-1">
                                     <li>• weather.datasharkvag.com (Static)</li>
                                     <li>• hedging.datasharkvag.com (Static)</li>
                                     <li>• Cloudflare Tunnel Relay</li>
                                 </ul>
                             </div>
-                            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-                                <h3 className="flex items-center font-semibold text-emerald-700 mb-2">
-                                    <Icon name="lock" className="mr-2" /> Private Zone
+                            <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                                <h3 className="flex items-center font-semibold text-blue-700 mb-2">
+                                    <Icon name="lock" className="mr-2" /> Private Zone - Tailscale VPN
                                 </h3>
-                                <ul className="text-sm text-emerald-900 space-y-1">
+                                <p className="text-xs text-blue-600 mb-2">Accessible only via Tailscale VPN (private network)</p>
+                                <ul className="text-sm text-blue-900 space-y-1">
                                     <li>• Home Assistant (Host Mode)</li>
                                     <li>• Nextcloud & Tailscale Node</li>
                                     <li>• Portainer CE Management</li>
-                                    <li>• InfluxDB (Sensor Data) & Grafana</li>
+                                    <li>• Grafana</li> & InfluxDB (Sensor Data)
                                 </ul>
                             </div>
                         </div>
-                        <div className="p-6 bg-slate-900 text-white rounded-xl">
-                            <h3 className="text-lg font-mono mb-4 text-emerald-400">Node Configuration</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center space-x-3">
-                                    <Icon name="cpu" className="text-slate-400" />
-                                    <div>
-                                        <p className="font-bold">Main Server (Pi 4B)</p>
-                                        <p className="text-xs text-slate-300">Docker Engine | Nginx Proxy Manager | 8GB RAM</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                    <Icon name="wifi" className="text-slate-400" />
-                                    <div>
-                                        <p className="font-bold">DNS Server (Pi Zero)</p>
-                                        <p className="text-xs text-slate-300">Pi-hole | Tailscale Node</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                    <Icon name="thermometer" className="text-slate-400" />
-                                    <div>
-                                        <p className="font-bold">Sensor Node (Remote Pi)</p>
-                                        <p className="text-xs text-slate-300">Sense HAT | Python Script | InfluxDB Writer</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </div>  
                 ),
                 docker: (
                     <div className="space-y-4">
@@ -187,27 +302,28 @@
                             {/* Remote Config */}
                             <div className="p-6 bg-indigo-50 border border-indigo-200 rounded-xl">
                                 <p className="text-indigo-800 font-bold text-sm flex items-center mb-2">
-                                    <Icon name="smartphone" className="mr-2 w-4 h-4" /> Remote Ad Blocking (Tailscale)
+                                    <Icon name="smartphone" className="mr-2 w-4 h-4" /> Remote Ad Blocking (Tailscale DNS Magic)
                                 </p>
                                 <p className="text-sm text-indigo-700 mb-2">
-                                    Enables ad-blocking on mobile devices anywhere in the world via VPN.
+                                    Enables ad-blocking on mobile devices anywhere in the world via VPN using Tailscale's global nameserver feature.
                                 </p>
                                 <div className="space-y-3 mt-3">
                                     <div className="bg-white p-3 rounded border border-indigo-100">
-                                        <p className="text-xs font-semibold text-indigo-900 mb-1">Step 1: Pi-hole Settings</p>
+                                        <p className="text-xs font-semibold text-indigo-900 mb-1">Step 1: Pi-hole Settings (Pi Zero)</p>
                                         <p className="text-[10px] text-slate-500">
                                             Go to <span className="font-mono bg-slate-100 px-1 rounded">Settings &gt; DNS &gt; Interface Settings</span> and select 
                                             <span className="font-bold text-indigo-600"> "Permit all origins"</span>. 
-                                            (Required because VPN traffic appears to come from a different subnet).
+                                            This is required because VPN traffic appears to come from the Tailscale subnet (100.x.x.x), not your local LAN.
                                         </p>
                                     </div>
                                     <div className="bg-white p-3 rounded border border-indigo-100">
                                         <p className="text-xs font-semibold text-indigo-900 mb-1">Step 2: Tailscale Admin Console</p>
-                                        <p className="text-[10px] text-slate-500">
-                                            Navigate to <span className="font-mono bg-slate-100 px-1 rounded">DNS</span> settings in Tailscale.
-                                            Add the <strong>Tailscale IP</strong> of your Pi Zero as a "Global Nameserver".
-                                            Enable <strong>"Override Local DNS"</strong> to force all mobile traffic through the Pi-hole.
-                                        </p>
+                                        <ul className="list-disc ml-4 text-[10px] text-slate-500 space-y-1">
+                                            <li>Navigate to the <span className="font-mono bg-slate-100 px-1 rounded">DNS</span> tab in the Tailscale dashboard.</li>
+                                            <li>Under "Global Nameservers", click "Add Nameserver".</li>
+                                            <li>Enter the <strong>Tailscale IP Address</strong> of your Pi Zero.</li>
+                                            <li>Enable <strong>"Override Local DNS"</strong>. This forces all connected devices to use Pi-hole for DNS, blocking ads even on cellular data.</li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
@@ -259,7 +375,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 import time
 
 # Configuration
-INFLUX_URL = "http://192.168.100.100:8086" # IP of Main Server
+INFLUX_URL = "http://192.168.1.50:8086" # IP of Main Server
 INFLUX_TOKEN = "your-super-secret-auth-token"
 INFLUX_ORG = "myorg"
 INFLUX_BUCKET = "mybucket"
