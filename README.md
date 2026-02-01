@@ -21,6 +21,7 @@ A robust application for real-time weather tracking and forecasting.
 
 ### Homelab Portal Guide (`HomelabPortal.html`)
 A setup guide for the homelab enthusiastic to have Nexcloud (cloud services locally), home-assistant, nginx, samba (HDD file-sharing), grafana, InfluxDB on the Raspberry Pi.
+* **Live Link:** [Homelab Setup](https://vgandhi1.github.io/web-interactive-collection/Homelab/HomelabPortal.html)
 * **Instruction:** Homealab/README.md
 * **Tech Stack:** docker-compose, nginx proxy manager (web hosting locally), database e.g. IndluxDB, MariaDB.
 
