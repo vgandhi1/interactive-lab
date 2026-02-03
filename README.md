@@ -18,6 +18,10 @@ A robust application for real-time weather tracking and forecasting.
 * **Live Link:** [Weather WebApp](https://vgandhi1.github.io/weather-WebApp/)
 * **Note:** This project is hosted in a separate repository but is integrated into this collection's main hub.
 
+### ToDoApp
+A modern full-stack To-Do application built with the FARM Stack (FastAPI, React, MongoDB)
+* **Live Link:** [ToDoApp](https://github.com/vgandhi1/ToDoApp)
+* **Note:** This project is hosted in a separate repository but is integrated into this collection's main hub.
 
 ### Homelab Portal Guide (`HomelabPortal.html`)
 A setup guide for the homelab enthusiastic to have Nexcloud (cloud services locally), home-assistant, nginx, samba (HDD file-sharing), grafana, InfluxDB on the Raspberry Pi.
