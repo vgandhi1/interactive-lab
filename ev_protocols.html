@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Protocol Architecture — EV Software Systems</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0a0d12;
+    --bg2:       #0f1319;
+    --bg3:       #151b24;
+    --bg4:       #1c2535;
+    --border:    #1e2d42;
+    --border2:   #263650;
+    --text:      #c8d8e8;
+    --text2:     #7a94b0;
+    --text3:     #4a637a;
+    --can:       #f0a500;
+    --can2:      #7a5200;
+    --lin:       #00c896;
+    --lin2:      #005a42;
+    --flex:      #a855f7;
+    --flex2:     #4a1878;
+    --doip:      #3b9aff;
+    --doip2:     #0a3070;
+    --accent:    #ff4d6d;
+    --mono:      'JetBrains Mono', monospace;
+    --display:   'Syne', sans-serif;
+    --body:      'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.75;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── BACKGROUND GRID ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(59,154,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,154,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── SIDEBAR ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0;
+    width: 260px;
+    height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    padding: 0 0 40px 0;
+  }
+
+  .nav-header {
+    padding: 28px 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+
+  .nav-logo {
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--doip);
+  }
+
+  .nav-subtitle {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-section {
+    padding: 6px 20px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-top: 16px;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    font-size: 13px;
+    color: var(--text2);
+    text-decoration: none;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  nav a:hover { color: var(--text); background: var(--bg3); }
+  nav a.active { color: var(--text); border-left-color: var(--doip); background: rgba(59,154,255,0.06); }
+
+  .nav-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── MAIN ── */
+  main {
+    margin-left: 260px;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 80px 60px 60px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(59,154,255,0.06) 0%, transparent 60%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: 'CAN · LIN · FLEXRAY · DOIP';
+    position: absolute;
+    right: -20px; top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--text3);
+    white-space: nowrap;
+  }
+
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--doip);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: 46px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #e8f4ff;
+    margin-bottom: 20px;
+  }
+
+  h1 span { color: var(--doip); }
+
+  .hero-desc {
+    max-width: 640px;
+    color: var(--text2);
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .hero-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 3px;
+    border: 1px solid;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 64px 60px;
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: 20px;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 32px;
+    font-weight: 800;
+    color: #e8f4ff;
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 36px 0 12px;
+  }
+
+  h4 {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 28px 0 10px;
+  }
+
+  p { color: var(--text2); margin-bottom: 16px; max-width: 760px; }
+
+  strong { color: var(--text); font-weight: 500; }
+
+  /* ── PROTOCOL HEADER BANDS ── */
+  .proto-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    border-radius: 8px;
+    margin-bottom: 32px;
+    border: 1px solid;
+  }
+
+  .proto-icon {
+    width: 48px; height: 48px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .proto-title { font-family: var(--display); font-size: 22px; font-weight: 800; }
+  .proto-sub { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  .proto-stats {
+    margin-left: auto;
+    display: flex;
+    gap: 20px;
+  }
+
+  .stat { text-align: right; }
+  .stat-val { font-family: var(--mono); font-size: 18px; font-weight: 700; }
+  .stat-key { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+
+  .can-theme   { background: rgba(240,165,0,0.06); border-color: var(--can2); }
+  .lin-theme   { background: rgba(0,200,150,0.06); border-color: var(--lin2); }
+  .flex-theme  { background: rgba(168,85,247,0.06); border-color: var(--flex2); }
+  .doip-theme  { background: rgba(59,154,255,0.06); border-color: var(--doip2); }
+
+  /* ── INSIGHT BOXES ── */
+  .insight {
+    border-left: 3px solid;
+    padding: 16px 20px;
+    border-radius: 0 6px 6px 0;
+    margin: 24px 0;
+    max-width: 760px;
+  }
+
+  .insight-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  .insight p { margin: 0; font-size: 14px; }
+
+  .insight-kafka   { border-color: var(--can); background: rgba(240,165,0,0.05); }
+  .insight-kafka .insight-label { color: var(--can); }
+  .insight-mfg     { border-color: var(--lin); background: rgba(0,200,150,0.05); }
+  .insight-mfg .insight-label  { color: var(--lin); }
+  .insight-warn    { border-color: var(--accent); background: rgba(255,77,109,0.05); }
+  .insight-warn .insight-label { color: var(--accent); }
+  .insight-key     { border-color: var(--doip); background: rgba(59,154,255,0.05); }
+  .insight-key .insight-label  { color: var(--doip); }
+  .insight-flex    { border-color: var(--flex); background: rgba(168,85,247,0.05); }
+  .insight-flex .insight-label { color: var(--flex); }
+
+  /* ── DIAGRAM CONTAINERS ── */
+  .diagram-wrap {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 32px;
+    margin: 32px 0;
+    overflow-x: auto;
+  }
+
+  .diagram-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  svg text { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── COMPARISON TABLE ── */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 13px;
+  }
+
+  .comp-table th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .comp-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text2);
+    vertical-align: top;
+  }
+
+  .comp-table tr:hover td { background: var(--bg3); }
+
+  .comp-table td:first-child {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  .tag-can  { background: rgba(240,165,0,0.15); color: var(--can); }
+  .tag-lin  { background: rgba(0,200,150,0.15); color: var(--lin); }
+  .tag-flex { background: rgba(168,85,247,0.15); color: var(--flex); }
+  .tag-doip { background: rgba(59,154,255,0.15); color: var(--doip); }
+  .tag-all  { background: rgba(200,216,232,0.1); color: var(--text); }
+
+  /* ── COEXISTENCE LAYERS ── */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .arch-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .arch-card-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .arch-card p { font-size: 13px; max-width: none; margin: 0; }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+    margin: 32px 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--can), var(--lin), var(--flex), var(--doip));
+    border-radius: 2px;
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 32px;
+  }
+
+  .tl-dot {
+    position: absolute;
+    left: -28px; top: 4px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+  }
+
+  .tl-year {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 4px;
+    letter-spacing: 0.1em;
+  }
+
+  .tl-title { font-family: var(--display); font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .tl-desc { font-size: 14px; color: var(--text2); max-width: none; margin: 0; }
+
+  /* ── SCROLL PROGRESS ── */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 260px; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--can), var(--lin), var(--flex), var(--doip));
+    transform-origin: left;
+    transform: scaleX(0);
+    z-index: 200;
+    transition: transform 0.1s;
+  }
+
+  /* ── FOOTER ── */
+  .doc-footer {
+    padding: 40px 60px;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    nav { display: none; }
+    main { margin-left: 0; }
+    .hero, section { padding: 40px 24px; }
+    h1 { font-size: 30px; }
+    .proto-stats { display: none; }
+    .arch-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="nav-header">
+    <div class="nav-logo">Vehicle Protocols</div>
+    <div class="nav-subtitle">EV Software Systems · Study Reference</div>
+  </div>
+
+  <div class="nav-section">Overview</div>
+  <a href="#overview" class="active"><span class="nav-dot" style="background:#3b9aff"></span>Master Narrative</a>
+  <a href="#timeline"><span class="nav-dot" style="background:#3b9aff"></span>Historical Context</a>
+  <a href="#comparison"><span class="nav-dot" style="background:#3b9aff"></span>Protocol Comparison</a>
+
+  <div class="nav-section">CAN Bus</div>
+  <a href="#can-intro"><span class="nav-dot" style="background:var(--can)"></span>Why CAN Exists</a>
+  <a href="#can-frame"><span class="nav-dot" style="background:var(--can)"></span>Frame Structure</a>
+  <a href="#can-arbitration"><span class="nav-dot" style="background:var(--can)"></span>Arbitration</a>
+  <a href="#can-errors"><span class="nav-dot" style="background:var(--can)"></span>Error Handling</a>
+
+  <div class="nav-section">LIN Bus</div>
+  <a href="#lin-intro"><span class="nav-dot" style="background:var(--lin)"></span>Why LIN Exists</a>
+  <a href="#lin-frame"><span class="nav-dot" style="background:var(--lin)"></span>Frame & Schedule</a>
+
+  <div class="nav-section">FlexRay</div>
+  <a href="#flex-intro"><span class="nav-dot" style="background:var(--flex)"></span>Determinism Problem</a>
+  <a href="#flex-cycle"><span class="nav-dot" style="background:var(--flex)"></span>Communication Cycle</a>
+
+  <div class="nav-section">DoIP</div>
+  <a href="#doip-intro"><span class="nav-dot" style="background:var(--doip)"></span>OTA Bandwidth Problem</a>
+  <a href="#doip-session"><span class="nav-dot" style="background:var(--doip)"></span>Session Sequence</a>
+
+  <div class="nav-section">Architecture</div>
+  <a href="#coexistence"><span class="nav-dot" style="background:#ff4d6d"></span>Modern EV Stack</a>
+  <a href="#factory"><span class="nav-dot" style="background:#ff4d6d"></span>Factory Software View</a>
+</nav>
+
+<!-- MAIN -->
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">// EV Software Systems · Protocol Architecture</div>
+    <h1>Vehicle <span>Protocol</span><br>Architecture</h1>
+    <p class="hero-desc">
+      CAN → LIN → FlexRay → DoIP as a single evolving narrative. Each protocol is an industry answer
+      to a specific engineering constraint — cost, bandwidth, determinism, or remote access.
+      Understanding <em>why</em> each exists is the difference between memorizing specs and having genuine architectural intuition.
+    </p>
+    <div class="hero-meta">
+      <span class="hero-badge" style="color:var(--can);border-color:var(--can2)">CAN / CAN FD</span>
+      <span class="hero-badge" style="color:var(--lin);border-color:var(--lin2)">LIN 2.2A</span>
+      <span class="hero-badge" style="color:var(--flex);border-color:var(--flex2)">FlexRay</span>
+      <span class="hero-badge" style="color:var(--doip);border-color:var(--doip2)">DoIP / ISO 13400</span>
+    </div>
+  </div>
+
+  <!-- ═══ OVERVIEW ═══ -->
+  <section id="overview">
+    <div class="section-label">// Section 01</div>
+    <h2>The Master Narrative</h2>
+    <p>
+      The best way to understand this protocol stack is not as four separate specs to memorize,
+      but as a <strong>single evolving answer</strong> to one recurring question:
+      how do you move data reliably between dozens of computers inside a vehicle,
+      given hard constraints on weight, cost, noise, timing, and bandwidth?
+    </p>
+    <p>
+      Each protocol represents an industry decision made at a specific moment in automotive history,
+      solving a problem the previous protocol couldn't handle. Understanding
+      <strong>why each wasn't fully replaced by its successor</strong> gives you genuine systems thinking —
+      the kind that surfaces in architecture interviews.
+    </p>
+
+    <!-- Architecture Overview SVG -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// Modern EV Protocol Stack — All Four Coexisting</div>
+      <svg viewBox="0 0 820 340" width="100%" style="max-width:820px;display:block;margin:0 auto;">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#3b9aff" opacity="0.6"/>
+          </marker>
+          <marker id="arr-can" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#f0a500" opacity="0.7"/>
+          </marker>
+          <marker id="arr-lin" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#00c896" opacity="0.7"/>
+          </marker>
+        </defs>
+
+        <!-- Cloud / OTA Backend -->
+        <rect x="340" y="10" width="140" height="44" rx="6" fill="rgba(59,154,255,0.12)" stroke="#3b9aff" stroke-width="1.2"/>
+        <text x="410" y="28" text-anchor="middle" fill="#3b9aff" font-size="11" font-weight="700">OTA BACKEND</text>
+        <text x="410" y="44" text-anchor="middle" fill="#7a94b0" font-size="9">HTTPS / TLS / MQTT</text>
+
+        <!-- Telematics -->
+        <rect x="340" y="82" width="140" height="44" rx="6" fill="rgba(59,154,255,0.08)" stroke="#1e4070" stroke-width="1.2"/>
+        <text x="410" y="100" text-anchor="middle" fill="#c8d8e8" font-size="11" font-weight="700">TELEMATICS ECU</text>
+        <text x="410" y="116" text-anchor="middle" fill="#7a94b0" font-size="9">LTE · Wi-Fi · DoIP</text>
+
+        <!-- Central Gateway -->
+        <rect x="310" y="162" width="200" height="52" rx="6" fill="rgba(255,77,109,0.08)" stroke="#ff4d6d" stroke-width="1.5"/>
+        <text x="410" y="183" text-anchor="middle" fill="#ff4d6d" font-size="12" font-weight="700">CENTRAL GATEWAY</text>
+        <text x="410" y="200" text-anchor="middle" fill="#7a94b0" font-size="9">CAN · LIN · Ethernet · DoIP</text>
+
+        <!-- Domain ECUs -->
+        <rect x="30" y="264" width="120" height="44" rx="5" fill="rgba(240,165,0,0.08)" stroke="#7a5200" stroke-width="1.2"/>
+        <text x="90" y="282" text-anchor="middle" fill="#f0a500" font-size="10" font-weight="700">POWERTRAIN</text>
+        <text x="90" y="298" text-anchor="middle" fill="#7a94b0" font-size="9">BMS · Motor · CAN FD</text>
+
+        <rect x="180" y="264" width="120" height="44" rx="5" fill="rgba(240,165,0,0.08)" stroke="#7a5200" stroke-width="1.2"/>
+        <text x="240" y="282" text-anchor="middle" fill="#f0a500" font-size="10" font-weight="700">CHASSIS / ADAS</text>
+        <text x="240" y="298" text-anchor="middle" fill="#7a94b0" font-size="9">ABS · Steer · CAN FD</text>
+
+        <rect x="330" y="264" width="120" height="44" rx="5" fill="rgba(0,200,150,0.08)" stroke="#005a42" stroke-width="1.2"/>
+        <text x="390" y="282" text-anchor="middle" fill="#00c896" font-size="10" font-weight="700">BODY DOMAIN</text>
+        <text x="390" y="298" text-anchor="middle" fill="#7a94b0" font-size="9">Doors · Seats · LIN</text>
+
+        <rect x="480" y="264" width="120" height="44" rx="5" fill="rgba(168,85,247,0.08)" stroke="#4a1878" stroke-width="1.2"/>
+        <text x="540" y="282" text-anchor="middle" fill="#a855f7" font-size="10" font-weight="700">INFOTAINMENT</text>
+        <text x="540" y="298" text-anchor="middle" fill="#7a94b0" font-size="9">HMI · Ethernet · SOME/IP</text>
+
+        <rect x="630" y="264" width="120" height="44" rx="5" fill="rgba(168,85,247,0.08)" stroke="#4a1878" stroke-width="1.2"/>
+        <text x="690" y="282" text-anchor="middle" fill="#a855f7" font-size="10" font-weight="700">ADAS COMPUTE</text>
+        <text x="690" y="298" text-anchor="middle" fill="#7a94b0" font-size="9">LIDAR · Camera · 1GbE</text>
+
+        <!-- Connections -->
+        <line x1="410" y1="54" x2="410" y2="82" stroke="#3b9aff" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+        <line x1="410" y1="126" x2="410" y2="162" stroke="#3b9aff" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <line x1="330" y1="198" x2="90" y2="264" stroke="#f0a500" stroke-width="1.5" stroke-opacity="0.6" marker-end="url(#arr-can)"/>
+        <line x1="360" y1="210" x2="240" y2="264" stroke="#f0a500" stroke-width="1.5" stroke-opacity="0.6" marker-end="url(#arr-can)"/>
+        <line x1="410" y1="214" x2="390" y2="264" stroke="#00c896" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arr-lin)"/>
+        <line x1="460" y1="210" x2="540" y2="264" stroke="#a855f7" stroke-width="1.5" stroke-opacity="0.6" marker-end="url(#arr)"/>
+        <line x1="490" y1="200" x2="690" y2="264" stroke="#a855f7" stroke-width="1.5" stroke-opacity="0.6" marker-end="url(#arr)"/>
+
+        <!-- Labels on lines -->
+        <text x="185" y="248" fill="#f0a500" font-size="9" opacity="0.8">CAN FD</text>
+        <text x="390" y="248" fill="#00c896" font-size="9" opacity="0.8">LIN</text>
+        <text x="490" y="248" fill="#a855f7" font-size="9" opacity="0.8">GbE</text>
+        <text x="405" y="75" fill="#3b9aff" font-size="9" opacity="0.8">DoIP/TLS</text>
+        <text x="415" y="152" fill="#3b9aff" font-size="9" opacity="0.8">DoIP</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══ TIMELINE ═══ -->
+  <section id="timeline">
+    <div class="section-label">// Section 02</div>
+    <h2>Historical Context</h2>
+    <p>Each protocol solved the problem that its predecessor couldn't. The timeline is the narrative.</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--can)"></div>
+        <div class="tl-year">1986 — Bosch publishes CAN specification</div>
+        <div class="tl-title" style="color:var(--can)">CAN — The Shared Bus</div>
+        <p class="tl-desc">Mercedes-Benz approached Bosch: luxury vehicles had 2km of copper wiring. Point-to-point connections made adding features exponentially expensive. CAN replaced a spider's web of wires with a single two-wire bus shared by all ECUs. Production vehicles from 1991 (Mercedes W140 S-Class).</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--lin)"></div>
+        <div class="tl-year">1999 — LIN Consortium formed (BMW, VW, Volvo, Motorola, Volcano)</div>
+        <div class="tl-title" style="color:var(--lin)">LIN — The Cost Reduction</div>
+        <p class="tl-desc">CAN was too expensive for seat motors, mirror controls, and window switches. LIN uses a standard UART peripheral — already on every cheap microcontroller — over a single wire. Cost per node dropped 3–5x. LIN didn't replace CAN; it extended below it for non-safety-critical leaf nodes.</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--flex)"></div>
+        <div class="tl-year">2001 — FlexRay Consortium (BMW, DaimlerChrysler, Motorola, Philips)</div>
+        <div class="tl-title" style="color:var(--flex)">FlexRay — The Determinism Guarantee</div>
+        <p class="tl-desc">Drive-by-wire required guaranteed, microsecond-precise message delivery that CAN's event-driven arbitration could never provide. FlexRay introduced time-triggered static slots: every safety-critical message transmits at a pre-scheduled moment, every cycle, unconditionally. BMW X5 2006 was first production deployment.</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--doip)"></div>
+        <div class="tl-year">2010 — ISO 13400 (DoIP) published; OTA era begins</div>
+        <div class="tl-title" style="color:var(--doip)">DoIP — The Bandwidth Leap</div>
+        <p class="tl-desc">A 50MB ECU firmware update over CAN takes ~15 minutes per ECU. Modern vehicles have 70–100 ECUs. OTA at scale is impossible without Ethernet. DoIP wraps standard UDS diagnostic payloads in TCP/IP, delivering them over 100Mbit/s–1Gbit/s automotive Ethernet. The same UDS commands work — just 200x faster.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ COMPARISON ═══ -->
+  <section id="comparison">
+    <div class="section-label">// Section 03</div>
+    <h2>Protocol Comparison</h2>
+
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Protocol</th>
+          <th>Speed</th>
+          <th>Topology</th>
+          <th>Wires</th>
+          <th>Payload</th>
+          <th>Scheduling</th>
+          <th>Primary Use</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-can">CAN 2.0</span></td>
+          <td>1 Mbit/s</td>
+          <td>Multi-master bus</td>
+          <td>2 (differential)</td>
+          <td>8 bytes</td>
+          <td>Event-driven, arbitration</td>
+          <td>Powertrain, chassis, body</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-can">CAN FD</span></td>
+          <td>8 Mbit/s</td>
+          <td>Multi-master bus</td>
+          <td>2 (differential)</td>
+          <td>64 bytes</td>
+          <td>Event-driven, arbitration</td>
+          <td>High-bandwidth ECUs, OTA prep</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-lin">LIN 2.2A</span></td>
+          <td>20 kbit/s</td>
+          <td>1 master + 16 slaves</td>
+          <td>1 + ground</td>
+          <td>8 bytes</td>
+          <td>Master schedule table</td>
+          <td>Seats, mirrors, doors, lighting</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-flex">FlexRay</span></td>
+          <td>10 Mbit/s/ch</td>
+          <td>Multi-master, dual-channel</td>
+          <td>2 per channel</td>
+          <td>254 bytes</td>
+          <td>Time-triggered static + dynamic</td>
+          <td>Drive-by-wire, safety-critical sync</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-doip">DoIP</span></td>
+          <td>100M–1Gbit/s</td>
+          <td>Star (Ethernet switches)</td>
+          <td>1 pair (100BASE-T1)</td>
+          <td>64KB UDS</td>
+          <td>TCP/IP (connection-oriented)</td>
+          <td>OTA flashing, remote diagnostics</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══ CAN ═══ -->
+  <section id="can-intro">
+    <div class="proto-header can-theme">
+      <div class="proto-icon" style="background:rgba(240,165,0,0.15);color:var(--can)">CAN</div>
+      <div>
+        <div class="proto-title" style="color:var(--can)">Controller Area Network</div>
+        <div class="proto-sub">ISO 11898 · Bosch 1986 · Production 1991</div>
+      </div>
+      <div class="proto-stats">
+        <div class="stat"><div class="stat-val" style="color:var(--can)">1Mbit</div><div class="stat-key">MAX SPEED</div></div>
+        <div class="stat"><div class="stat-val" style="color:var(--can)">8B</div><div class="stat-key">PAYLOAD</div></div>
+        <div class="stat"><div class="stat-val" style="color:var(--can)">~2km</div><div class="stat-key">WIRE SAVED</div></div>
+      </div>
+    </div>
+
+    <p>
+      Before CAN, every ECU that needed to talk to another had a dedicated point-to-point wire.
+      A 1980s luxury vehicle had over 2km of copper wiring in its harness — heavier than the engine block
+      in some configurations. Adding a new feature meant designing new wiring for every vehicle variant.
+    </p>
+    <p>
+      CAN replaced this with a <strong>shared serial bus</strong>: two wires running through the vehicle,
+      and every ECU connects to those same two wires. Any ECU can broadcast a message; every ECU on the bus
+      hears it and decides whether to act based on the message ID.
+    </p>
+
+    <div class="insight insight-kafka">
+      <div class="insight-label">⟡ Kafka / MQTT Analogy</div>
+      <p>CAN is architecturally identical to a Kafka topic with multiple producers and consumers.
+      The message ID is the topic. Producers broadcast; consumers filter by ID.
+      There is no concept of "send this to ECU #7" — only "publish message 0x0C4, and whoever cares about 0x0C4 will consume it."
+      If you've designed Kafka consumer groups, you already understand CAN's addressing philosophy.</p>
+    </div>
+
+    <h3 id="can-frame">CAN Frame Structure</h3>
+    <p>Every message on a CAN bus follows this exact bit layout. Knowing it cold is a baseline expectation for any protocol-facing role.</p>
+
+    <!-- CAN Frame SVG -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// CAN 2.0A Standard Frame — Bit-Level Breakdown</div>
+      <svg viewBox="0 0 820 200" width="100%" style="max-width:820px;display:block;margin:0 auto;">
+        <!-- Frame fields -->
+        <!-- SOF -->
+        <rect x="10" y="50" width="30" height="60" rx="3" fill="rgba(200,216,232,0.08)" stroke="#3b3f4a" stroke-width="1"/>
+        <text x="25" y="86" text-anchor="middle" fill="#7a94b0" font-size="9">SOF</text>
+        <text x="25" y="122" text-anchor="middle" fill="#4a637a" font-size="8">1b</text>
+
+        <!-- ARB ID -->
+        <rect x="42" y="50" width="100" height="60" rx="3" fill="rgba(240,165,0,0.1)" stroke="rgba(240,165,0,0.3)" stroke-width="1.2"/>
+        <text x="92" y="82" text-anchor="middle" fill="#f0a500" font-size="10" font-weight="600">Arbitration</text>
+        <text x="92" y="96" text-anchor="middle" fill="#f0a500" font-size="10" font-weight="600">ID</text>
+        <text x="92" y="122" text-anchor="middle" fill="#7a5200" font-size="8">11 bits</text>
+
+        <!-- RTR -->
+        <rect x="144" y="50" width="36" height="60" rx="3" fill="rgba(200,216,232,0.05)" stroke="#3b3f4a" stroke-width="1"/>
+        <text x="162" y="83" text-anchor="middle" fill="#7a94b0" font-size="9">RTR</text>
+        <text x="162" y="122" text-anchor="middle" fill="#4a637a" font-size="8">1b</text>
+
+        <!-- IDE -->
+        <rect x="182" y="50" width="36" height="60" rx="3" fill="rgba(200,216,232,0.05)" stroke="#3b3f4a" stroke-width="1"/>
+        <text x="200" y="83" text-anchor="middle" fill="#7a94b0" font-size="9">IDE</text>
+        <text x="200" y="122" text-anchor="middle" fill="#4a637a" font-size="8">1b</text>
+
+        <!-- DLC -->
+        <rect x="220" y="50" width="50" height="60" rx="3" fill="rgba(59,154,255,0.1)" stroke="rgba(59,154,255,0.2)" stroke-width="1"/>
+        <text x="245" y="83" text-anchor="middle" fill="#3b9aff" font-size="9">DLC</text>
+        <text x="245" y="122" text-anchor="middle" fill="#0a3070" font-size="8">4 bits</text>
+
+        <!-- DATA -->
+        <rect x="272" y="50" width="220" height="60" rx="3" fill="rgba(59,154,255,0.15)" stroke="rgba(59,154,255,0.4)" stroke-width="1.5"/>
+        <text x="382" y="82" text-anchor="middle" fill="#3b9aff" font-size="12" font-weight="700">DATA FIELD</text>
+        <text x="382" y="97" text-anchor="middle" fill="#3b9aff" font-size="10">0 – 8 bytes payload</text>
+        <text x="382" y="122" text-anchor="middle" fill="#0a3070" font-size="8">0–64 bits (Classic) / 0–512 bits (FD)</text>
+
+        <!-- CRC -->
+        <rect x="494" y="50" width="80" height="60" rx="3" fill="rgba(168,85,247,0.1)" stroke="rgba(168,85,247,0.25)" stroke-width="1"/>
+        <text x="534" y="78" text-anchor="middle" fill="#a855f7" font-size="9">CRC</text>
+        <text x="534" y="91" text-anchor="middle" fill="#a855f7" font-size="8">15+1 bits</text>
+        <text x="534" y="122" text-anchor="middle" fill="#4a1878" font-size="8">Error detect</text>
+
+        <!-- ACK -->
+        <rect x="576" y="50" width="60" height="60" rx="3" fill="rgba(0,200,150,0.1)" stroke="rgba(0,200,150,0.25)" stroke-width="1"/>
+        <text x="606" y="78" text-anchor="middle" fill="#00c896" font-size="9">ACK</text>
+        <text x="606" y="91" text-anchor="middle" fill="#00c896" font-size="8">2 bits</text>
+        <text x="606" y="122" text-anchor="middle" fill="#005a42" font-size="8">Any receiver</text>
+
+        <!-- EOF -->
+        <rect x="638" y="50" width="50" height="60" rx="3" fill="rgba(200,216,232,0.05)" stroke="#3b3f4a" stroke-width="1"/>
+        <text x="663" y="83" text-anchor="middle" fill="#7a94b0" font-size="9">EOF</text>
+        <text x="663" y="122" text-anchor="middle" fill="#4a637a" font-size="8">7 bits</text>
+
+        <!-- IFS -->
+        <rect x="690" y="50" width="40" height="60" rx="3" fill="rgba(200,216,232,0.03)" stroke="#2a2f3a" stroke-width="1"/>
+        <text x="710" y="83" text-anchor="middle" fill="#4a637a" font-size="8">IFS</text>
+        <text x="710" y="122" text-anchor="middle" fill="#3a3f4a" font-size="8">3b</text>
+
+        <!-- Annotations -->
+        <line x1="92" y1="30" x2="92" y2="50" stroke="rgba(240,165,0,0.4)" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="92" y="24" text-anchor="middle" fill="#7a5200" font-size="9">Lower ID = Higher Priority</text>
+
+        <line x1="382" y1="30" x2="382" y2="50" stroke="rgba(59,154,255,0.4)" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="382" y="24" text-anchor="middle" fill="#0a3070" font-size="9">This is your Kafka message payload</text>
+
+        <line x1="606" y1="130" x2="606" y2="150" stroke="rgba(0,200,150,0.4)" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="606" y="162" text-anchor="middle" fill="#005a42" font-size="9">Any receiver drives ACK dominant — no dedicated ACK target</text>
+
+        <!-- Title -->
+        <text x="10" y="185" fill="#4a637a" font-size="9">← Direction of transmission (MSB first) — Standard 11-bit ID frame shown. Extended = 29-bit ID (CAN 2.0B)</text>
+      </svg>
+    </div>
+
+    <h3 id="can-arbitration">Non-Destructive Bitwise Arbitration</h3>
+    <p>
+      This is CAN's most elegant engineering decision. When two ECUs transmit simultaneously,
+      there is <strong>no collision in the Ethernet sense</strong>. The lower-ID message wins —
+      and crucially, it is not corrupted and does not need retransmission.
+    </p>
+
+    <!-- Arbitration SVG -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// CAN Bus Arbitration — Two Simultaneous Transmitters</div>
+      <svg viewBox="0 0 820 220" width="100%" style="max-width:820px;display:block;margin:0 auto;">
+        <!-- Y axis labels -->
+        <text x="14" y="60" fill="#7a94b0" font-size="10" font-weight="600">ECU A</text>
+        <text x="14" y="100" fill="#7a94b0" font-size="10">ID: 0x0C4</text>
+        <text x="6" y="142" fill="#f0a500" font-size="10" font-weight="600">ECU B</text>
+        <text x="8" y="162" fill="#f0a500" font-size="10">ID: 0x1A0</text>
+        <text x="4" y="202" fill="#00c896" font-size="10" font-weight="600">BUS</text>
+
+        <!-- Bit positions header -->
+        <text x="80"  y="22" fill="#4a637a" font-size="9" text-anchor="middle">bit 10</text>
+        <text x="140" y="22" fill="#4a637a" font-size="9" text-anchor="middle">bit 9</text>
+        <text x="200" y="22" fill="#4a637a" font-size="9" text-anchor="middle">bit 8</text>
+        <text x="260" y="22" fill="#4a637a" font-size="9" text-anchor="middle">bit 7</text>
+        <text x="320" y="22" fill="#4a637a" font-size="9" text-anchor="middle">bit 6</text>
+        <text x="380" y="22" fill="#f0a500" font-size="9" text-anchor="middle" font-weight="600">bit 5 ← DIVERGE</text>
+        <text x="480" y="22" fill="#4a637a" font-size="9" text-anchor="middle">ECU B backs off</text>
+
+        <!-- ECU A waveform (0x0C4 = 000 1100 0100) -->
+        <!-- bits: 0,0,0,1,1,0,0,0,1,0,0 -->
+        <polyline points="50,75 80,75 80,45 110,45 140,45 170,45 200,75 230,75 260,75 290,75 320,75 350,75 380,75 410,75 440,75 470,75 500,75 530,75 560,75 590,75 620,75" fill="none" stroke="#7a94b0" stroke-width="2"/>
+
+        <!-- ECU B waveform (0x1A0 = 001 1010 0000) -->
+        <!-- bits: 0,0,1,1,0,1,0,... -->
+        <polyline points="50,157 80,157 110,157 140,157 170,127 200,127 230,127 260,127 290,157 320,157 350,157 380,127" fill="none" stroke="#f0a500" stroke-width="2" stroke-dasharray="6,3"/>
+        <!-- ECU B detects loss at bit 5 and stops -->
+        <line x1="380" y1="127" x2="380" y2="200" stroke="#f0a500" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.5"/>
+        <text x="395" y="145" fill="#f0a500" font-size="9">ECU B reads dominant</text>
+        <text x="395" y="157" fill="#f0a500" font-size="9">but sent recessive →</text>
+        <text x="395" y="169" fill="#f0a500" font-size="9">immediately backs off</text>
+
+        <!-- BUS line = winner (ECU A = always dominant) -->
+        <polyline points="50,210 80,210 80,190 110,190 140,190 170,190 200,210 230,210 260,210 290,210 320,210 350,210 380,210 410,210 440,210 470,210 500,210 530,210 560,210" fill="none" stroke="#00c896" stroke-width="2.5"/>
+
+        <!-- Dominant/Recessive labels -->
+        <text x="760" y="48" fill="#7a94b0" font-size="9">dominant (0)</text>
+        <text x="760" y="76" fill="#4a637a" font-size="9">recessive (1)</text>
+        <line x1="750" y1="45" x2="750" y2="75" stroke="#3b3f4a" stroke-width="1"/>
+
+        <!-- Legend -->
+        <rect x="50" y="28" width="12" height="3" fill="#7a94b0" rx="1"/>
+        <text x="66" y="32" fill="#7a94b0" font-size="9">ECU A (wins: lower ID 0x0C4)</text>
+        <rect x="250" y="28" width="12" height="3" fill="#f0a500" rx="1"/>
+        <text x="266" y="32" fill="#f0a500" font-size="9">ECU B (loses: higher ID 0x1A0)</text>
+        <rect x="450" y="28" width="12" height="3" fill="#00c896" rx="1"/>
+        <text x="466" y="32" fill="#00c896" font-size="9">Bus wire (shows winning frame)</text>
+      </svg>
+    </div>
+
+    <div class="insight insight-warn">
+      <div class="insight-label">⚡ Critical Insight — Not Like Ethernet</div>
+      <p>Ethernet CSMA/CD: both frames are destroyed on collision; both must retransmit.
+      CAN CSMA/CR: only the loser backs off. The winner's frame was never corrupted.
+      This is non-destructive arbitration — it's why CAN can guarantee bounded worst-case latency:
+      in a fully-loaded bus, a message must wait at most (N-1) message durations before winning arbitration.</p>
+    </div>
+
+    <h3 id="can-errors">Error Handling & Fault Confinement</h3>
+    <p>CAN's fault confinement is implemented entirely in hardware — not in software.
+    Every CAN controller maintains two counters: Transmit Error Counter (TEC) and Receive Error Counter (REC).
+    These govern a three-state machine.</p>
+
+    <!-- Error State SVG -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// CAN Node Fault Confinement State Machine</div>
+      <svg viewBox="0 0 700 180" width="100%" style="max-width:700px;display:block;margin:0 auto;">
+        <defs>
+          <marker id="marr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#7a94b0"/>
+          </marker>
+          <marker id="marr-r" markerWidth="8" markerHeight="8" refX="2" refY="3" orient="auto">
+            <path d="M8,0 L8,6 L0,3 z" fill="#7a94b0"/>
+          </marker>
+        </defs>
+
+        <!-- States -->
+        <rect x="40"  y="60" width="160" height="60" rx="8" fill="rgba(0,200,150,0.1)" stroke="#00c896" stroke-width="1.5"/>
+        <text x="120" y="87"  text-anchor="middle" fill="#00c896" font-size="13" font-weight="700">Error Active</text>
+        <text x="120" y="104" text-anchor="middle" fill="#7a94b0" font-size="10">TEC/REC 0 – 127</text>
+        <text x="120" y="116" text-anchor="middle" fill="#7a94b0" font-size="9">Normal operation</text>
+
+        <rect x="270" y="60" width="160" height="60" rx="8" fill="rgba(240,165,0,0.1)" stroke="#f0a500" stroke-width="1.5"/>
+        <text x="350" y="87"  text-anchor="middle" fill="#f0a500" font-size="13" font-weight="700">Error Passive</text>
+        <text x="350" y="104" text-anchor="middle" fill="#7a94b0" font-size="10">TEC/REC 128 – 255</text>
+        <text x="350" y="116" text-anchor="middle" fill="#7a94b0" font-size="9">Passive error flags</text>
+
+        <rect x="500" y="60" width="160" height="60" rx="8" fill="rgba(255,77,109,0.1)" stroke="#ff4d6d" stroke-width="1.5"/>
+        <text x="580" y="87"  text-anchor="middle" fill="#ff4d6d" font-size="13" font-weight="700">Bus Off</text>
+        <text x="580" y="104" text-anchor="middle" fill="#7a94b0" font-size="10">TEC > 255</text>
+        <text x="580" y="116" text-anchor="middle" fill="#7a94b0" font-size="9">Disconnected from bus</text>
+
+        <!-- Transitions forward -->
+        <path d="M200,82 Q235,60 270,82" fill="none" stroke="#f0a500" stroke-width="1.5" marker-end="url(#marr)"/>
+        <text x="235" y="55" text-anchor="middle" fill="#f0a500" font-size="9">TEC ≥ 128</text>
+
+        <path d="M430,82 Q465,60 500,82" fill="none" stroke="#ff4d6d" stroke-width="1.5" marker-end="url(#marr)"/>
+        <text x="465" y="55" text-anchor="middle" fill="#ff4d6d" font-size="9">TEC > 255</text>
+
+        <!-- Transitions backward -->
+        <path d="M270,108 Q235,130 200,108" fill="none" stroke="#00c896" stroke-width="1.5" marker-end="url(#marr)"/>
+        <text x="235" y="148" text-anchor="middle" fill="#00c896" font-size="9">TEC/REC &lt; 128</text>
+
+        <!-- Bus Off recovery -->
+        <path d="M500,108 Q350,165 200,108" fill="none" stroke="#3b9aff" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#marr)"/>
+        <text x="350" y="175" text-anchor="middle" fill="#3b9aff" font-size="9">128 × 11 recessive bits (requires ~1.3ms at 1Mbit/s)</text>
+      </svg>
+    </div>
+
+    <div class="insight insight-mfg">
+      <div class="insight-label">⟡ Factory Software Implication</div>
+      <p>In manufacturing end-of-line testing, a Bus Off event on a factory tester CAN port is a common failure mode
+      when a new ECU is first connected and sends malformed frames. Your monitoring system needs to catch
+      Bus Off transitions — they won't surface as application errors, only as hardware counter events in the CAN controller's status register.
+      Plan B's tooling (python-can) exposes these via the <code style="color:var(--lin);font-family:var(--mono);font-size:13px">bus.state</code> attribute.</p>
+    </div>
+  </section>
+
+  <!-- ═══ LIN ═══ -->
+  <section id="lin-intro">
+    <div class="proto-header lin-theme">
+      <div class="proto-icon" style="background:rgba(0,200,150,0.15);color:var(--lin)">LIN</div>
+      <div>
+        <div class="proto-title" style="color:var(--lin)">Local Interconnect Network</div>
+        <div class="proto-sub">LIN 2.2A / ISO 17987 · 1999 Consortium · Max 20 kbit/s</div>
+      </div>
+      <div class="proto-stats">
+        <div class="stat"><div class="stat-val" style="color:var(--lin)">20k</div><div class="stat-key">MAX SPEED</div></div>
+        <div class="stat"><div class="stat-val" style="color:var(--lin)">1</div><div class="stat-key">WIRE</div></div>
+        <div class="stat"><div class="stat-val" style="color:var(--lin)">3-5×</div><div class="stat-key">CHEAPER/NODE</div></div>
+      </div>
+    </div>
+
+    <p>LIN was not invented to replace CAN. It was invented to solve a different problem: <strong>CAN is too expensive for actuators that don't need it.</strong></p>
+    <p>A seat motor moves slowly, transmits a few bytes per second, and has no safety-critical timing requirements.
+    A full CAN controller with differential transceivers costs $3–5 per node in silicon alone.
+    LIN uses a standard UART peripheral — already present on virtually every cheap microcontroller for pennies —
+    over a single wire.</p>
+
+    <div class="insight insight-mfg">
+      <div class="insight-label">⟡ Manufacturing / PLC Analogy</div>
+      <p>LIN's schedule table is the network equivalent of a PLC scan cycle. The master has a fixed program:
+      at every time slot, it solicits a specific frame from a specific slave. No slave ever initiates.
+      No arbitration. No surprises. The behavior of the entire LIN network is completely predictable
+      from reading the schedule table alone — making it trivial to simulate for factory end-of-line testing.</p>
+    </div>
+
+    <h3 id="lin-frame">LIN Frame Structure & Schedule Table</h3>
+
+    <!-- LIN Frame SVG -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// LIN Frame Structure — Master Header + Slave Response</div>
+      <svg viewBox="0 0 820 220" width="100%" style="max-width:820px;display:block;margin:0 auto;">
+
+        <!-- Master Header -->
+        <text x="10" y="30" fill="#00c896" font-size="11" font-weight="700">MASTER HEADER (always sent by master)</text>
+
+        <rect x="10"  y="40" width="110" height="55" rx="4" fill="rgba(0,200,150,0.12)" stroke="rgba(0,200,150,0.4)" stroke-width="1.5"/>
+        <text x="65"  y="63" text-anchor="middle" fill="#00c896" font-size="10" font-weight="700">BREAK</text>
+        <text x="65"  y="78" text-anchor="middle" fill="#7a94b0" font-size="9">&gt;13 dominant bits</text>
+        <text x="65"  y="90" text-anchor="middle" fill="#4a637a" font-size="8">Sync start signal</text>
+
+        <rect x="128" y="40" width="100" height="55" rx="4" fill="rgba(0,200,150,0.10)" stroke="rgba(0,200,150,0.3)" stroke-width="1.2"/>
+        <text x="178" y="63" text-anchor="middle" fill="#00c896" font-size="10" font-weight="700">SYNC BYTE</text>
+        <text x="178" y="78" text-anchor="middle" fill="#7a94b0" font-size="9">Always 0x55</text>
+        <text x="178" y="90" text-anchor="middle" fill="#4a637a" font-size="8">Slave auto-bauds here</text>
+
+        <rect x="236" y="40" width="110" height="55" rx="4" fill="rgba(0,200,150,0.12)" stroke="rgba(0,200,150,0.4)" stroke-width="1.5"/>
+        <text x="291" y="60" text-anchor="middle" fill="#00c896" font-size="10" font-weight="700">PROTECTED ID</text>
+        <text x="291" y="75" text-anchor="middle" fill="#7a94b0" font-size="9">6-bit Frame ID</text>
+        <text x="291" y="88" text-anchor="middle" fill="#7a94b0" font-size="9">+ 2 parity bits</text>
+
+        <!-- Divider -->
+        <line x1="360" y1="35" x2="360" y2="105" stroke="#3b3f4a" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="390" y="30" fill="#f0a500" font-size="11" font-weight="700">SLAVE RESPONSE</text>
+
+        <rect x="368" y="40" width="260" height="55" rx="4" fill="rgba(240,165,0,0.08)" stroke="rgba(240,165,0,0.3)" stroke-width="1.2"/>
+        <text x="498" y="63" text-anchor="middle" fill="#f0a500" font-size="10" font-weight="700">DATA (1–8 bytes)</text>
+        <text x="498" y="78" text-anchor="middle" fill="#7a94b0" font-size="9">Published by appropriate slave</text>
+        <text x="498" y="90" text-anchor="middle" fill="#4a637a" font-size="8">(or master, for publish frames)</text>
+
+        <rect x="636" y="40" width="100" height="55" rx="4" fill="rgba(168,85,247,0.08)" stroke="rgba(168,85,247,0.25)" stroke-width="1"/>
+        <text x="686" y="63" text-anchor="middle" fill="#a855f7" font-size="10" font-weight="700">CHECKSUM</text>
+        <text x="686" y="78" text-anchor="middle" fill="#7a94b0" font-size="9">Classic or Enhanced</text>
+        <text x="686" y="90" text-anchor="middle" fill="#4a637a" font-size="8">1 byte</text>
+
+        <!-- Schedule Table -->
+        <text x="10" y="130" fill="#00c896" font-size="11" font-weight="700">SCHEDULE TABLE — Door Module Example (60ms cycle)</text>
+
+        <!-- Slots -->
+        <rect x="10"  y="140" width="90" height="50" rx="3" fill="rgba(0,200,150,0.07)" stroke="#1e4038" stroke-width="1"/>
+        <text x="55"  y="158" text-anchor="middle" fill="#00c896" font-size="9" font-weight="600">T=0ms</text>
+        <text x="55"  y="172" text-anchor="middle" fill="#7a94b0" font-size="8">PID 0x10</text>
+        <text x="55"  y="184" text-anchor="middle" fill="#4a637a" font-size="8">Window cmd</text>
+
+        <rect x="107" y="140" width="90" height="50" rx="3" fill="rgba(0,200,150,0.07)" stroke="#1e4038" stroke-width="1"/>
+        <text x="152" y="158" text-anchor="middle" fill="#00c896" font-size="9" font-weight="600">T=10ms</text>
+        <text x="152" y="172" text-anchor="middle" fill="#7a94b0" font-size="8">PID 0x11</text>
+        <text x="152" y="184" text-anchor="middle" fill="#4a637a" font-size="8">Window status</text>
+
+        <rect x="204" y="140" width="90" height="50" rx="3" fill="rgba(0,200,150,0.07)" stroke="#1e4038" stroke-width="1"/>
+        <text x="249" y="158" text-anchor="middle" fill="#00c896" font-size="9" font-weight="600">T=20ms</text>
+        <text x="249" y="172" text-anchor="middle" fill="#7a94b0" font-size="8">PID 0x12</text>
+        <text x="249" y="184" text-anchor="middle" fill="#4a637a" font-size="8">Mirror cmd</text>
+
+        <rect x="301" y="140" width="90" height="50" rx="3" fill="rgba(0,200,150,0.07)" stroke="#1e4038" stroke-width="1"/>
+        <text x="346" y="158" text-anchor="middle" fill="#00c896" font-size="9" font-weight="600">T=30ms</text>
+        <text x="346" y="172" text-anchor="middle" fill="#7a94b0" font-size="8">PID 0x13</text>
+        <text x="346" y="184" text-anchor="middle" fill="#4a637a" font-size="8">Mirror status</text>
+
+        <rect x="398" y="140" width="90" height="50" rx="3" fill="rgba(59,154,255,0.07)" stroke="#0a3070" stroke-width="1"/>
+        <text x="443" y="158" text-anchor="middle" fill="#3b9aff" font-size="9" font-weight="600">T=40ms</text>
+        <text x="443" y="172" text-anchor="middle" fill="#7a94b0" font-size="8">PID 0x3C</text>
+        <text x="443" y="184" text-anchor="middle" fill="#4a637a" font-size="8">MRF (diag)</text>
+
+        <rect x="495" y="140" width="90" height="50" rx="3" fill="rgba(59,154,255,0.07)" stroke="#0a3070" stroke-width="1"/>
+        <text x="540" y="158" text-anchor="middle" fill="#3b9aff" font-size="9" font-weight="600">T=50ms</text>
+        <text x="540" y="172" text-anchor="middle" fill="#7a94b0" font-size="8">PID 0x3D</text>
+        <text x="540" y="184" text-anchor="middle" fill="#4a637a" font-size="8">SRF (diag)</text>
+
+        <text x="600" y="165" fill="#4a637a" font-size="22">↺</text>
+        <text x="625" y="160" fill="#4a637a" font-size="9">repeat</text>
+        <text x="625" y="172" fill="#4a637a" font-size="9">@ 60ms</text>
+      </svg>
+    </div>
+
+    <p>PIDs <code style="color:var(--doip);font-family:var(--mono);font-size:13px">0x3C</code> and
+    <code style="color:var(--doip);font-family:var(--mono);font-size:13px">0x3D</code> are reserved
+    in LIN 2.x for diagnostics — they allow UDS-over-LIN for ECU configuration at the factory.
+    This is how body domain ECUs (seat modules, mirror controllers) get their variant coding during manufacturing end-of-line testing,
+    even though they live on a LIN bus with no direct Ethernet connection.</p>
+  </section>
+
+  <!-- ═══ FLEXRAY ═══ -->
+  <section id="flex-intro">
+    <div class="proto-header flex-theme">
+      <div class="proto-icon" style="background:rgba(168,85,247,0.15);color:var(--flex)">FRY</div>
+      <div>
+        <div class="proto-title" style="color:var(--flex)">FlexRay</div>
+        <div class="proto-sub">ISO 17458 · 2001 Consortium · 10 Mbit/s per channel · BMW X5 2006</div>
+      </div>
+      <div class="proto-stats">
+        <div class="stat"><div class="stat-val" style="color:var(--flex)">10M</div><div class="stat-key">BITS/SEC/CH</div></div>
+        <div class="stat"><div class="stat-val" style="color:var(--flex)">2ch</div><div class="stat-key">REDUNDANCY</div></div>
+        <div class="stat"><div class="stat-val" style="color:var(--flex)">±1μs</div><div class="stat-key">SYNC ACCURACY</div></div>
+      </div>
+    </div>
+
+    <p>
+      By the early 2000s, engineers were designing drive-by-wire systems — brake-by-wire, steer-by-wire —
+      with no mechanical fallback. CAN's event-driven arbitration is fundamentally unsuitable for this.
+      In CAN, a high-priority message might be delayed by microseconds or milliseconds depending on bus load —
+      non-deterministic. <strong>You cannot certify a steering system with non-deterministic latency under ISO 26262 ASIL-D.</strong>
+    </p>
+
+    <div class="insight insight-flex">
+      <div class="insight-label">⟡ The Core Problem FlexRay Solves</div>
+      <p>If the steering angle sensor ECU sends "turn left 15°" and the steering actuator ECU receives it
+      1.2ms late instead of 0.8ms late — that 0.4ms variance is the problem. At highway speeds, that inconsistency
+      compounds across control loops. FlexRay eliminates variance by guaranteeing the message transmits
+      at a pre-scheduled, hardware-enforced time slot, every cycle, unconditionally.</p>
+    </div>
+
+    <h3 id="flex-cycle">The FlexRay Communication Cycle</h3>
+
+    <!-- FlexRay Cycle SVG -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// FlexRay Communication Cycle — Static + Dynamic Segments</div>
+      <svg viewBox="0 0 820 240" width="100%" style="max-width:820px;display:block;margin:0 auto;">
+
+        <!-- Cycle container -->
+        <rect x="10" y="50" width="800" height="80" rx="6" fill="rgba(168,85,247,0.04)" stroke="rgba(168,85,247,0.2)" stroke-width="1"/>
+        <text x="410" y="32" text-anchor="middle" fill="#a855f7" font-size="11" font-weight="600">ONE FLEXRAY COMMUNICATION CYCLE (typical: 1–5ms)</text>
+
+        <!-- Static Segment -->
+        <rect x="10" y="50" width="420" height="80" rx="6" fill="rgba(168,85,247,0.1)" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="220" y="72" text-anchor="middle" fill="#a855f7" font-size="12" font-weight="700">STATIC SEGMENT</text>
+        <text x="220" y="87" text-anchor="middle" fill="#7a94b0" font-size="9">Time-triggered — pre-computed offline schedule</text>
+        <text x="220" y="100" text-anchor="middle" fill="#7a94b0" font-size="9">EVERY slot fires EVERY cycle — even if no new data</text>
+
+        <!-- Static slots -->
+        <rect x="14"  y="105" width="58" height="22" rx="2" fill="rgba(168,85,247,0.2)" stroke="#a855f7" stroke-width="1"/>
+        <text x="43"  y="120" text-anchor="middle" fill="#a855f7" font-size="8" font-weight="700">Slot 1</text>
+
+        <rect x="76"  y="105" width="58" height="22" rx="2" fill="rgba(168,85,247,0.2)" stroke="#a855f7" stroke-width="1"/>
+        <text x="105" y="120" text-anchor="middle" fill="#a855f7" font-size="8" font-weight="700">Slot 2</text>
+
+        <rect x="138" y="105" width="58" height="22" rx="2" fill="rgba(168,85,247,0.15)" stroke="#a855f7" stroke-width="1"/>
+        <text x="167" y="120" text-anchor="middle" fill="#a855f7" font-size="8" font-weight="700">Slot 3</text>
+
+        <text x="210" y="120" fill="#a855f7" font-size="14" opacity="0.6">···</text>
+
+        <rect x="242" y="105" width="58" height="22" rx="2" fill="rgba(168,85,247,0.2)" stroke="#a855f7" stroke-width="1"/>
+        <text x="271" y="116" text-anchor="middle" fill="#a855f7" font-size="7" font-weight="700">Steering</text>
+        <text x="271" y="125" text-anchor="middle" fill="#a855f7" font-size="7">ECU (N)</text>
+
+        <rect x="304" y="105" width="58" height="22" rx="2" fill="rgba(168,85,247,0.15)" stroke="#a855f7" stroke-width="1"/>
+        <text x="333" y="116" text-anchor="middle" fill="#a855f7" font-size="7" font-weight="700">Brake</text>
+        <text x="333" y="125" text-anchor="middle" fill="#a855f7" font-size="7">ECU (N+1)</text>
+
+        <rect x="366" y="105" width="60" height="22" rx="2" fill="rgba(168,85,247,0.1)" stroke="#a855f7" stroke-width="1"/>
+        <text x="396" y="120" text-anchor="middle" fill="#a855f7" font-size="8">Slot N+2</text>
+
+        <!-- Dynamic Segment -->
+        <rect x="432" y="50" width="240" height="80" rx="0" fill="rgba(59,154,255,0.07)" stroke="rgba(59,154,255,0.3)" stroke-width="1.5"/>
+        <text x="552" y="72" text-anchor="middle" fill="#3b9aff" font-size="12" font-weight="700">DYNAMIC SEGMENT</text>
+        <text x="552" y="87" text-anchor="middle" fill="#7a94b0" font-size="9">Mini-slot mechanism — similar to CAN</text>
+        <text x="552" y="100" text-anchor="middle" fill="#7a94b0" font-size="9">Event-driven; non-safety-critical data</text>
+
+        <!-- Dynamic minislots -->
+        <rect x="436" y="105" width="30" height="22" rx="2" fill="rgba(59,154,255,0.15)" stroke="rgba(59,154,255,0.4)" stroke-width="1"/>
+        <text x="451" y="119" text-anchor="middle" fill="#3b9aff" font-size="7">M1</text>
+        <rect x="470" y="105" width="50" height="22" rx="2" fill="rgba(59,154,255,0.12)" stroke="rgba(59,154,255,0.3)" stroke-width="1"/>
+        <text x="495" y="119" text-anchor="middle" fill="#3b9aff" font-size="8">Event A</text>
+        <rect x="524" y="105" width="30" height="22" rx="2" fill="rgba(59,154,255,0.08)" stroke="rgba(59,154,255,0.2)" stroke-width="1"/>
+        <text x="539" y="119" text-anchor="middle" fill="#3b9aff" font-size="7">M3</text>
+        <rect x="558" y="105" width="45" height="22" rx="2" fill="rgba(59,154,255,0.12)" stroke="rgba(59,154,255,0.3)" stroke-width="1"/>
+        <text x="580" y="119" text-anchor="middle" fill="#3b9aff" font-size="8">Event B</text>
+        <text x="625" y="119" fill="#3b9aff" font-size="12" opacity="0.5">··</text>
+
+        <!-- Symbol/NIT/Idle -->
+        <rect x="674" y="50" width="68" height="80" rx="0" fill="rgba(200,216,232,0.03)" stroke="#2a2f3a" stroke-width="1"/>
+        <text x="708" y="78" text-anchor="middle" fill="#4a637a" font-size="8">Symbol</text>
+        <text x="708" y="94" text-anchor="middle" fill="#4a637a" font-size="8">Window</text>
+        <text x="708" y="108" text-anchor="middle" fill="#4a637a" font-size="8">+</text>
+        <text x="708" y="120" text-anchor="middle" fill="#4a637a" font-size="8">NIT</text>
+
+        <!-- Dual channel -->
+        <text x="10" y="165" fill="#a855f7" font-size="10" font-weight="600">Channel A ──────────────────────────────────────────────────────────────────</text>
+        <text x="10" y="182" fill="#4a637a" font-size="10">Channel B ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ (redundant)</text>
+        <text x="10" y="205" fill="#7a94b0" font-size="9">Safety-critical ECUs connect to BOTH channels. If Ch.A fails (wiring fault, EMI), Ch.B continues seamlessly.</text>
+        <text x="10" y="220" fill="#7a94b0" font-size="9">Required for ISO 26262 ASIL-D certification. CAN's single-bus architecture cannot replicate this.</text>
+      </svg>
+    </div>
+
+    <div class="insight insight-warn">
+      <div class="insight-label">⚡ Why FlexRay Is Fading on New Platforms</div>
+      <p>FlexRay's static schedule must be computed offline using specialized tooling, making network design rigid.
+      Every node needs a dedicated FlexRay controller chip. And 10 Mbit/s became insufficient once ADAS pushed
+      bandwidth requirements into the gigabit range. Automotive Ethernet with TSN (IEEE 802.1AS/Qbv) now provides
+      microsecond-accurate time-triggered scheduling at 100Mbit/s–1Gbit/s, making FlexRay architecturally redundant
+      for new designs. You will encounter FlexRay on vehicles from 2006–2020 and must understand it to maintain
+      and test those platforms — but Rivian's architecture is Ethernet-native.</p>
+    </div>
+  </section>
+
+  <!-- ═══ DOIP ═══ -->
+  <section id="doip-intro">
+    <div class="proto-header doip-theme">
+      <div class="proto-icon" style="background:rgba(59,154,255,0.15);color:var(--doip)">DoIP</div>
+      <div>
+        <div class="proto-title" style="color:var(--doip)">Diagnostics over IP</div>
+        <div class="proto-sub">ISO 13400 · TCP/UDP port 13400 · UDS over Ethernet</div>
+      </div>
+      <div class="proto-stats">
+        <div class="stat"><div class="stat-val" style="color:var(--doip)">200×</div><div class="stat-key">FASTER THAN CAN</div></div>
+        <div class="stat"><div class="stat-val" style="color:var(--doip)">13400</div><div class="stat-key">TCP/UDP PORT</div></div>
+        <div class="stat"><div class="stat-val" style="color:var(--doip)">&lt;5s</div><div class="stat-key">50MB FLASH</div></div>
+      </div>
+    </div>
+
+    <p>DoIP is the solution to one specific, quantifiable problem: <strong>OTA at scale is impossible over CAN.</strong>
+    A 50MB ECU firmware image over CAN at 500 kbit/s (with ISO-TP overhead) takes approximately 15–20 minutes per ECU.
+    A modern vehicle has 70–100 ECUs. Full vehicle software update over CAN would take days.
+    Over 100Mbit/s automotive Ethernet, that same 50MB takes under 5 seconds.</p>
+
+    <p>The critical insight: <strong>DoIP does not change UDS.</strong> The same service IDs, the same session states,
+    the same SecurityAccess seed/key — all identical. DoIP only replaces the transport layer beneath UDS,
+    swapping ISO-TP over CAN for TCP over Ethernet. Everything above that layer is unchanged.</p>
+
+    <h3 id="doip-session">DoIP Session Establishment Sequence</h3>
+    <p>This sequence must complete successfully before a single UDS byte can flow.
+    Failures here are among the most common integration issues in OTA development.
+    Your Python OTA client must implement all seven steps.</p>
+
+    <!-- DoIP Session SVG -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// DoIP Routing Activation — Full Session Establishment</div>
+      <svg viewBox="0 0 820 420" width="100%" style="max-width:820px;display:block;margin:0 auto;">
+        <defs>
+          <marker id="darr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#3b9aff"/>
+          </marker>
+          <marker id="darr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#7a94b0"/>
+          </marker>
+          <marker id="darr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#f0a500"/>
+          </marker>
+        </defs>
+
+        <!-- Actors -->
+        <rect x="40"  y="10" width="130" height="36" rx="5" fill="rgba(59,154,255,0.12)" stroke="#3b9aff" stroke-width="1.5"/>
+        <text x="105" y="24" text-anchor="middle" fill="#3b9aff" font-size="11" font-weight="700">OTA CLIENT</text>
+        <text x="105" y="38" text-anchor="middle" fill="#7a94b0" font-size="8">Python / Tester Tool</text>
+
+        <rect x="330" y="10" width="160" height="36" rx="5" fill="rgba(255,77,109,0.1)" stroke="#ff4d6d" stroke-width="1.5"/>
+        <text x="410" y="24" text-anchor="middle" fill="#ff4d6d" font-size="11" font-weight="700">GATEWAY ECU</text>
+        <text x="410" y="38" text-anchor="middle" fill="#7a94b0" font-size="8">DoIP Entity · TCP 13400</text>
+
+        <rect x="620" y="10" width="160" height="36" rx="5" fill="rgba(240,165,0,0.1)" stroke="#f0a500" stroke-width="1.5"/>
+        <text x="700" y="24" text-anchor="middle" fill="#f0a500" font-size="11" font-weight="700">TARGET ECU</text>
+        <text x="700" y="38" text-anchor="middle" fill="#7a94b0" font-size="8">e.g. BMS on CAN</text>
+
+        <!-- Lifelines -->
+        <line x1="105" y1="46" x2="105" y2="415" stroke="#3b9aff" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
+        <line x1="410" y1="46" x2="410" y2="415" stroke="#ff4d6d" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
+        <line x1="700" y1="46" x2="700" y2="415" stroke="#f0a500" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
+
+        <!-- Step 1 -->
+        <line x1="105" y1="75" x2="398" y2="75" stroke="#3b9aff" stroke-width="1.5" marker-end="url(#darr)"/>
+        <text x="245" y="68" text-anchor="middle" fill="#3b9aff" font-size="9" font-weight="600">1. Vehicle Identification Request</text>
+        <text x="245" y="82" text-anchor="middle" fill="#4a637a" font-size="8">UDP broadcast → port 13400</text>
+
+        <!-- Step 2 -->
+        <line x1="398" y1="100" x2="117" y2="100" stroke="#7a94b0" stroke-width="1.5" marker-end="url(#darr2)"/>
+        <text x="245" y="93" text-anchor="middle" fill="#7a94b0" font-size="9" font-weight="600">2. Vehicle Announcement</text>
+        <text x="245" y="107" text-anchor="middle" fill="#4a637a" font-size="8">VIN + EID + GID + Logical Address · UDP unicast</text>
+
+        <!-- TCP connection note -->
+        <rect x="30" y="118" width="200" height="22" rx="3" fill="rgba(59,154,255,0.06)" stroke="rgba(59,154,255,0.2)" stroke-width="1"/>
+        <text x="130" y="133" text-anchor="middle" fill="#3b9aff" font-size="9">TCP connect → port 13400 (3-way handshake)</text>
+
+        <!-- Step 3 -->
+        <line x1="105" y1="155" x2="398" y2="155" stroke="#3b9aff" stroke-width="1.5" marker-end="url(#darr)"/>
+        <text x="245" y="148" text-anchor="middle" fill="#3b9aff" font-size="9" font-weight="600">3. Routing Activation Request</text>
+        <text x="245" y="162" text-anchor="middle" fill="#4a637a" font-size="8">Source address + Activation type · TCP</text>
+
+        <!-- Step 4 -->
+        <line x1="398" y1="185" x2="117" y2="185" stroke="#7a94b0" stroke-width="1.5" marker-end="url(#darr2)"/>
+        <text x="245" y="178" text-anchor="middle" fill="#7a94b0" font-size="9" font-weight="600">4. Routing Activation Response</text>
+        <text x="245" y="192" text-anchor="middle" fill="#4a637a" font-size="8">Confirms routing · Assigns logical src addr · TCP</text>
+
+        <!-- Divider line — UDS begins -->
+        <line x1="30" y1="210" x2="790" y2="210" stroke="#1e2d42" stroke-width="1" stroke-dasharray="6,4"/>
+        <text x="410" y="222" text-anchor="middle" fill="#4a637a" font-size="9">─── UDS DIAGNOSTIC MESSAGES CAN NOW FLOW ───</text>
+
+        <!-- Step 5 -->
+        <line x1="105" y1="240" x2="398" y2="240" stroke="#3b9aff" stroke-width="1.5" marker-end="url(#darr)"/>
+        <text x="245" y="233" text-anchor="middle" fill="#3b9aff" font-size="9" font-weight="600">5. DoIP Diagnostic Message</text>
+        <text x="245" y="247" text-anchor="middle" fill="#4a637a" font-size="8">src=tester addr, target=BMS logical addr, UDS payload · TCP</text>
+
+        <!-- Gateway translates to CAN -->
+        <line x1="422" y1="265" x2="688" y2="265" stroke="#f0a500" stroke-width="1.5" marker-end="url(#darr3)"/>
+        <text x="555" y="258" text-anchor="middle" fill="#f0a500" font-size="9">Gateway translates → ISO-TP on CAN</text>
+        <text x="555" y="272" text-anchor="middle" fill="#4a637a" font-size="8">DoIP → CAN address mapping (0x712 → CAN 0x07DF)</text>
+
+        <!-- Step 6 -->
+        <line x1="398" y1="295" x2="117" y2="295" stroke="#7a94b0" stroke-width="1.5" marker-end="url(#darr2)"/>
+        <text x="245" y="288" text-anchor="middle" fill="#7a94b0" font-size="9" font-weight="600">6. Diagnostic Message ACK</text>
+        <text x="245" y="302" text-anchor="middle" fill="#4a637a" font-size="8">Gateway confirms receipt before target responds · TCP</text>
+
+        <!-- Target responds to CAN -->
+        <line x1="688" y1="320" x2="422" y2="320" stroke="#f0a500" stroke-width="1.5" marker-end="url(#darr3)"/>
+        <text x="555" y="313" text-anchor="middle" fill="#f0a500" font-size="9">UDS response from ECU → CAN ISO-TP</text>
+
+        <!-- Step 7 -->
+        <line x1="398" y1="345" x2="117" y2="345" stroke="#7a94b0" stroke-width="1.5" marker-end="url(#darr2)"/>
+        <text x="245" y="338" text-anchor="middle" fill="#7a94b0" font-size="9" font-weight="600">7. DoIP Diagnostic Message Response</text>
+        <text x="245" y="352" text-anchor="middle" fill="#4a637a" font-size="8">UDS positive/negative response wrapped in DoIP · TCP</text>
+
+        <!-- Step label -->
+        <text x="30" y="390" fill="#4a637a" font-size="9">Steps 1–2: Discovery phase (UDP). Steps 3–4: Session establishment (TCP). Steps 5–7: Diagnostic data flow (TCP). </text>
+        <text x="30" y="403" fill="#4a637a" font-size="9">Gateway performs bidirectional address translation: DoIP logical address ↔ CAN physical address. Target ECU is unaware of DoIP.</text>
+      </svg>
+    </div>
+
+    <div class="insight insight-key">
+      <div class="insight-label">⟡ OTA Engineering Key Point</div>
+      <p>The gateway's address translation table — mapping DoIP logical addresses to CAN bus addresses — is itself a software artifact
+      that must be maintained as vehicles gain new ECUs via OTA. A DoIP routing activation that returns code <code style="color:var(--lin);font-family:var(--mono);font-size:13px">0x06</code>
+      (Unknown Source Address) is one of the most common integration failures during OTA testing,
+      and it always means the gateway's routing table doesn't include your tester's source address.
+      This is managed at the vehicle configuration layer, not the protocol layer.</p>
+    </div>
+  </section>
+
+  <!-- ═══ COEXISTENCE ═══ -->
+  <section id="coexistence">
+    <div class="section-label">// Section 08</div>
+    <h2>Modern EV — All Four Protocols Coexisting</h2>
+
+    <p>In a current-generation EV like Rivian's platform, all four protocols are present simultaneously.
+    Understanding the boundaries — where each protocol lives, who owns the translation between them —
+    is the core architectural knowledge for all four target roles.</p>
+
+    <div class="arch-grid">
+      <div class="arch-card" style="border-color:var(--doip2)">
+        <div class="arch-card-title" style="color:var(--doip)">⟡ Ethernet Backbone (DoIP / SOME/IP)</div>
+        <p style="color:var(--text2);font-size:13px">100BASE-T1 / 1000BASE-T1 connecting domain controllers and the central gateway.
+        DoIP for diagnostics and OTA. SOME/IP for service-oriented runtime communication between major ECUs.
+        All new architecture design is Ethernet-native.</p>
+      </div>
+      <div class="arch-card" style="border-color:var(--can2)">
+        <div class="arch-card-title" style="color:var(--can)">⟡ CAN FD (Intra-Domain)</div>
+        <p style="color:var(--text2);font-size:13px">Connects ECUs within each domain — powertrain, chassis, ADAS —
+        where bandwidth exceeds classic CAN but node count and cost don't justify Ethernet per-ECU.
+        BMS, motor controller, ABS, ESC all speak CAN FD internally.</p>
+      </div>
+      <div class="arch-card" style="border-color:var(--lin2)">
+        <div class="arch-card-title" style="color:var(--lin)">⟡ LIN (Leaf Actuators)</div>
+        <p style="color:var(--text2);font-size:13px">Connects leaf-node actuators to body domain gateway ECUs.
+        Door modules, seat position motors, mirror controllers, ambient lighting nodes.
+        Gateway bridges LIN ↔ CAN. Factory variant coding of LIN slaves happens via 0x3C/0x3D diagnostic frames.</p>
+      </div>
+      <div class="arch-card" style="border-color:var(--flex2)">
+        <div class="arch-card-title" style="color:var(--flex)">⟡ FlexRay (Legacy / Carry-Forward)</div>
+        <p style="color:var(--text2);font-size:13px">Present in vehicles designed 2006–2020, possibly carried forward in specific safety-critical subsystems.
+        Not used in new architecture design at Rivian. Understanding it matters for testing and maintaining
+        platforms that bridge old and new architecture generations.</p>
+      </div>
+    </div>
+
+    <div class="insight insight-key">
+      <div class="insight-label">⟡ The Central Gateway — Your Primary Integration Surface</div>
+      <p>The central gateway speaks all protocols simultaneously. It enforces firewall rules between domains,
+      performs address translation for DoIP routing, and is the single entry point for all OTA and diagnostic traffic.
+      From a factory software role perspective, the gateway's behavior during manufacturing —
+      how it's configured, how it routes diagnostic traffic, how it handles variant coding across all bus types —
+      is the primary integration surface you would own. This is where your MES/systems engineering background
+      maps most directly onto vehicle software architecture.</p>
+    </div>
+  </section>
+
+  <!-- ═══ FACTORY ═══ -->
+  <section id="factory">
+    <div class="section-label">// Section 09</div>
+    <h2>Factory Software View</h2>
+    <p>How these protocols map to manufacturing end-of-line testing, OTA release pipelines, and your existing experience.</p>
+
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Manufacturing Concept</th>
+          <th>Vehicle Software Equivalent</th>
+          <th>Protocol Involved</th>
+          <th>Your Bridging Advantage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>PLC scan cycle</td>
+          <td>LIN master schedule table</td>
+          <td><span class="tag tag-lin">LIN</span></td>
+          <td>Deterministic, master-controlled polling — identical design philosophy to PLC I/O scan</td>
+        </tr>
+        <tr>
+          <td>OPC-UA / MQTT message bus</td>
+          <td>CAN message bus (topic = CAN ID)</td>
+          <td><span class="tag tag-can">CAN</span></td>
+          <td>Pub/sub addressing model: producers broadcast, consumers filter — identical to Kafka topics</td>
+        </tr>
+        <tr>
+          <td>MES change control + software version management</td>
+          <td>Vehicle SW release pipeline + OTA campaign</td>
+          <td><span class="tag tag-doip">DoIP</span></td>
+          <td>Your MES TPO role is structurally equivalent to a vehicle SW release role — apply the same change-control rigor</td>
+        </tr>
+        <tr>
+          <td>End-of-line functional test</td>
+          <td>UDS service 0x22 ReadDataByIdentifier, 0x2F IOControl</td>
+          <td><span class="tag tag-doip">DoIP</span> <span class="tag tag-can">CAN</span></td>
+          <td>EOL testers communicate via DoIP/UDS — designing test sequences uses the same structured validation methodology</td>
+        </tr>
+        <tr>
+          <td>Device variant coding at assembly</td>
+          <td>UDS 0x2E WriteDataByIdentifier + LIN 0x3C diagnostic frames</td>
+          <td><span class="tag tag-lin">LIN</span> <span class="tag tag-doip">DoIP</span></td>
+          <td>Configuration at point of manufacture — same concept as MES recipe management, different protocol</td>
+        </tr>
+        <tr>
+          <td>DFMEA / process FMEA</td>
+          <td>ISO 21434 TARA (Threat Analysis and Risk Assessment)</td>
+          <td><span class="tag tag-all">All</span></td>
+          <td>Same structured risk decomposition methodology — STRIDE adds attacker intent dimension to familiar risk framework</td>
+        </tr>
+        <tr>
+          <td>Kafka / MQTT telemetry pipeline</td>
+          <td>NATS JetStream → ClickHouse for vehicle telemetry</td>
+          <td><span class="tag tag-all">All</span></td>
+          <td>Your Kafka experience maps directly — NATS is faster and lighter; the architectural pattern is identical</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight insight-kafka">
+      <div class="insight-label">⟡ Next Topics in This Thread</div>
+      <p>
+        <strong>Session 2:</strong> CAN deep dive — arbitration at the bit level, error frame types, ISO-TP segmentation math, DBC signal decoding, CAN FD differences. &nbsp;|&nbsp;
+        <strong>Session 3:</strong> DoIP + UDS as a system — full ECU flash sequence service by service, SOVD as the forward-looking replacement, Python implementation patterns. &nbsp;|&nbsp;
+        <strong>Session 4:</strong> NATS JetStream architecture vs Kafka, subject hierarchy design for vehicle telemetry, JetStream consumers for OTA event streaming. &nbsp;|&nbsp;
+        <strong>Session 5:</strong> ClickHouse MergeTree engine, columnar storage internals, schema design for CAN telemetry workloads, query patterns for fleet analytics.
+      </p>
+    </div>
+  </section>
+
+  <div class="doc-footer">
+    <span>EV Software Systems — Vehicle Protocol Architecture</span>
+    <span>CAN · LIN · FlexRay · DoIP · ISO 11898 · ISO 17987 · ISO 17458 · ISO 13400</span>
+    <span>Vinay — Study Reference · 2026</span>
+  </div>
+
+</main>
+
+<script>
+  // Progress bar
+  const bar = document.getElementById('progressBar');
+  window.addEventListener('scroll', () => {
+    const doc = document.documentElement;
+    const pct = doc.scrollTop / (doc.scrollHeight - doc.clientHeight);
+    bar.style.transform = `scaleX(${pct})`;
+  });
+
+  // Active nav link
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navLinks = document.querySelectorAll('nav a');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`nav a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
