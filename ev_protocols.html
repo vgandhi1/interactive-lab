@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vehicle Protocol Architecture — EV Software Systems</title>
+<title>Vehicle Protocol Architecture — EV & Software-Defined Vehicle (SDV) | Technical Education Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -504,6 +504,7 @@
 
   <div class="nav-section">Overview</div>
   <a href="#overview" class="active"><span class="nav-dot" style="background:#3b9aff"></span>Master Narrative</a>
+  <a href="#sdv-context"><span class="nav-dot" style="background:#3b9aff"></span>SDV Context</a>
   <a href="#timeline"><span class="nav-dot" style="background:#3b9aff"></span>Historical Context</a>
   <a href="#comparison"><span class="nav-dot" style="background:#3b9aff"></span>Protocol Comparison</a>
 
@@ -535,12 +536,16 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-tag">// EV Software Systems · Protocol Architecture</div>
+    <div class="hero-tag">// Technical Education Guide · EV & Software-Defined Vehicle (SDV)</div>
     <h1>Vehicle <span>Protocol</span><br>Architecture</h1>
     <p class="hero-desc">
       CAN → LIN → FlexRay → DoIP as a single evolving narrative. Each protocol is an industry answer
       to a specific engineering constraint — cost, bandwidth, determinism, or remote access.
       Understanding <em>why</em> each exists is the difference between memorizing specs and having genuine architectural intuition.
+    </p>
+    <p class="hero-desc" style="font-size:14px;color:var(--text3);margin-top:-8px;">
+      <strong style="color:var(--text2);">Who this is for:</strong> New engineers entering the electrical vehicle (EV) and software-defined vehicle (SDV) industry.
+      Use this as your protocol foundation before diving into security requirements and OTA/diagnostics implementation.
     </p>
     <div class="hero-meta">
       <span class="hero-badge" style="color:var(--can);border-color:var(--can2)">CAN / CAN FD</span>
@@ -565,6 +570,20 @@
       solving a problem the previous protocol couldn't handle. Understanding
       <strong>why each wasn't fully replaced by its successor</strong> gives you genuine systems thinking —
       the kind that surfaces in architecture interviews.
+    </p>
+
+    <h3 id="sdv-context">Software-Defined Vehicle (SDV) Context</h3>
+    <p>
+      In a <strong>software-defined vehicle</strong>, features and behavior are increasingly determined by software
+      (OTA updates, new functions, domain controllers) rather than fixed hardware. The in-vehicle network is the backbone:
+      <strong>domain</strong> or <strong>zonal</strong> ECUs talk over CAN, LIN, or Ethernet; a <strong>central gateway</strong> connects
+      to the cloud for OTA and diagnostics (DoIP over Ethernet). Knowing which protocol is used where — and why —
+      is essential for SDV roles in architecture, integration, manufacturing, and security.
+    </p>
+    <p>
+      This guide focuses on the <strong>protocol layer</strong>. For security protocols and requirements (SecOC, secure boot,
+      UN R155/ISO 21434, key provisioning), see the companion
+      <a href="ev-cybersecurity.html" style="color:var(--doip);text-decoration:underline;">EV Cybersecurity Engineering Guide</a>.
     </p>
 
     <!-- Architecture Overview SVG -->
@@ -1231,6 +1250,12 @@
     <p>The critical insight: <strong>DoIP does not change UDS.</strong> The same service IDs, the same session states,
     the same SecurityAccess seed/key — all identical. DoIP only replaces the transport layer beneath UDS,
     swapping ISO-TP over CAN for TCP over Ethernet. Everything above that layer is unchanged.</p>
+    <p>
+      <strong>ISO-TP (ISO 15765-2)</strong> is the transport used for UDS over CAN: it segments payloads larger than 7 bytes
+      into multiple CAN frames (First Frame, Consecutive Frames) with flow control. When diagnostics run over DoIP,
+      TCP carries the same UDS payloads without segmentation limits (up to 64KB). Understanding ISO-TP helps when
+      debugging gateway behavior (DoIP ↔ CAN translation) or when working with legacy CAN-only ECUs.
+    </p>
 
     <h3 id="doip-session">DoIP Session Establishment Sequence</h3>
     <p>This sequence must complete successfully before a single UDS byte can flow.
@@ -1350,10 +1375,11 @@
 
     <div class="arch-grid">
       <div class="arch-card" style="border-color:var(--doip2)">
-        <div class="arch-card-title" style="color:var(--doip)">⟡ Ethernet Backbone (DoIP / SOME/IP)</div>
+        <div class="arch-card-title" style="color:var(--doip)">⟡ Ethernet Backbone (DoIP / SOME/IP / TSN)</div>
         <p style="color:var(--text2);font-size:13px">100BASE-T1 / 1000BASE-T1 connecting domain controllers and the central gateway.
         DoIP for diagnostics and OTA. SOME/IP for service-oriented runtime communication between major ECUs.
-        All new architecture design is Ethernet-native.</p>
+        TSN (Time-Sensitive Networking, IEEE 802.1) provides deterministic, time-synchronized Ethernet for ADAS and safety-critical traffic.
+        All new SDV architecture design is Ethernet-native.</p>
       </div>
       <div class="arch-card" style="border-color:var(--can2)">
         <div class="arch-card-title" style="color:var(--can)">⟡ CAN FD (Intra-Domain)</div>
@@ -1456,11 +1482,19 @@
         <strong>Session 5:</strong> ClickHouse MergeTree engine, columnar storage internals, schema design for CAN telemetry workloads, query patterns for fleet analytics.
       </p>
     </div>
+
+    <div class="insight insight-key">
+      <div class="insight-label">⟡ Related Guide — Security</div>
+      <p>
+        For security protocols and requirements in EV/SDV (SecOC, secure boot, UN R155/R156, ISO/SAE 21434, key provisioning, OTA security),
+        use the <a href="ev-cybersecurity.html" style="color:var(--doip);text-decoration:underline;">EV Cybersecurity Engineering Guide</a> as your technical education companion.
+      </p>
+    </div>
   </section>
 
   <div class="doc-footer">
-    <span>EV Software Systems — Vehicle Protocol Architecture</span>
-    <span>CAN · LIN · FlexRay · DoIP · ISO 11898 · ISO 17987 · ISO 17458 · ISO 13400</span>
+    <span>EV & SDV — Vehicle Protocol Architecture · Technical Education Guide for New Engineers</span>
+    <span>CAN · LIN · FlexRay · DoIP · SOME/IP · TSN · ISO 11898 · ISO 17987 · ISO 17458 · ISO 13400 · ISO 15765-2</span>
     <span>Vinay — Study Reference · 2026</span>
   </div>
 

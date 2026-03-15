@@ -1,0 +1,5 @@
+# Normalize line endings: checkout with CRLF on Windows, store as LF in repo
+* text=auto eol=lf
+
+# Optional: force LF for scripts if you run them on Linux/WSL
+*.sh text eol=lf

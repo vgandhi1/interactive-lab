@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EV Cybersecurity — Security Protocols & Requirements | Technical Education Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep:    #040b0f;
+  --bg-card:    #081420;
+  --bg-surface: #0c1e2e;
+  --bg-raised:  #102434;
+  --border:     #183448;
+  --border-hi:  #204a68;
+  --accent:     #00e5ff;
+  --accent2:    #39ff6a;
+  --accent3:    #ff6b35;
+  --warn:       #ffd166;
+  --purple:     #b388ff;
+  --pink:       #ff80ab;
+  --text:       #c8e0ef;
+  --text-dim:   #4e7d96;
+  --text-mid:   #7aafc5;
+  --mono:       'Share Tech Mono', monospace;
+  --sans:       'Barlow', sans-serif;
+  --cond:       'Barlow Condensed', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg-deep);color:var(--text);font-family:var(--sans);font-weight:300;line-height:1.75;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+
+/* ══ LAYOUT ══ */
+.wrap{position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:0 36px;}
+@media(max-width:700px){.wrap{padding:0 18px;}}
+
+/* ══ HEADER ══ */
+header{position:relative;padding:90px 0 70px;border-bottom:1px solid var(--border);overflow:hidden;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(0,229,255,.22);padding:5px 16px;border-radius:2px;margin-bottom:32px;background:rgba(0,229,255,.04);}
+.hero-badge::before{content:'';width:7px;height:7px;background:var(--accent);border-radius:50%;animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.3;transform:scale(.65);}}
+h1{font-family:var(--cond);font-weight:900;font-size:clamp(2.8rem,6.5vw,5.4rem);line-height:.95;letter-spacing:-.01em;text-transform:uppercase;color:#fff;margin-bottom:10px;}
+h1 .hi{color:var(--accent);}
+.hero-role{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--text-dim);text-transform:uppercase;margin-bottom:26px;}
+.hero-desc{max-width:700px;font-size:1.02rem;color:var(--text-mid);margin-bottom:38px;line-height:1.8;}
+.hero-kpis{display:flex;gap:40px;flex-wrap:wrap;}
+.kpi{text-align:left;}
+.kpi-n{font-family:var(--cond);font-weight:900;font-size:2.2rem;color:var(--accent2);line-height:1;}
+.kpi-l{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase;margin-top:3px;}
+.svg-deco{position:absolute;top:0;right:-40px;opacity:.055;pointer-events:none;}
+
+/* ══ STICKY NAV ══ */
+.nav-bar{position:sticky;top:0;z-index:200;background:rgba(4,11,15,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:13px 0;}
+.nav-inner{display:flex;gap:4px;flex-wrap:wrap;max-width:1160px;margin:0 auto;padding:0 36px;}
+.nav-inner a{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;padding:5px 11px;border:1px solid transparent;border-radius:2px;transition:all .2s;white-space:nowrap;}
+.nav-inner a:hover{color:var(--accent);border-color:rgba(0,229,255,.28);background:rgba(0,229,255,.05);}
+
+/* ══ SECTION ══ */
+section{padding:72px 0;border-bottom:1px solid var(--border);}
+.sec-eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.sec-eyebrow::after{content:'';width:50px;height:1px;background:var(--accent);opacity:.35;}
+h2{font-family:var(--cond);font-weight:900;font-size:clamp(1.8rem,4.5vw,3rem);color:#fff;text-transform:uppercase;line-height:1.05;margin-bottom:10px;letter-spacing:.02em;}
+.sec-intro{max-width:780px;color:var(--text-mid);font-size:.98rem;margin-bottom:34px;line-height:1.8;}
+
+/* ══ CALLOUTS ══ */
+.callout{border-left:3px solid;padding:18px 22px;margin:20px 0;border-radius:0 4px 4px 0;font-size:.93rem;}
+.callout strong{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:7px;}
+.ci{border-color:var(--accent);background:rgba(0,229,255,.04);color:#6ec8dc;}
+.ci strong{color:var(--accent);}
+.cw{border-color:var(--warn);background:rgba(255,209,102,.04);color:#c9a050;}
+.cw strong{color:var(--warn);}
+.ce{border-color:var(--accent3);background:rgba(255,107,53,.04);color:#c0704a;}
+.ce strong{color:var(--accent3);}
+.cg{border-color:var(--accent2);background:rgba(57,255,106,.04);color:#52c96a;}
+.cg strong{color:var(--accent2);}
+
+/* ══ CARDS ══ */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;margin-top:6px;}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:26px;transition:border-color .25s,transform .22s;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;opacity:0;transition:opacity .25s;}
+.card:hover{transform:translateY(-3px);}
+.card:hover::before{opacity:1;}
+.card.cc::before{background:var(--accent);}      .card.cc:hover{border-color:rgba(0,229,255,.3);}
+.card.cg::before{background:var(--accent2);}     .card.cg:hover{border-color:rgba(57,255,106,.3);}
+.card.co::before{background:var(--accent3);}     .card.co:hover{border-color:rgba(255,107,53,.3);}
+.card.cy::before{background:var(--warn);}        .card.cy:hover{border-color:rgba(255,209,102,.3);}
+.card.cp::before{background:var(--purple);}      .card.cp:hover{border-color:rgba(179,136,255,.3);}
+.card h3{font-family:var(--cond);font-weight:700;font-size:1.12rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:11px;display:flex;align-items:center;gap:9px;}
+.card.cc h3{color:var(--accent);}   .card.cg h3{color:var(--accent2);}  .card.co h3{color:var(--accent3);}
+.card.cy h3{color:var(--warn);}     .card.cp h3{color:var(--purple);}
+.icon-box{width:26px;height:26px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.card.cc .icon-box{background:rgba(0,229,255,.09);border:1px solid rgba(0,229,255,.18);}
+.card.cg .icon-box{background:rgba(57,255,106,.08);border:1px solid rgba(57,255,106,.2);}
+.card.co .icon-box{background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);}
+.card.cy .icon-box{background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.2);}
+.card.cp .icon-box{background:rgba(179,136,255,.08);border:1px solid rgba(179,136,255,.2);}
+
+/* ══ TAGS ══ */
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;padding:3px 9px;border-radius:2px;border:1px solid;}
+.t-c{color:var(--accent);border-color:rgba(0,229,255,.25);background:rgba(0,229,255,.06);}
+.t-g{color:var(--accent2);border-color:rgba(57,255,106,.25);background:rgba(57,255,106,.06);}
+.t-o{color:var(--accent3);border-color:rgba(255,107,53,.25);background:rgba(255,107,53,.06);}
+.t-y{color:var(--warn);border-color:rgba(255,209,102,.25);background:rgba(255,209,102,.06);}
+.t-p{color:var(--purple);border-color:rgba(179,136,255,.25);background:rgba(179,136,255,.06);}
+
+/* ══ CODE ══ */
+.code-wrap{position:relative;margin:16px 0;}
+.code-lang{position:absolute;top:10px;right:14px;font-family:var(--mono);font-size:9.5px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;}
+pre{background:#030c12;border:1px solid var(--border);border-radius:4px;padding:20px 22px;font-family:var(--mono);font-size:12.5px;line-height:1.75;color:#6bc6e0;overflow-x:auto;}
+.cm{color:var(--text-dim);}
+.ck{color:var(--accent2);}
+.cv{color:var(--warn);}
+.cd{color:var(--accent3);}
+.cs{color:var(--accent);}
+
+/* ══ TWO / THREE COL ══ */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:800px){.two{grid-template-columns:1fr;}.three{grid-template-columns:1fr 1fr;}}
+@media(max-width:500px){.three{grid-template-columns:1fr;}}
+
+/* ══ CHECKLIST ══ */
+.cl{list-style:none;}
+.cl li{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid rgba(24,52,72,.55);font-size:.93rem;color:var(--text-mid);}
+.cl li:last-child{border-bottom:none;}
+.cl li::before{content:'▸';color:var(--accent2);flex-shrink:0;margin-top:2px;}
+.cl.co li::before{color:var(--accent3);}
+.cl.cc li::before{color:var(--accent);}
+.cl.cy li::before{color:var(--warn);}
+.cl li strong{color:var(--text);font-weight:600;}
+
+/* ══ DOMAIN BLOCK ══ */
+.domain{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden;}
+.domain::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.domain.dc::after{background:linear-gradient(90deg,var(--accent),transparent);}
+.domain.dg::after{background:linear-gradient(90deg,var(--accent2),transparent);}
+.domain.do::after{background:linear-gradient(90deg,var(--accent3),transparent);}
+.domain.dy::after{background:linear-gradient(90deg,var(--warn),transparent);}
+.domain.dp::after{background:linear-gradient(90deg,var(--purple),transparent);}
+.domain.dr::after{background:linear-gradient(90deg,var(--pink),transparent);}
+.domain-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:20px;flex-wrap:wrap;}
+.domain-title{font-family:var(--cond);font-weight:900;font-size:1.5rem;color:#fff;text-transform:uppercase;letter-spacing:.04em;}
+.domain-num{font-family:var(--mono);font-size:36px;font-weight:400;line-height:1;opacity:.07;position:absolute;top:24px;right:28px;}
+.domain-label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;}
+.domain.dc .domain-label{color:var(--accent);}
+.domain.dg .domain-label{color:var(--accent2);}
+.domain.do .domain-label{color:var(--accent3);}
+.domain.dy .domain-label{color:var(--warn);}
+.domain.dp .domain-label{color:var(--purple);}
+.domain.dr .domain-label{color:var(--pink);}
+
+/* ══ TIMELINE ══ */
+.timeline{position:relative;padding-left:36px;}
+.timeline::before{content:'';position:absolute;left:8px;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--accent) 0%,rgba(0,229,255,.15) 100%);}
+.tl-item{position:relative;margin-bottom:44px;}
+.tl-item::before{content:'';position:absolute;left:-31px;top:8px;width:12px;height:12px;border:2px solid var(--accent);background:var(--bg-deep);border-radius:50%;transition:background .2s;}
+.tl-item:hover::before{background:var(--accent);}
+.tl-phase{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase;margin-bottom:5px;}
+.tl-week{font-family:var(--cond);font-weight:900;font-size:1.4rem;color:#fff;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.tl-goal{font-size:.88rem;color:var(--text-dim);font-family:var(--mono);margin-bottom:16px;}
+
+/* ══ SKILL MATRIX ══ */
+.sm-row{display:grid;grid-template-columns:200px 1fr 90px;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid rgba(24,52,72,.5);}
+.sm-row:last-child{border-bottom:none;}
+.sm-name{font-family:var(--mono);font-size:12px;color:var(--text);}
+.sm-bg{height:4px;background:rgba(24,52,72,.9);border-radius:2px;overflow:hidden;}
+.sm-fill{height:100%;border-radius:2px;}
+.fc{background:var(--accent);}  .fg{background:var(--accent2);}  .fo{background:var(--accent3);}
+.sm-lv{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.08em;text-align:right;}
+@media(max-width:600px){.sm-row{grid-template-columns:1fr 60px;}.sm-bg{display:none;}}
+
+/* ══ TABLE ══ */
+.tbl-wrap{overflow-x:auto;margin-top:10px;}
+table{width:100%;border-collapse:collapse;font-size:.88rem;}
+th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);text-align:left;padding:11px 14px;border-bottom:1px solid var(--border);background:rgba(8,20,32,.7);white-space:nowrap;}
+td{padding:11px 14px;color:var(--text-mid);border-bottom:1px solid rgba(24,52,72,.4);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(0,229,255,.015);}
+td:first-child{font-family:var(--mono);font-size:11.5px;color:var(--accent);white-space:nowrap;}
+
+/* ══ SCENARIO CARDS ══ */
+.scenario{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:26px;margin-bottom:16px;}
+.scenario-q{font-style:italic;color:var(--text-mid);font-size:.97rem;padding:14px 18px;background:rgba(0,229,255,.04);border-left:3px solid var(--accent);border-radius:0 3px 3px 0;margin-bottom:18px;line-height:1.7;}
+.scenario-label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+.scenario h3{font-family:var(--cond);font-weight:700;font-size:1.15rem;color:#fff;text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px;}
+.answer-steps{counter-reset:step;}
+.answer-steps li{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(24,52,72,.5);font-size:.93rem;color:var(--text-mid);}
+.answer-steps li:last-child{border-bottom:none;}
+.answer-steps li::before{counter-increment:step;content:counter(step);font-family:var(--mono);font-size:10px;color:var(--bg-deep);background:var(--accent2);border-radius:2px;padding:1px 6px;flex-shrink:0;margin-top:3px;}
+.answer-steps li strong{color:var(--text);}
+
+/* ══ PHASE PILL ══ */
+.phase-pill{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;background:var(--accent2);color:var(--bg-deep);padding:2px 9px;border-radius:2px;margin-bottom:16px;font-weight:700;}
+.phase-pill.o{background:var(--accent3);}
+.phase-pill.y{background:var(--warn);}
+.phase-pill.c{background:var(--accent);}
+.phase-pill.p{background:var(--purple);}
+
+/* ══ RESOURCE CARD ══ */
+.res-card{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:20px 24px;margin-bottom:12px;display:flex;gap:16px;align-items:flex-start;transition:border-color .2s;}
+.res-card:hover{border-color:var(--border-hi);}
+.res-icon{font-size:22px;flex-shrink:0;margin-top:2px;}
+.res-body{}
+.res-title{font-family:var(--cond);font-weight:700;font-size:1.05rem;color:#fff;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.res-author{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.1em;margin-bottom:6px;}
+.res-desc{font-size:.88rem;color:var(--text-mid);line-height:1.65;}
+.res-type{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;border:1px solid;padding:2px 8px;border-radius:2px;margin-top:8px;}
+
+/* ══ SECTION DIVIDER LABEL ══ */
+.sub-head{font-family:var(--cond);font-weight:700;font-size:1.25rem;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin:32px 0 16px;border-bottom:1px solid var(--border);padding-bottom:8px;}
+
+/* ══ WARNING BOX ══ */
+.warn-strip{background:rgba(255,209,102,.05);border:1px solid rgba(255,209,102,.2);border-radius:4px;padding:16px 20px;font-size:.9rem;color:#c9a050;display:flex;gap:12px;align-items:flex-start;margin:16px 0;}
+.warn-strip .wi{font-size:18px;flex-shrink:0;}
+
+/* ══ FOOTER ══ */
+footer{padding:48px 0;text-align:center;color:var(--text-dim);font-family:var(--mono);font-size:11px;letter-spacing:.1em;}
+footer span{color:var(--accent);}
+
+/* ══ ANIMATIONS ══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+header .wrap>*{animation:fadeUp .55s ease both;}
+header .wrap>*:nth-child(2){animation-delay:.08s;}
+header .wrap>*:nth-child(3){animation-delay:.14s;}
+header .wrap>*:nth-child(4){animation-delay:.2s;}
+header .wrap>*:nth-child(5){animation-delay:.26s;}
+
+/* ══ PRINT HINT ══ */
+.print-note{font-family:var(--mono);font-size:10px;color:var(--text-dim);text-align:right;margin-bottom:8px;letter-spacing:.08em;}
+</style>
+</head>
+<body>
+
+<!-- ══════════ HERO ══════════ -->
+<header>
+  <svg class="svg-deco" width="480" height="360" viewBox="0 0 480 360" fill="none">
+    <path d="M20 180 H100 V80 H230 V20 H420" stroke="white" stroke-width="1.4"/>
+    <path d="M230 20 V180 H320 V260 H440" stroke="white" stroke-width="1.4"/>
+    <path d="M100 180 V290 H250 V340 H440" stroke="white" stroke-width="1.2"/>
+    <path d="M320 180 V100 H420 V20" stroke="white" stroke-width="1"/>
+    <path d="M160 180 H160 V120 H320" stroke="white" stroke-width=".8" stroke-dasharray="4 4"/>
+    <circle cx="100"  cy="180" r="6" fill="white"/>
+    <circle cx="230"  cy="20"  r="6" fill="white"/>
+    <circle cx="320"  cy="180" r="6" fill="white"/>
+    <circle cx="250"  cy="340" r="5" fill="white"/>
+    <circle cx="160"  cy="180" r="4" fill="white" opacity=".5"/>
+    <rect x="96"  y="76"  width="8" height="8" fill="white"/>
+    <rect x="416" y="16"  width="8" height="8" fill="white"/>
+    <rect x="316" y="96"  width="8" height="8" fill="white"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-badge">Technical Education Guide · Security Protocols & Requirements for EV & SDV</div>
+    <h1>EV <span class="hi">Cyber</span>security<br>Engineering</h1>
+    <p class="hero-role">New Engineers · EV & Software-Defined Vehicle · Security Protocols & Requirements</p>
+    <p class="hero-desc">
+      A technical education guide for new engineers entering the electrical vehicle (EV) and software-defined
+      vehicle (SDV) industry. Covers security protocols and requirements for EV vehicles: in-vehicle (SecOC,
+      secure boot), manufacturing (key provisioning, HSM), cloud (mTLS, OTA signing), and regulatory
+      (UN R155/R156, ISO/SAE 21434). Use alongside the
+      <a href="ev_protocols.html" style="color:var(--accent);text-decoration:underline;">Vehicle Protocol Architecture</a>
+      guide for protocol fundamentals (CAN, LIN, DoIP, UDS).
+    </p>
+    <div class="hero-kpis">
+      <div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">Technical Domains</div></div>
+      <div class="kpi"><div class="kpi-n">24</div><div class="kpi-l">Weeks Roadmap</div></div>
+      <div class="kpi"><div class="kpi-n">40+</div><div class="kpi-l">Code Examples</div></div>
+      <div class="kpi"><div class="kpi-n">50+</div><div class="kpi-l">Resources</div></div>
+      <div class="kpi"><div class="kpi-n">4+</div><div class="kpi-l">Yrs Exp. Target</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════ STICKY NAV ══════════ -->
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="#overview">Role Overview</a>
+    <a href="#threat">Threat Landscape</a>
+    <a href="#domains">Core Domains</a>
+    <a href="#skills">Skill Matrix</a>
+    <a href="#roadmap">24-Week Roadmap</a>
+    <a href="#tools">Tools & Stack</a>
+    <a href="#standards">Standards</a>
+    <a href="#patterns">Design Patterns</a>
+    <a href="#interview">Interview Prep</a>
+    <a href="#projects">Portfolio</a>
+    <a href="#resources">Resources</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ══════════ 01 ROLE OVERVIEW ══════════ -->
+<section id="overview">
+  <div class="sec-eyebrow">01 · Role Understanding</div>
+  <h2>Understanding the Role</h2>
+  <p class="sec-intro">
+    Security Manufacturing Engineering is a uniquely cross-cutting discipline. Unlike a pure AppSec
+    or infrastructure security role, you operate across hardware trust anchors, factory floor tooling,
+    vehicle software stacks, and cloud backend systems simultaneously. Understanding the full picture
+    is a hard requirement — not a bonus.
+  </p>
+
+  <div class="callout cg">
+    <strong>Where to Start (New Engineer)</strong>
+    Build protocol foundations first: read the
+    <a href="ev_protocols.html" style="color:var(--accent2);text-decoration:underline;">Vehicle Protocol Architecture</a>
+    guide (CAN, LIN, FlexRay, DoIP, UDS) so you understand what you are securing. Then use this guide for
+    security protocols (SecOC, TLS/mTLS, certificate lifecycle), security requirements (UN R155, ISO 21434),
+    and how they apply to EV and software-defined vehicles.
+  </div>
+
+  <div class="callout ci">
+    <strong>Why This Role Exists</strong>
+    Electric vehicles are fully software-defined networked computers. A compromised ECU, a forged
+    firmware update, or a misconfigured manufacturing provisioning system can result in fleet-wide
+    safety incidents, regulatory failures, or theft at scale. This role is the engineering function
+    that makes the difference between a secure and an insecure vehicle leaving the factory floor.
+  </div>
+
+  <h3 class="sub-head">The Four Responsibility Pillars</h3>
+  <div class="card-grid">
+    <div class="card cc">
+      <h3><span class="icon-box">🏭</span>Manufacturing Security</h3>
+      <p style="color:var(--text-mid);font-size:.93rem;">
+        Secure provisioning of cryptographic material — keys, certificates, device identities — into
+        ECUs and control units during vehicle production. This includes HSM integration, secure
+        boot chain configuration, certificate injection tooling, and audit trails for every device
+        that leaves the line. A single misconfigured tool can silently produce an entire batch of
+        vehicles with no meaningful cryptographic identity.
+      </p>
+      <div class="tags">
+        <span class="tag t-c">HSM Provisioning</span>
+        <span class="tag t-c">Secure Boot</span>
+        <span class="tag t-c">PKI Lifecycle</span>
+        <span class="tag t-c">Key Ceremony</span>
+      </div>
+    </div>
+    <div class="card cg">
+      <h3><span class="icon-box">🔧</span>Service & Diagnostics Security</h3>
+      <p style="color:var(--text-mid);font-size:.93rem;">
+        Controlling authenticated access to vehicle diagnostic interfaces (OBD-II, UDS/ISO 14229)
+        during service, repair, and dealer operations. This means role-based access to diagnostic
+        sessions, signed software updates applied by technicians, tamper-evident audit logs, and
+        secure decommissioning procedures for end-of-life vehicles. Unprotected diagnostic access
+        is one of the most common real-world attack vectors.
+      </p>
+      <div class="tags">
+        <span class="tag t-g">UDS Protocol</span>
+        <span class="tag t-g">DiagAuth Tokens</span>
+        <span class="tag t-g">Audit Logging</span>
+        <span class="tag t-g">RBAC</span>
+      </div>
+    </div>
+    <div class="card co">
+      <h3><span class="icon-box">🚗</span>Vehicle Software Security</h3>
+      <p style="color:var(--text-mid);font-size:.93rem;">
+        Defining and implementing security requirements for in-vehicle software: ECU gateway
+        isolation policies, secure inter-ECU communication (SecOC / AUTOSAR), OTA update
+        pipeline with cryptographic signing, anti-rollback protection, and software bill of
+        materials (SBOM) management. You own security reviews for every new ECU supplier
+        integration and every new software component.
+      </p>
+      <div class="tags">
+        <span class="tag t-o">CAN / SOME-IP</span>
+        <span class="tag t-o">SecOC</span>
+        <span class="tag t-o">OTA Signing</span>
+        <span class="tag t-o">SBOM</span>
+      </div>
+    </div>
+    <div class="card cy">
+      <h3><span class="icon-box">☁️</span>Cloud & Backend Security</h3>
+      <p style="color:var(--text-mid);font-size:.93rem;">
+        Securing the vehicle-to-cloud telemetry pipeline, fleet identity infrastructure, OTA
+        delivery CDN, and manufacturing tooling APIs. This spans AWS IAM least-privilege design,
+        KMS-based envelope encryption for sensitive data, IoT device provisioning at scale,
+        service mesh mTLS between microservices, and security monitoring via GuardDuty and
+        Security Hub. The cloud is the control plane for a million vehicles.
+      </p>
+      <div class="tags">
+        <span class="tag t-y">AWS KMS/IAM</span>
+        <span class="tag t-y">mTLS</span>
+        <span class="tag t-y">Zero Trust</span>
+        <span class="tag t-y">IoT Core</span>
+      </div>
+    </div>
+    <div class="card cp">
+      <h3><span class="icon-box">⚡</span>Security Automation at Scale</h3>
+      <p style="color:var(--text-mid);font-size:.93rem;">
+        A security team cannot manually review every change across a fleet growing at thousands
+        of vehicles per week. This role is expected to build security pipelines — SAST/DAST in CI,
+        automated certificate rotation, dependency vulnerability scanning (SCA), policy-as-code
+        in Kubernetes, and automated compliance reporting. Security must scale with engineering
+        velocity.
+      </p>
+      <div class="tags">
+        <span class="tag t-p">CI/CD Security</span>
+        <span class="tag t-p">Policy as Code</span>
+        <span class="tag t-p">SBOM Scanning</span>
+        <span class="tag t-p">OPA/Rego</span>
+      </div>
+    </div>
+    <div class="card cc">
+      <h3><span class="icon-box">🤝</span>Cross-Functional Leadership</h3>
+      <p style="color:var(--text-mid);font-size:.93rem;">
+        Equally critical to the technical work: influencing product, manufacturing, and supplier
+        teams to embed security early. Writing clear security requirements, running threat model
+        workshops, presenting security risk to leadership, and finding pragmatic solutions when
+        pure security ideals conflict with shipping timelines. "Security champion" skills matter
+        here as much as coding skills.
+      </p>
+      <div class="tags">
+        <span class="tag t-c">Threat Modeling</span>
+        <span class="tag t-c">Risk Communication</span>
+        <span class="tag t-c">Security by Design</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 02 THREAT LANDSCAPE ══════════ -->
+<section id="threat">
+  <div class="sec-eyebrow">02 · Context</div>
+  <h2>EV Threat Landscape</h2>
+  <p class="sec-intro">
+    Before writing a single line of security code, you need a mental model of what you're defending
+    against. The automotive threat landscape is uniquely complex because attack surfaces span
+    physical hardware, wireless interfaces, manufacturing processes, and global cloud infrastructure.
+  </p>
+
+  <h3 class="sub-head">Attack Surface Map</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Attack Surface</th>
+          <th>Attack Scenarios</th>
+          <th>Real-World Examples</th>
+          <th>Defender Controls</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>OBD-II / UDS Diagnostic Port</td>
+          <td>Unauthenticated flash of arbitrary firmware; ECU credential extraction; disable safety systems via diagnostic sessions</td>
+          <td>Tesla white-hat researchers re-flashing MCU; keyless theft via OBD relay (2019–)</td>
+          <td>Seed-key challenge-response auth; signed diagnostic sessions; physical port protection</td>
+        </tr>
+        <tr>
+          <td>CAN Bus / In-Vehicle Network</td>
+          <td>Message injection (spoofed brake/throttle); replay attacks; ECU impersonation; denial of service via bus flooding</td>
+          <td>Miller & Valasek 2015 Jeep Cherokee remote CAN injection via Uconnect; Keen Lab BMW research</td>
+          <td>SecOC message authentication codes; gateway firewall rules; anomaly detection IDS</td>
+        </tr>
+        <tr>
+          <td>Telematics / Cellular (TCU)</td>
+          <td>Remote code execution via cellular stack; C2C communication interception; GPS spoofing; modem firmware attacks</td>
+          <td>Jeep remote exploit via Sprint cellular (Millar/Valasek); NIO telematics research</td>
+          <td>Modem firmware signing; network segmentation from safety domains; VPN tunnel to backend</td>
+        </tr>
+        <tr>
+          <td>Bluetooth / Wi-Fi / NFC</td>
+          <td>BLE spoofing for digital key theft; infotainment RCE; rogue Wi-Fi MITM; NFC relay for passive entry</td>
+          <td>BMW keyless entry relay attacks; infotainment sandbox escapes reported multiple OEMs</td>
+          <td>BLE distance bounding; certificate pinning; UWB for accurate proximity; sandbox hardening</td>
+        </tr>
+        <tr>
+          <td>OTA Update Infrastructure</td>
+          <td>Malicious firmware pushed to entire fleet; rollback to vulnerable version; update delivery MITM; certificate compromise</td>
+          <td>Theoretical fleet-scale attack if update server is compromised; multiple researchers demonstrated signing bypass</td>
+          <td>TUF/Uptane framework; hardware anti-rollback counters; staged rollout with telemetry gates</td>
+        </tr>
+        <tr>
+          <td>Manufacturing / Factory Floor</td>
+          <td>Clone of legitimate ECUs with weak keys; compromise of provisioning tooling; insider insertion of backdoor firmware</td>
+          <td>Supply chain attacks analogous to SolarWinds; reported counterfeit ECU markets</td>
+          <td>HSM-backed key injection; hardware attestation; build system signing; audit logging</td>
+        </tr>
+        <tr>
+          <td>Supply Chain (Software + Hardware)</td>
+          <td>Malicious open-source dependency; compromised supplier SDK; counterfeit chips with hidden capabilities</td>
+          <td>Log4Shell in vehicle-adjacent Java services; XZ Utils backdoor (2024)</td>
+          <td>SBOM + continuous SCA scanning; vendor security assessments; binary analysis tooling</td>
+        </tr>
+        <tr>
+          <td>Cloud Backend APIs</td>
+          <td>Vehicle identity spoofing; unauthorized OTA command injection; telemetry data exfiltration; admin API abuse</td>
+          <td>General API security incidents across multiple connected car platforms; Yuga Labs researcher exposed 15.5M vehicle records (Spireon, 2023)</td>
+          <td>mTLS vehicle identity; OAuth2 with short-lived tokens; WAF; anomaly detection; rate limiting</td>
+        </tr>
+        <tr>
+          <td>Charging Infrastructure (V2G / OCPP)</td>
+          <td>Malicious charger exploiting ISO 15118 stack; power grid manipulation via V2G; OCPP server injection</td>
+          <td>SaiFlow research on OCPP MITM (2022); multiple EVSE vulnerabilities found at Pwn2Own Automotive 2024</td>
+          <td>TLS certificate pinning on OCPP; ISO 15118 mutual auth; input validation on OCPP commands</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout cw" style="margin-top:24px">
+    <strong>Pwn2Own Automotive 2024</strong>
+    At the first automotive-focused Pwn2Own competition in Tokyo (January 2024), researchers
+    demonstrated 49 zero-day exploits across EV chargers, IVI systems, and automotive operating
+    systems — collecting over $1.3M in prizes. Study the disclosed findings. They represent
+    exactly the class of vulnerabilities you will defend against.
+  </div>
+</section>
+
+<!-- ══════════ 03 CORE DOMAINS ══════════ -->
+<section id="domains">
+  <div class="sec-eyebrow">03 · Technical Domains</div>
+  <h2>Core Technical Domains</h2>
+  <p class="sec-intro">
+    Nine technical domains form the knowledge base for this role. Each is detailed below with
+    conceptual depth, must-know topics, code examples, and pitfalls. Begin with Domains 1–3 as
+    your foundation before moving to the automotive-specific and cloud domains.
+  </p>
+
+  <!-- DOMAIN 1: CRYPTO -->
+  <div class="domain dc">
+    <div class="domain-num">01</div>
+    <div class="domain-label">Domain 01 · Foundation</div>
+    <div class="domain-title">Cryptography & Secure Communication Protocols</div>
+    <p style="color:var(--text-mid);margin:12px 0 20px;max-width:820px;font-size:.97rem;">
+      Every security guarantee in the vehicle — firmware authenticity, OTA integrity, device
+      identity, diagnostic access control, and cloud telemetry confidentiality — ultimately depends
+      on correct cryptographic implementation. This is non-negotiable depth regardless of which
+      layer you work in.
+    </p>
+    <div class="two">
+      <div>
+        <div class="phase-pill">Symmetric Encryption</div>
+        <ul class="cl">
+          <li><strong>AES-256-GCM</strong>: The standard for bulk encryption. GCM mode provides both confidentiality and authenticated integrity (AEAD). 96-bit nonce, 128-bit auth tag. Never reuse a nonce under the same key — catastrophic failure mode.</li>
+          <li><strong>ChaCha20-Poly1305</strong>: Preferred on embedded/mobile hardware without AES acceleration (ARM Cortex-M without hardware AES). Designed to be software-side-channel resistant.</li>
+          <li><strong>Key wrapping</strong>: AES-KWP (RFC 5649) for wrapping keys at rest. Used extensively in HSM key export operations.</li>
+          <li><strong>Avoid</strong>: AES-CBC without explicit MAC (CBC-MAC is not authentication), AES-ECB (deterministic, block patterns visible), DES/3DES (deprecated, insufficient key length).</li>
+        </ul>
+        <div class="phase-pill c">Asymmetric / Public Key</div>
+        <ul class="cl">
+          <li><strong>ECDSA with P-256 (secp256r1)</strong>: The standard for firmware signing and certificate authentication. Widely supported in automotive HSMs and TPMs. 64-byte signatures.</li>
+          <li><strong>Ed25519</strong>: Faster, simpler, no nonce required. Preferred for new systems where HSM support exists. Resistant to timing side-channels by design.</li>
+          <li><strong>RSA-OAEP-SHA256</strong>: Still common for key transport in legacy HSMs. Use 2048-bit minimum; prefer 4096-bit for long-lived root CA keys.</li>
+          <li><strong>ECDH (Diffie-Hellman)</strong>: Used for key agreement in TLS handshake and secure channel establishment between ECUs.</li>
+          <li><strong>Post-Quantum consideration</strong>: NIST finalized ML-KEM (Kyber) and ML-DSA (Dilithium) in 2024. Begin tracking PQC migration requirements — vehicles have 10–15 year lifecycles.</li>
+        </ul>
+        <div class="phase-pill y">Hash Functions & MACs</div>
+        <ul class="cl">
+          <li><strong>SHA-256 / SHA-384</strong>: General purpose. SHA-256 for firmware digests, TLS, certificate fingerprints. SHA-384 for higher-security applications.</li>
+          <li><strong>HMAC-SHA256</strong>: Message authentication code for symmetric authentication. Used in SecOC (vehicle network message auth), API request signing, TOTP.</li>
+          <li><strong>CMAC-AES</strong>: Block-cipher based MAC, common in automotive (ISO 14229 / AUTOSAR) where AES hardware exists but SHA may not.</li>
+          <li><strong>Avoid</strong>: MD5, SHA-1 for any new security purpose (collision-broken); custom MAC constructions.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="phase-pill o">TLS 1.3 Deep Dive</div>
+        <ul class="cl">
+          <li><strong>Handshake</strong>: ClientHello → ServerHello → Encrypted Extensions → Certificate → CertVerify → Finished. Only 1 RTT for new connections (0-RTT for resumed). Study each message field.</li>
+          <li><strong>Cipher suites</strong> (TLS 1.3): TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256, TLS_AES_128_GCM_SHA256. All include forward secrecy — mandatory.</li>
+          <li><strong>mTLS (mutual TLS)</strong>: Both client and server present certificates. Critical for vehicle-to-cloud and service-to-service authentication. Understand certificate chain validation, CRL vs OCSP.</li>
+          <li><strong>Certificate pinning</strong>: Hard-code expected server cert/public key hash in the vehicle client. Prevents MITM if CA is compromised. Must plan pin rotation carefully.</li>
+          <li><strong>DTLS 1.3</strong>: TLS over UDP — used for SOME/IP and V2X (Vehicle-to-Everything) communications where connection overhead is unacceptable.</li>
+        </ul>
+        <div class="code-wrap">
+          <span class="code-lang">Python · AES-256-GCM + ECDSA Sign</span>
+          <pre><span class="cm"># Generate vehicle firmware signing keypair</span>
+<span class="ck">from</span> cryptography.hazmat.primitives.asymmetric <span class="ck">import</span> ec
+<span class="ck">from</span> cryptography.hazmat.primitives <span class="ck">import</span> hashes, serialization
+<span class="ck">from</span> cryptography.hazmat.primitives.ciphers.aead <span class="ck">import</span> AESGCM
+<span class="ck">import</span> os, hashlib
+
+<span class="cm"># ── Asymmetric: firmware signing ──────────────────</span>
+private_key = ec.generate_private_key(ec.SECP256R1())
+public_key  = private_key.public_key()
+
+<span class="cm"># Sign firmware binary digest (DER format)</span>
+firmware_bytes = open(<span class="cv">"firmware.bin"</span>, <span class="cv">"rb"</span>).read()
+firmware_hash  = hashlib.sha256(firmware_bytes).digest()
+signature = private_key.sign(firmware_hash, ec.ECDSA(hashes.SHA256()))
+
+<span class="cm"># Verify on target (ECU bootloader does this)</span>
+<span class="ck">try</span>:
+    public_key.verify(signature, firmware_hash,
+                      ec.ECDSA(hashes.SHA256()))
+    print(<span class="cv">"✓ Firmware signature valid"</span>)
+<span class="ck">except</span> Exception:
+    print(<span class="cv">"✗ SIGNATURE INVALID — reject firmware"</span>)
+
+<span class="cm"># ── Symmetric: encrypt telemetry payload ──────────</span>
+key   = AESGCM.generate_key(bit_length=<span class="cv">256</span>)
+aesgcm = AESGCM(key)
+nonce  = os.urandom(<span class="cv">12</span>)   <span class="cm"># 96-bit nonce, never reuse!</span>
+
+plaintext  = b<span class="cv">"{'speed':120,'soc':0.73,'lat':37.7}"</span>
+ciphertext = aesgcm.encrypt(nonce, plaintext, aad=<span class="cv">b"vehicle-id-001"</span>)
+
+<span class="cm"># aad = associated data: authenticated but not encrypted</span>
+<span class="cm"># Typically includes device ID, timestamp, sequence num</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-head">PKI Architecture for Vehicle Fleets</div>
+    <div class="two">
+      <div>
+        <ul class="cl">
+          <li><strong>Root CA</strong>: Offline, air-gapped, HSM-protected. Signs intermediate CAs only. 10+ year validity. Key ceremony is a formal, audited process with multiple key custodians.</li>
+          <li><strong>Intermediate CA (Mfg)</strong>: Online, HSM-backed. Issues device certificates during factory provisioning. Short-lived and rotatable without touching Root CA.</li>
+          <li><strong>Intermediate CA (OTA)</strong>: Dedicated intermediate for signing firmware update packages. Scoped to OTA signing only — compromise doesn't affect device identity.</li>
+          <li><strong>Device Certificates</strong>: Issued per ECU at manufacturing. Contain vehicle VIN, ECU part number, manufacturing date. Used for mutual TLS with cloud services.</li>
+          <li><strong>CRL vs OCSP vs OCSP Stapling</strong>: Certificate revocation strategy matters for a fleet with intermittent connectivity. Design for offline-capable revocation.</li>
+          <li><strong>Certificate lifecycle automation</strong>: Use ACME protocol (RFC 8555), step-ca, or AWS ACM Private CA for automated issuance and rotation. Manual certificate management does not scale.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <span class="code-lang">bash · Build a Two-Tier PKI with step-ca</span>
+          <pre><span class="cm"># Install step-ca (SmallStep)</span>
+<span class="cd">wget</span> https://dl.smallstep.com/gh-release/cli/latest/step_linux_amd64.tar.gz
+<span class="cd">tar</span> -xzf step_linux_amd64.tar.gz && sudo mv step /usr/local/bin/
+
+<span class="cm"># Initialize offline Root CA (run air-gapped)</span>
+<span class="cd">step</span> ca init --name <span class="cv">"VehicleFleet Root CA"</span> \
+     --dns rootca.internal \
+     --address :9000 \
+     --provisioner <span class="cv">"root-admin@company.com"</span>
+
+<span class="cm"># Create Intermediate Manufacturing CA</span>
+<span class="cd">step</span> certificate create \
+     <span class="cv">"Manufacturing Intermediate CA"</span> \
+     mfg-intermediate.crt mfg-intermediate.key \
+     --ca root-ca.crt --ca-key root-ca.key \
+     --profile intermediate-ca \
+     --not-after 8760h     <span class="cm"># 1 year validity</span>
+
+<span class="cm"># Issue device cert for ECU during provisioning</span>
+<span class="cd">step</span> certificate create \
+     <span class="cv">"ECU-${VIN}-${ECU_PART}"</span> \
+     device.crt device.key \
+     --ca mfg-intermediate.crt \
+     --ca-key mfg-intermediate.key \
+     --not-after 87600h    <span class="cm"># 10-year vehicle lifetime</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 2: LINUX -->
+  <div class="domain dg">
+    <div class="domain-num">02</div>
+    <div class="domain-label">Domain 02 · Platform</div>
+    <div class="domain-title">Linux Systems Security & Hardening (Debian/Ubuntu Focus)</div>
+    <p style="color:var(--text-mid);margin:12px 0 20px;max-width:820px;font-size:.97rem;">
+      Factory tooling servers, diagnostic workstations, backend services, and increasingly vehicle
+      head units all run Linux. You need the ability to build, configure, and monitor these systems
+      from a blank Debian ISO — not just use existing infrastructure. This is explicitly called out
+      in the JD.
+    </p>
+    <div class="two">
+      <div>
+        <div class="phase-pill">OS Hardening Fundamentals</div>
+        <ul class="cl">
+          <li><strong>CIS Benchmarks</strong>: The Center for Internet Security publishes scored hardening guides for Debian, Ubuntu, Docker, Kubernetes. These are the reference standard. Study CIS Level 1 (required) and Level 2 (preferred). Use <code>openscap</code> or <code>lynis</code> to audit compliance.</li>
+          <li><strong>Attack surface reduction</strong>: Disable unused systemd services; remove non-essential packages (apt purge); close all listening ports not required by function; disable IPv6 if not needed.</li>
+          <li><strong>Kernel hardening via sysctl</strong>: ASLR, kernel pointer restriction, ptrace scope, core dump disabling, TCP hardening (SYN cookies, RFC 1337). Know which parameters matter and why.</li>
+          <li><strong>Filesystem security</strong>: Mount /tmp, /var, /home with noexec, nosuid, nodev options. Separate partitions for /var/log to prevent log-exhaustion attacks. LUKS2 full disk encryption with TPM2 unsealing.</li>
+          <li><strong>User and privilege management</strong>: PAM configuration (pam_pwquality, pam_faillock); sudoers NOPASSWD restrictions; audit all privilege escalation events; disable direct root login everywhere.</li>
+          <li><strong>SSH hardening</strong>: Ed25519 host keys; public-key only (PasswordAuthentication no); AllowUsers whitelist; MaxAuthTries 3; LoginGraceTime 30s; ClientAliveInterval for session timeout; fail2ban or equivalent.</li>
+        </ul>
+        <div class="phase-pill y">Mandatory Access Control</div>
+        <ul class="cl">
+          <li><strong>AppArmor (Debian default)</strong>: Profile-based MAC. Learn aa-genprof to build profiles; aa-complain for testing; aa-enforce for production. Write profiles for every manufacturing service. Know how to read AppArmor audit logs in journalctl.</li>
+          <li><strong>SELinux (RHEL/CentOS)</strong>: Type enforcement, MLS, role-based. More powerful but complex. Understand policy modules, booleans, and context labeling even if you primarily use AppArmor.</li>
+          <li><strong>Seccomp</strong>: Kernel-level syscall filtering — use in Docker containers and via systemd's SystemCallFilter. Restrict each service to only the syscalls it actually needs.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <span class="code-lang">bash · Production Debian Hardening Script</span>
+          <pre><span class="cm">#!/bin/bash</span>
+<span class="cm"># Debian 12 Security Hardening — EV Manufacturing Server</span>
+<span class="cd">set</span> -euo pipefail
+
+<span class="cm">## ── 1. Kernel Security Parameters ──────────────</span>
+<span class="cd">cat</span> >> /etc/sysctl.d/99-security.conf << <span class="cv">'EOF'</span>
+<span class="cv">kernel.randomize_va_space = 2          # Full ASLR</span>
+<span class="cv">kernel.kptr_restrict = 2               # Hide kernel pointers</span>
+<span class="cv">kernel.dmesg_restrict = 1              # Restrict dmesg</span>
+<span class="cv">kernel.yama.ptrace_scope = 2           # Restrict ptrace</span>
+<span class="cv">kernel.core_uses_pid = 1</span>
+<span class="cv">kernel.sysrq = 0                       # Disable magic sysrq</span>
+<span class="cv">net.ipv4.tcp_syncookies = 1            # SYN flood protection</span>
+<span class="cv">net.ipv4.conf.all.rp_filter = 1        # Reverse path filter</span>
+<span class="cv">net.ipv4.conf.all.accept_redirects = 0</span>
+<span class="cv">net.ipv4.conf.all.send_redirects = 0</span>
+<span class="cv">net.ipv4.conf.all.log_martians = 1</span>
+<span class="cv">fs.protected_hardlinks = 1</span>
+<span class="cv">fs.protected_symlinks = 1</span>
+<span class="cv">EOF</span>
+<span class="cd">sysctl</span> --system
+
+<span class="cm">## ── 2. SSH Hardening ────────────────────────────</span>
+<span class="cd">cat</span> > /etc/ssh/sshd_config.d/hardening.conf << <span class="cv">'EOF'</span>
+<span class="cv">PermitRootLogin no</span>
+<span class="cv">PasswordAuthentication no</span>
+<span class="cv">PubkeyAuthentication yes</span>
+<span class="cv">AuthorizedKeysFile .ssh/authorized_keys</span>
+<span class="cv">X11Forwarding no</span>
+<span class="cv">AllowAgentForwarding no</span>
+<span class="cv">AllowTcpForwarding no</span>
+<span class="cv">MaxAuthTries 3</span>
+<span class="cv">LoginGraceTime 30</span>
+<span class="cv">ClientAliveInterval 300</span>
+<span class="cv">ClientAliveCountMax 2</span>
+<span class="cv">Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com</span>
+<span class="cv">MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com</span>
+<span class="cv">KexAlgorithms curve25519-sha256,diffie-hellman-group14-sha256</span>
+<span class="cv">EOF</span>
+
+<span class="cm">## ── 3. Enable AppArmor & UFW ────────────────────</span>
+<span class="cd">systemctl</span> enable --now apparmor
+<span class="cd">ufw</span> default deny incoming
+<span class="cd">ufw</span> default allow outgoing
+<span class="cd">ufw</span> allow 22/tcp comment <span class="cv">'SSH management'</span>
+<span class="cd">ufw</span> --force enable
+
+<span class="cm">## ── 4. Auditd for security event logging ────────</span>
+<span class="cd">apt</span> install -y auditd audispd-plugins
+<span class="cd">cat</span> >> /etc/audit/rules.d/manufacturing.rules << <span class="cv">'EOF'</span>
+<span class="cv">-w /etc/passwd -p wa -k identity</span>
+<span class="cv">-w /etc/sudoers -p wa -k privilege</span>
+<span class="cv">-a always,exit -F arch=b64 -S execve -k exec_log</span>
+<span class="cv">-a always,exit -F arch=b64 -S openat -k file_access</span>
+<span class="cv">EOF</span>
+<span class="cd">service</span> auditd restart</pre>
+        </div>
+        <div class="phase-pill c">Monitoring & Intrusion Detection</div>
+        <ul class="cl">
+          <li><strong>auditd</strong>: Kernel-level audit framework — log all file access, exec calls, privilege changes. Write audit rules for manufacturing-critical paths (HSM device access, key files, provisioning scripts).</li>
+          <li><strong>AIDE / Tripwire</strong>: File integrity monitoring. Detect unauthorized modification of critical binaries and config files between deployments.</li>
+          <li><strong>Fail2ban</strong>: Parse auth logs and automatically firewall brute-force sources. Configure for SSH, web services, diagnostic APIs.</li>
+          <li><strong>Centralized log shipping</strong>: Ship all security logs to immutable, append-only log storage (AWS CloudWatch, Splunk, Loki). Manufacturing systems must have tamper-evident audit trails.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 3: CONFIG MGMT -->
+  <div class="domain do">
+    <div class="domain-num">03</div>
+    <div class="domain-label">Domain 03 · Automation</div>
+    <div class="domain-title">Configuration Management & Container Security</div>
+    <p style="color:var(--text-mid);margin:12px 0 20px;max-width:820px;font-size:.97rem;">
+      Security at scale requires infrastructure as code. Manual configuration of factory tooling
+      servers creates drift, inconsistency, and undetected vulnerabilities. Every security policy
+      must be codified, version-controlled, and automatically enforced.
+    </p>
+    <div class="two">
+      <div>
+        <div class="phase-pill">Ansible Security Automation</div>
+        <ul class="cl">
+          <li><strong>Idempotent hardening roles</strong>: Write Ansible roles that can be applied repeatedly without side effects. Every security control should be a task with a corresponding assertion/test.</li>
+          <li><strong>Ansible Vault</strong>: Encrypt all secrets (private keys, passwords, API tokens) in vault-encrypted files. Use separate vault passwords per environment (dev/staging/prod).</li>
+          <li><strong>Dynamic inventory</strong>: In factory environments, servers may be provisioned dynamically. Use EC2 dynamic inventory or custom inventory plugins for accurate targeting.</li>
+          <li><strong>Molecule for testing</strong>: Test Ansible roles in Docker containers before deploying to production factory servers. Write failing-first tests for each security control.</li>
+          <li><strong>Drift detection</strong>: Schedule Ansible runs in check mode via cron/CI to detect unauthorized configuration changes — equivalent to file integrity monitoring at the infra level.</li>
+        </ul>
+        <div class="phase-pill y">Docker / Container Security</div>
+        <ul class="cl">
+          <li><strong>Rootless containers</strong>: Run containers as non-root users. Use USER instruction in Dockerfile. Prevents container escape from reaching host root.</li>
+          <li><strong>Minimal base images</strong>: Use distroless (google/distroless) or alpine — reduces attack surface by eliminating shell, package manager, and debugging tools from production images.</li>
+          <li><strong>Read-only filesystems</strong>: --read-only flag; mount only required writable paths with tmpfs. Prevents malware from persisting inside containers.</li>
+          <li><strong>No-new-privileges</strong>: --security-opt=no-new-privileges:true prevents setuid binaries from gaining additional privileges.</li>
+          <li><strong>Seccomp profiles</strong>: Docker's default seccomp profile blocks ~44 dangerous syscalls. Create custom profiles for manufacturing services that block even more.</li>
+          <li><strong>Image signing</strong>: Use cosign (Sigstore) to sign container images in CI and verify signatures before deployment. Part of supply chain integrity.</li>
+          <li><strong>Vulnerability scanning</strong>: Integrate Trivy or Grype into CI pipeline. Fail builds on CRITICAL/HIGH CVEs in base images or application dependencies.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <span class="code-lang">YAML · Ansible Role — Secure Container Deploy</span>
+          <pre><span class="cm"># roles/secure_service/tasks/main.yml</span>
+---
+- <span class="ck">name</span>: Ensure cosign is installed
+  <span class="ck">get_url</span>:
+    url: <span class="cv">"https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64"</span>
+    dest: /usr/local/bin/cosign
+    mode: <span class="cv">'0755'</span>
+
+- <span class="ck">name</span>: Verify image signature before deployment
+  <span class="ck">command</span>: >
+    cosign verify
+    --certificate-identity <span class="cv">"ci@company.com"</span>
+    --certificate-oidc-issuer <span class="cv">"https://accounts.google.com"</span>
+    <span class="cv">"{{ registry }}/{{ image }}:{{ version }}"</span>
+  <span class="ck">register</span>: sig_check
+  <span class="ck">failed_when</span>: sig_check.rc != <span class="cv">0</span>
+
+- <span class="ck">name</span>: Run hardened diagnostic service
+  <span class="ck">community.docker.docker_container</span>:
+    <span class="ck">name</span>: vehicle-diag
+    <span class="ck">image</span>: <span class="cv">"{{ registry }}/vehicle-diag:{{ version }}"</span>
+    <span class="ck">restart_policy</span>: unless-stopped
+    <span class="ck">read_only</span>: <span class="ck">true</span>
+    <span class="ck">user</span>: <span class="cv">"1000:1000"</span>
+    <span class="ck">security_opts</span>:
+      - <span class="cv">"no-new-privileges:true"</span>
+      - <span class="cv">"apparmor:vehicle-diag-profile"</span>
+      - <span class="cv">"seccomp:/etc/docker/seccomp/diag.json"</span>
+    <span class="ck">cap_drop</span>: [<span class="cv">"ALL"</span>]
+    <span class="ck">cap_add</span>:  []   <span class="cm"># Explicitly none</span>
+    <span class="ck">tmpfs</span>:
+      /tmp: <span class="cv">"size=64m,mode=1777,noexec"</span>
+    <span class="ck">env</span>:
+      VAULT_ADDR: <span class="cv">"https://vault.internal:8200"</span>
+      VAULT_ROLE: <span class="cv">"vehicle-diag-prod"</span></pre>
+        </div>
+        <div class="code-wrap">
+          <span class="code-lang">YAML · Kubernetes Pod Security Standards</span>
+          <pre><span class="cm"># Restrict entire namespace to Restricted profile</span>
+<span class="ck">apiVersion</span>: v1
+<span class="ck">kind</span>: Namespace
+<span class="ck">metadata</span>:
+  <span class="ck">name</span>: manufacturing-services
+  <span class="ck">labels</span>:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit:   restricted
+    pod-security.kubernetes.io/warn:    restricted
+---
+<span class="cm"># NetworkPolicy: default deny-all, explicit allow</span>
+<span class="ck">apiVersion</span>: networking.k8s.io/v1
+<span class="ck">kind</span>: NetworkPolicy
+<span class="ck">metadata</span>:
+  <span class="ck">name</span>: default-deny-all
+  <span class="ck">namespace</span>: manufacturing-services
+<span class="ck">spec</span>:
+  <span class="ck">podSelector</span>: {}
+  <span class="ck">policyTypes</span>: [Ingress, Egress]</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 4: AUTOMOTIVE -->
+  <div class="domain dy">
+    <div class="domain-num">04</div>
+    <div class="domain-label">Domain 04 · Automotive Specific</div>
+    <div class="domain-title">Embedded Systems & Automotive Security Architecture</div>
+    <p style="color:var(--text-mid);margin:12px 0 20px;max-width:820px;font-size:.97rem;">
+      While you are not writing ECU firmware day-to-day, you need sufficient depth to evaluate
+      security claims from suppliers, conduct meaningful threat modeling, and design security
+      requirements that are actually implementable in constrained embedded environments.
+    </p>
+    <div class="two">
+      <div>
+        <div class="phase-pill y">ECU Architecture</div>
+        <ul class="cl">
+          <li><strong>ECU Hardware Stack</strong>: MCU (e.g., Infineon AURIX, NXP S32K, Renesas RH850) → secure bootloader → RTOS (FreeRTOS, AUTOSAR OS) → application software. Each layer has specific security responsibilities.</li>
+          <li><strong>Hardware Security Module (HSM / SHE / HSE)</strong>: Dedicated security co-processor within the MCU. Stores private keys, performs crypto operations without exposing key material to host CPU. The automotive equivalent of a TPM. Key operations never leave the HSM.</li>
+          <li><strong>Secure Boot Chain</strong>: ROM → Level 1 Bootloader (ROM-based, immutable) → Level 2 Bootloader (flash, signed by ROM key) → Application (signed by BL2 key). Any signature failure must halt boot — never proceed to an unsigned state.</li>
+          <li><strong>AUTOSAR Adaptive Platform</strong>: Modern high-compute ECUs (IVI, ADAS) run AUTOSAR Adaptive on Linux. Security services include IAM (Identity and Access Management), Crypto Service Manager, Intrusion Detection and Management System (IDMS).</li>
+          <li><strong>TrustZone / ARM Secure World</strong>: ARM Cortex-A processors support hardware-isolated Secure World (TEE — Trusted Execution Environment). Crypto operations, secure storage, and attestation run in the Secure World, isolated from the Normal World OS.</li>
+        </ul>
+        <div class="phase-pill o">In-Vehicle Network Security</div>
+        <ul class="cl">
+          <li><strong>CAN Bus</strong>: Classic CAN has no authentication or source identification — any node can send any message. Attack vector: message injection after physical access (or remote code execution on a connected ECU). CAN FD adds larger payloads but no security.</li>
+          <li><strong>SecOC (Secure Onboard Communication)</strong>: AUTOSAR standard for authenticating CAN/LIN/FlexRay messages using CMAC-AES or HMAC. Adds a Message Authentication Code and freshness counter to critical messages (throttle, brake, steering). Study AUTOSAR SecOC specification.</li>
+          <li><strong>Automotive Ethernet + SOME/IP</strong>: High-bandwidth ECUs use Ethernet. SOME/IP (Scalable service-Oriented MiddlewarE over IP) is the dominant service discovery and communication protocol. Secure with TLS/DTLS 1.3 and SOME/IP firewall policies.</li>
+          <li><strong>Gateway ECU / Central Gateway</strong>: The security enforcement point between network domains (powertrain, chassis, infotainment, telematics). Implement firewall rules between domains; never allow raw CAN frames to reach telematics from powertrain.</li>
+          <li><strong>Automotive IDS (IDPS)</strong>: Rule-based and ML-based intrusion detection on the vehicle network. Monitor for unexpected message rates, out-of-range values, new CAN IDs, SecOC failures. Report to cloud SIEM.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="phase-pill c">OTA Update Security</div>
+        <ul class="cl">
+          <li><strong>Uptane Framework</strong>: The industry-standard OTA security framework (adopted by multiple OEMs and Linux Foundation AGL). Hierarchical trust model: Director Repository (vehicle-specific targets) + Image Repository (verified firmware images). Read the Uptane standard specification.</li>
+          <li><strong>TUF (The Update Framework)</strong>: The foundation of Uptane. Four metadata roles: Root (trust anchor), Timestamp (freshness), Snapshot (consistent view), Targets (file hashes + sizes). Understand key compromise recovery procedures.</li>
+          <li><strong>Anti-rollback</strong>: Hardware monotonic counter in the ECU's HSM increments on each successful update. Firmware cannot roll back past the current counter value — prevents reinstalling known-vulnerable firmware.</li>
+          <li><strong>A/B Partition Strategy</strong>: Two firmware slots — active and standby. New firmware is written to standby, verified, then activated on next boot. Automatic rollback to previous known-good if new firmware fails health checks. Zero-downtime and safe.</li>
+          <li><strong>Delta updates</strong>: For bandwidth efficiency, only transmit the diff between versions. Must ensure diff application is secure — validate final image hash after applying delta, not just the delta itself.</li>
+        </ul>
+        <div class="code-wrap">
+          <span class="code-lang">Python · CAN Bus Anomaly Simulation (vcan)</span>
+          <pre><span class="cm"># Test automotive IDS with simulated attack</span>
+<span class="cm"># Setup: sudo modprobe vcan && sudo ip link add vcan0 type vcan</span>
+<span class="cm">#        && sudo ip link set vcan0 up</span>
+
+<span class="ck">import</span> can, time, struct
+
+bus = can.interface.Bus(<span class="cv">'vcan0'</span>, bustype=<span class="cv">'socketcan'</span>)
+
+<span class="cm"># ── Normal operation: speed sensor message ────────</span>
+<span class="ck">def</span> send_speed(speed_kmh):
+    data = struct.pack(<span class="cv">'>H'</span>, speed_kmh * <span class="cv">100</span>)  <span class="cm"># 0.01 km/h resolution</span>
+    msg  = can.Message(arbitration_id=<span class="cv">0x180</span>, data=data, is_extended_id=<span class="ck">False</span>)
+    bus.send(msg)
+
+<span class="cm"># ── Attack: inject fake brake command ─────────────</span>
+<span class="ck">def</span> inject_brake_command():
+    <span class="cm"># ECU ID 0x200 = brake controller (spoofed)</span>
+    payload = bytes([<span class="cv">0xFF</span>, <span class="cv">0xFF</span>, <span class="cv">0x00</span>, <span class="cv">0x00</span>])  <span class="cm"># Max brake pressure</span>
+    msg = can.Message(arbitration_id=<span class="cv">0x200</span>,
+                      data=payload, is_extended_id=<span class="ck">False</span>)
+    bus.send(msg)
+    print(<span class="cv">"[ATTACK] Fake brake command injected on 0x200"</span>)
+
+<span class="cm"># ── IDS Monitor: detect rate anomalies ────────────</span>
+msg_counts = {}
+<span class="ck">for</span> msg <span class="ck">in</span> bus:
+    aid = msg.arbitration_id
+    msg_counts[aid] = msg_counts.get(aid, <span class="cv">0</span>) + <span class="cv">1</span>
+    <span class="ck">if</span> msg_counts[aid] > <span class="cv">1000</span>:  <span class="cm"># Threshold: >1000/sec suspicious</span>
+        print(<span class="cv">f"[ALERT] CAN flood on ID 0x{aid:03X}"</span>)</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 5: AWS CLOUD -->
+  <div class="domain dp">
+    <div class="domain-num">05</div>
+    <div class="domain-label">Domain 05 · Cloud Security</div>
+    <div class="domain-title">AWS Cloud Security for Connected Vehicle Fleets</div>
+    <p style="color:var(--text-mid);margin:12px 0 20px;max-width:820px;font-size:.97rem;">
+      The cloud is the operational backbone — fleet identity, OTA delivery, telemetry ingestion,
+      manufacturing tooling APIs, and security monitoring all live here. AWS is the dominant
+      provider in automotive. Deep AWS security knowledge is explicitly a preferred qualification.
+    </p>
+    <div class="two">
+      <div>
+        <div class="phase-pill p">IAM — Least Privilege Architecture</div>
+        <ul class="cl">
+          <li><strong>Policy design principles</strong>: Start with zero permissions. Add only what is explicitly required. Use condition keys (aws:SourceIp, aws:MultiFactorAuthPresent, aws:RequestedRegion) to further constrain.</li>
+          <li><strong>IRSA (IAM Roles for Service Accounts)</strong>: In EKS, map Kubernetes service accounts to IAM roles without static credentials. Pods receive auto-rotating tokens. No secrets in environment variables.</li>
+          <li><strong>Service Control Policies (SCPs)</strong>: Org-level guardrails. Prevent any account from disabling CloudTrail, creating unencrypted S3 buckets, or deploying in non-approved regions.</li>
+          <li><strong>Permission boundaries</strong>: Limit the maximum permissions a role can have even if its policy allows more. Used to safely delegate IAM management to teams without privilege escalation risk.</li>
+          <li><strong>IAM Access Analyzer</strong>: Automated detection of overly permissive policies and public resource exposure. Run continuously in CI/CD on policy changes.</li>
+        </ul>
+        <div class="phase-pill c">KMS & Secrets Management</div>
+        <ul class="cl">
+          <li><strong>Envelope encryption</strong>: Use KMS to generate a Data Encryption Key (DEK). Encrypt data locally with the DEK using AES-256-GCM. Store the KMS-encrypted DEK alongside the ciphertext. Never store plaintext keys.</li>
+          <li><strong>Key policies vs IAM policies</strong>: KMS key access requires both the KMS key policy and the IAM identity policy to grant access. Defense in depth — compromised IAM credentials alone cannot decrypt data.</li>
+          <li><strong>AWS Secrets Manager</strong>: Store and auto-rotate database credentials, API keys, private keys. Use resource-based policies to scope access. Rotation Lambda handles zero-downtime rotation.</li>
+          <li><strong>CloudHSM</strong>: Dedicated hardware HSM in AWS. Required for operations that need FIPS 140-2 Level 3 or where you need HSM-level key custody guarantees (e.g., root CA private keys).</li>
+        </ul>
+      </div>
+      <div>
+        <div class="phase-pill o">AWS IoT Core — Fleet Identity at Scale</div>
+        <ul class="cl">
+          <li><strong>Just-in-Time Registration (JITR)</strong>: Vehicles auto-register when they first connect using a certificate signed by a registered CA. Lambda processes registration and attaches IoT policies based on certificate attributes (VIN, model year).</li>
+          <li><strong>Fleet Provisioning</strong>: Template-based provisioning using a claim certificate. Vehicles exchange the claim certificate for a unique device certificate upon first connection. Eliminates individual certificate pre-loading requirements.</li>
+          <li><strong>IoT Policies</strong>: JSON-based, with IoT-specific condition keys (iot:ClientId, iot:Certificate.Subject.CommonName). Lock each vehicle to its own MQTT topic namespace — no cross-vehicle data access.</li>
+          <li><strong>MQTT topic design</strong>: <code>vehicles/{VIN}/telemetry/+</code> for pub; <code>vehicles/{VIN}/commands/#</code> for sub. Enforce topic ACLs in IoT policy. Use MQTT 5.0 with enhanced auth for fresh token validation.</li>
+          <li><strong>Device Defender</strong>: Behavioral anomaly detection for IoT devices. Detect unusual connection patterns, unexpected topic subscriptions, abnormal message sizes — cloud-side IDS.</li>
+        </ul>
+        <div class="code-wrap">
+          <span class="code-lang">Python · KMS Envelope Encrypt + IoT Publish</span>
+          <pre><span class="ck">import</span> boto3, json, base64
+<span class="ck">from</span> cryptography.hazmat.primitives.ciphers.aead <span class="ck">import</span> AESGCM
+<span class="ck">import</span> os
+
+kms  = boto3.client(<span class="cv">'kms'</span>, region_name=<span class="cv">'us-east-1'</span>)
+iot  = boto3.client(<span class="cv">'iot-data'</span>)
+
+<span class="ck">def</span> encrypt_and_publish(vin: str, telemetry: dict) -> <span class="ck">None</span>:
+    <span class="cm"># 1. Generate data encryption key from KMS</span>
+    dek_response = kms.generate_data_key(
+        KeyId=<span class="cv">'alias/vehicle-telemetry'</span>,
+        KeySpec=<span class="cv">'AES_256'</span>
+    )
+    plaintext_dek  = dek_response[<span class="cv">'Plaintext'</span>]       <span class="cm"># ephemeral</span>
+    encrypted_dek  = dek_response[<span class="cv">'CiphertextBlob'</span>]  <span class="cm"># store with data</span>
+
+    <span class="cm"># 2. Locally encrypt telemetry with plaintext DEK</span>
+    aesgcm    = AESGCM(plaintext_dek)
+    nonce     = os.urandom(<span class="cv">12</span>)
+    payload   = json.dumps(telemetry).encode()
+    ciphertext = aesgcm.encrypt(nonce, payload,
+                                aad=vin.encode())
+
+    <span class="cm"># 3. Publish encrypted envelope to IoT Core</span>
+    envelope = {
+        <span class="cv">"vin"</span>:          vin,
+        <span class="cv">"ciphertext"</span>:   base64.b64encode(ciphertext).decode(),
+        <span class="cv">"nonce"</span>:        base64.b64encode(nonce).decode(),
+        <span class="cv">"encrypted_dek"</span>: base64.b64encode(encrypted_dek).decode(),
+    }
+    iot.publish(
+        topic=<span class="cv">f"vehicles/{vin}/telemetry/encrypted"</span>,
+        qos=<span class="cv">1</span>,
+        payload=json.dumps(envelope)
+    )
+
+    <span class="cm"># Zero out plaintext key immediately</span>
+    plaintext_dek = <span class="ck">None</span></pre>
+        </div>
+      </div>
+    </div>
+    <div class="callout cg" style="margin-top:16px">
+      <strong>AWS Security Services for Detection & Compliance</strong>
+      CloudTrail (all API calls logged) → GuardDuty (threat detection on CloudTrail + VPC Flow Logs + DNS) → Security Hub (aggregation of findings from GuardDuty, Inspector, Config) → EventBridge (route findings to Lambda for automated remediation) → SNS (alerting). Learn to build this pipeline end-to-end.
+    </div>
+  </div>
+
+  <!-- DOMAIN 6: PYTHON/GO/RUST -->
+  <div class="domain dr">
+    <div class="domain-num">06</div>
+    <div class="domain-label">Domain 06 · Engineering</div>
+    <div class="domain-title">Security Engineering in Python, Go & Rust</div>
+    <p style="color:var(--text-mid);margin:12px 0 20px;max-width:820px;font-size:.97rem;">
+      Language proficiency is required — but this role expects security-idiomatic code, not just
+      functional code. Each language has specific use cases and security pitfalls in the automotive
+      security context.
+    </p>
+    <div class="three">
+      <div>
+        <div class="phase-pill c">Python</div>
+        <p style="font-size:.88rem;color:var(--text-mid);margin-bottom:12px;">Primary scripting and tooling language. Automation, CI security checks, cloud SDK operations, cryptographic utility tools.</p>
+        <ul class="cl cc">
+          <li><strong>cryptography library</strong> (not pycryptodome): The reference implementation. Hazmat layer gives low-level access; high-level recipes for common patterns.</li>
+          <li><strong>subprocess security</strong>: Never use shell=True with user input. Use shlex.split or list arguments. Understand shell injection vectors.</li>
+          <li><strong>Secrets handling</strong>: Use secrets module (not random). Clear sensitive variables explicitly. Use SecureString patterns for passwords in memory.</li>
+          <li><strong>Input validation</strong>: pydantic for strict type enforcement on external inputs. Never trust data from vehicles or external APIs without validation.</li>
+          <li><strong>Dependency security</strong>: pip-audit and safety for known CVE scanning. Pin all dependencies in requirements.txt with hashes.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="phase-pill o">Go</div>
+        <p style="font-size:.88rem;color:var(--text-mid);margin-bottom:12px;">High-performance backends, CLI tools, OTA servers, security services. Statically compiled — excellent for containerized deployments.</p>
+        <ul class="cl co">
+          <li><strong>Standard library crypto</strong>: crypto/tls, crypto/x509, crypto/ecdsa, crypto/rand. Prefer stdlib over third-party for crypto primitives.</li>
+          <li><strong>Error handling discipline</strong>: Always check and handle crypto errors. In Go, ignoring error returns from crypto functions is a class of vulnerability.</li>
+          <li><strong>gorilla/mux or chi for HTTP</strong>: Add security middleware: CORS policy, Content-Security-Policy, rate limiting, request size limits.</li>
+          <li><strong>govulncheck</strong>: Official Go vulnerability scanner. Integrate in CI to detect CVEs in transitive dependencies.</li>
+          <li><strong>Memory safety</strong>: Go is GC'd and memory-safe by default. But unsafe package bypasses these — never use it in security-critical code.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="phase-pill">Rust</div>
+        <p style="font-size:.88rem;color:var(--text-mid);margin-bottom:12px;">Memory-safe systems programming. Parser security, embedded components, cryptographic library implementations, high-assurance tools.</p>
+        <ul class="cl cy">
+          <li><strong>Memory safety guarantees</strong>: Ownership + borrow checker eliminates entire classes of vulnerabilities: buffer overflow, use-after-free, race conditions. Critical for parsing untrusted data (firmware images, CAN frames, TLS input).</li>
+          <li><strong>ring / rustls</strong>: ring for crypto primitives (BoringSSL-based); rustls for TLS without OpenSSL. Widely used in security-critical applications.</li>
+          <li><strong>no_std for embedded</strong>: Rust runs on bare-metal without OS. Write memory-safe bootloader components or secure element drivers.</li>
+          <li><strong>cargo-audit</strong>: Scan dependencies against RustSec advisory database. Integrate in CI.</li>
+          <li><strong>Unsafe blocks</strong>: Mark and minimize. Any unsafe block must be peer-reviewed and justified with a formal safety argument.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 7: THREAT MODELING -->
+  <div class="domain dc">
+    <div class="domain-num">07</div>
+    <div class="domain-label">Domain 07 · Process</div>
+    <div class="domain-title">Threat Modeling & Security Requirements Engineering</div>
+    <p style="color:var(--text-mid);margin:12px 0 20px;max-width:820px;font-size:.97rem;">
+      This is one of the most underrated but most important skills for the role. The ability to
+      systematically identify threats, evaluate risks, and translate them into concrete security
+      requirements is what makes you effective across teams — and it is explicitly required by
+      ISO 21434.
+    </p>
+    <div class="two">
+      <div>
+        <div class="phase-pill">STRIDE Methodology</div>
+        <ul class="cl">
+          <li><strong>Spoofing</strong>: Can an attacker impersonate a legitimate entity? → Authentication controls (certificates, challenge-response, HMAC)</li>
+          <li><strong>Tampering</strong>: Can data or firmware be modified without detection? → Integrity controls (digital signatures, MACs, hash chains)</li>
+          <li><strong>Repudiation</strong>: Can an actor deny performing an action? → Non-repudiation (signed audit logs, HSM-signed operations, blockchain for key operations)</li>
+          <li><strong>Information Disclosure</strong>: Can sensitive data be extracted? → Confidentiality (encryption at rest + in transit, key access controls)</li>
+          <li><strong>Denial of Service</strong>: Can legitimate services be disrupted? → Availability (rate limiting, watchdog timers, failsafe defaults)</li>
+          <li><strong>Elevation of Privilege</strong>: Can an attacker gain higher access? → Authorization (RBAC, least privilege, MAC policies)</li>
+        </ul>
+        <div class="phase-pill y">TARA (ISO 21434 Process)</div>
+        <ul class="cl cy">
+          <li><strong>Asset identification</strong>: What does the system protect? (keys, firmware, telemetry data, vehicle control)</li>
+          <li><strong>Threat scenarios</strong>: For each asset, enumerate feasible attack paths considering attacker motivation (theft, safety manipulation, data theft)</li>
+          <li><strong>Impact rating</strong>: SFOP assessment: Safety (physical harm), Financial, Operational, Privacy. Rate each on a 4-level scale.</li>
+          <li><strong>Attack feasibility</strong>: Elapsed time, required expertise, knowledge of target, window of opportunity, equipment. Combine into feasibility rating.</li>
+          <li><strong>Risk value</strong>: Impact × Feasibility → Risk level (Critical / High / Medium / Low)</li>
+          <li><strong>Cybersecurity goals</strong>: For each Critical/High risk, define a measurable security goal (e.g., "Firmware updates shall only be applied if ECDSA signature with the OTA signing key validates successfully")</li>
+          <li><strong>Cybersecurity requirements</strong>: Decompose goals into technical requirements assignable to specific ECUs, services, or processes</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <span class="code-lang">Python · Lightweight TARA Table Generator</span>
+          <pre><span class="ck">from</span> dataclasses <span class="ck">import</span> dataclass
+<span class="ck">from</span> enum <span class="ck">import</span> IntEnum
+
+<span class="ck">class</span> Impact(IntEnum):
+    NEGLIGIBLE=1; MODERATE=2; MAJOR=3; SEVERE=4
+
+<span class="ck">class</span> Feasibility(IntEnum):
+    HIGH=1; MEDIUM=2; LOW=3; VERY_LOW=4
+
+@dataclass
+<span class="ck">class</span> ThreatScenario:
+    asset: str
+    threat: str
+    attack_vector: str
+    impact: Impact
+    feasibility: Feasibility
+
+    @property
+    <span class="ck">def</span> risk_level(self) -> str:
+        score = self.impact * (5 - self.feasibility)
+        <span class="ck">if</span> score >= 12: <span class="ck">return</span> <span class="cv">"CRITICAL"</span>
+        <span class="ck">if</span> score >= 8:  <span class="ck">return</span> <span class="cv">"HIGH"</span>
+        <span class="ck">if</span> score >= 4:  <span class="ck">return</span> <span class="cv">"MEDIUM"</span>
+        <span class="ck">return</span> <span class="cv">"LOW"</span>
+
+<span class="cm"># Example TARA for OTA update system</span>
+threats = [
+    ThreatScenario(
+        asset=<span class="cv">"OTA firmware package"</span>,
+        threat=<span class="cv">"Attacker delivers unsigned firmware"</span>,
+        attack_vector=<span class="cv">"Compromise OTA delivery CDN"</span>,
+        impact=Impact.SEVERE,
+        feasibility=Feasibility.LOW
+    ),
+    ThreatScenario(
+        asset=<span class="cv">"OTA signing private key"</span>,
+        threat=<span class="cv">"Signing key exfiltration"</span>,
+        attack_vector=<span class="cv">"Compromise CI/CD signing environment"</span>,
+        impact=Impact.SEVERE,
+        feasibility=Feasibility.MEDIUM
+    ),
+]
+
+<span class="ck">for</span> t <span class="ck">in</span> threats:
+    print(<span class="cv">f"[{t.risk_level:8}] {t.threat}"</span>)</pre>
+        </div>
+        <div class="callout ci">
+          <strong>Recommended Tool: OWASP Threat Dragon</strong>
+          Free, open-source threat modeling tool. Produces DFD (Data Flow Diagrams) with STRIDE
+          analysis per data flow and component. Use it to build visual threat models for
+          manufacturing processes and vehicle communication architectures during your preparation.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 8: CI/CD SECURITY -->
+  <div class="domain dg">
+    <div class="domain-num">08</div>
+    <div class="domain-label">Domain 08 · Automation</div>
+    <div class="domain-title">Secure CI/CD & Supply Chain Security</div>
+    <p style="color:var(--text-mid);margin:12px 0 20px;max-width:820px;font-size:.97rem;">
+      The software supply chain is one of the most actively exploited attack vectors today. Your
+      job includes ensuring that every component that goes into a vehicle has verifiable provenance
+      and has not been tampered with — from source code to factory floor.
+    </p>
+    <div class="two">
+      <div>
+        <div class="phase-pill">Pipeline Security Controls</div>
+        <ul class="cl">
+          <li><strong>SAST (Static Analysis)</strong>: Run Semgrep, Bandit (Python), gosec (Go), or Clippy (Rust) on every pull request. Block merges on critical findings. Write custom Semgrep rules for automotive-specific anti-patterns.</li>
+          <li><strong>SCA (Software Composition Analysis)</strong>: Detect known CVEs in all dependencies. Use Dependabot, Snyk, or OWASP Dependency-Check. Maintain an up-to-date SBOM (Software Bill of Materials) in CycloneDX or SPDX format.</li>
+          <li><strong>Container scanning</strong>: Trivy or Grype scan every image on build. Fail pipeline on CRITICAL severity. Weekly re-scan of deployed images for new CVEs (base image vulnerabilities emerge after initial deployment).</li>
+          <li><strong>Secret scanning</strong>: Pre-commit hooks (detect-secrets, gitleaks) and CI scanning prevent credentials from reaching the repository. Scan entire git history for historical leaks on onboarding.</li>
+          <li><strong>Build provenance (SLSA)</strong>: Supply-chain Levels for Software Artifacts. At SLSA Level 3, builds are fully isolated and produce signed provenance. Sigstore/cosign for artifact signing. Rekor (transparency log) for public audit trail.</li>
+        </ul>
+        <div class="phase-pill c">SBOM (Software Bill of Materials)</div>
+        <ul class="cl cc">
+          <li><strong>Why it matters for vehicles</strong>: When a vulnerability like Log4Shell emerges, you need to answer "which vehicles in our fleet contain this component?" within hours. Without a comprehensive SBOM, that's impossible.</li>
+          <li><strong>Generation</strong>: syft (Anchore) for container/filesystem SBOMs; cyclonedx-gomod / cyclonedx-python for language-specific. Generate at build time and sign with cosign.</li>
+          <li><strong>Formats</strong>: CycloneDX (preferred for automotive; used by ENISA, BSI guidance) and SPDX (Linux Foundation standard). Both supported by most tooling.</li>
+          <li><strong>VEX (Vulnerability Exploitability eXchange)</strong>: Accompanies SBOM with machine-readable statements about whether a specific CVE is exploitable in your specific build context. Reduces false positive triage burden.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <span class="code-lang">YAML · GitHub Actions Secure Pipeline</span>
+          <pre><span class="cm"># .github/workflows/secure-build.yml</span>
+<span class="ck">name</span>: Secure Vehicle Service Build
+<span class="ck">on</span>: [push, pull_request]
+
+<span class="ck">jobs</span>:
+  <span class="ck">security-pipeline</span>:
+    <span class="ck">runs-on</span>: ubuntu-24.04
+    <span class="ck">permissions</span>:
+      contents: read
+      id-token: write    <span class="cm"># For OIDC signing</span>
+      security-events: write
+
+    <span class="ck">steps</span>:
+    - <span class="ck">uses</span>: actions/checkout@v4
+
+    - <span class="ck">name</span>: SAST - Semgrep
+      <span class="ck">run</span>: |
+        pip install semgrep
+        semgrep --config=auto --error \
+          --sarif-output=semgrep.sarif .
+      <span class="ck">continue-on-error</span>: false
+
+    - <span class="ck">name</span>: SCA - pip-audit
+      <span class="ck">run</span>: pip-audit --strict --output pip-audit.json
+
+    - <span class="ck">name</span>: Build container image
+      <span class="ck">run</span>: docker build -t vehicle-service:${{github.sha}} .
+
+    - <span class="ck">name</span>: Container vuln scan - Trivy
+      <span class="ck">uses</span>: aquasecurity/trivy-action@master
+      <span class="ck">with</span>:
+        image-ref: vehicle-service:${{github.sha}}
+        exit-code: <span class="cv">'1'</span>
+        severity: CRITICAL,HIGH
+
+    - <span class="ck">name</span>: Generate SBOM (CycloneDX)
+      <span class="ck">run</span>: |
+        syft vehicle-service:${{github.sha}} \
+          -o cyclonedx-json=sbom.cdx.json
+
+    - <span class="ck">name</span>: Sign image + SBOM with cosign (OIDC)
+      <span class="ck">uses</span>: sigstore/cosign-installer@v3
+    - <span class="ck">run</span>: |
+        cosign sign --yes vehicle-service:${{github.sha}}
+        cosign attest --yes --type cyclonedx \
+          --predicate sbom.cdx.json \
+          vehicle-service:${{github.sha}}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 9: INCIDENT RESPONSE -->
+  <div class="domain dp">
+    <div class="domain-num">09</div>
+    <div class="domain-label">Domain 09 · Operations</div>
+    <div class="domain-title">Security Operations, Monitoring & Incident Response</div>
+    <div class="two">
+      <div>
+        <div class="phase-pill p">Detection & Monitoring</div>
+        <ul class="cl">
+          <li><strong>SIEM for vehicle fleets</strong>: Centralize: vehicle IDS alerts (Intrusion Detection), OTA deployment events, diagnostic session logs, cloud API events (CloudTrail), container runtime alerts. Correlate across sources.</li>
+          <li><strong>Key security signals</strong>: SecOC MAC failures (possible CAN injection attempt); unexpected diagnostic session openings outside service windows; certificate validation failures; OTA rollback events; anomalous CAN message rates.</li>
+          <li><strong>AWS GuardDuty for cloud</strong>: Machine learning-based threat detection. Findings include: unusual EC2 behavior, credential misuse, unusual API calls, cryptocurrency mining, compromised IAM principals.</li>
+          <li><strong>Metrics to monitor</strong>: Certificate expiry runway (alert at 30 days); HSM error rates; provisioning failure rates (spike = potential attack); OTA success rate by vehicle cohort.</li>
+        </ul>
+        <div class="phase-pill y">Incident Response for Automotive</div>
+        <ul class="cl cy">
+          <li><strong>Vehicle-specific playbooks</strong>: Plan for: mass firmware rollback; certificate revocation of compromised batch; isolation of compromised vehicle from OTA channel; coordinated disclosure to regulators (UNECE R155 requires CSMS incident reporting).</li>
+          <li><strong>Certificate revocation at scale</strong>: How do you revoke 10,000 device certificates after a compromised intermediate CA? Plan this before you need it: OCSP responder infrastructure, CRL distribution points, IoT Core policy detachment automation.</li>
+          <li><strong>Forensics</strong>: Preserve chain of custody for HSM audit logs, vehicle telematics data, cloud CloudTrail. Know how to collect volatile evidence from running Linux systems without contaminating evidence.</li>
+          <li><strong>PSIRT process</strong>: Product Security Incident Response Team. Understand coordinated vulnerability disclosure, CVE scoring (CVSS), security advisories, and patch release timelines typical in automotive (18-month production cycle vs. days-to-patch in software).</li>
+        </ul>
+      </div>
+      <div>
+        <div class="callout cw">
+          <strong>Automotive Incident Response Reality</strong>
+          Unlike web services, you cannot simply "patch and redeploy" a vehicle in minutes. OTA
+          updates require vehicle connectivity, driver consent (in some markets), and careful
+          staged rollout. Security incidents affecting vehicle safety may trigger regulatory
+          notification obligations (NHTSA in the US; homologation authorities in EU). Factor these
+          constraints into every security design decision.
+        </div>
+        <div class="code-wrap">
+          <span class="code-lang">Python · Automated Certificate Revocation Response</span>
+          <pre><span class="ck">import</span> boto3
+
+<span class="cm"># Emergency: revoke all certs from compromised batch</span>
+<span class="ck">def</span> revoke_manufacturing_batch(batch_id: str, reason: str):
+    iot  = boto3.client(<span class="cv">'iot'</span>)
+    acm  = boto3.client(<span class="cv">'acm-pca'</span>)
+
+    <span class="cm"># 1. List all certs from batch (tagged at provisioning)</span>
+    paginator = iot.get_paginator(<span class="cv">'list_certificates'</span>)
+    certs_to_revoke = []
+
+    <span class="ck">for</span> page <span class="ck">in</span> paginator.paginate():
+        <span class="ck">for</span> cert <span class="ck">in</span> page[<span class="cv">'certificates'</span>]:
+            tags = iot.list_tags_for_resource(
+                resourceArn=cert[<span class="cv">'certificateArn'</span>]
+            )[<span class="cv">'tags'</span>]
+            tag_map = {t[<span class="cv">'Key'</span>]: t[<span class="cv">'Value'</span>] <span class="ck">for</span> t <span class="ck">in</span> tags}
+            <span class="ck">if</span> tag_map.get(<span class="cv">'ManufacturingBatch'</span>) == batch_id:
+                certs_to_revoke.append(cert)
+
+    <span class="cm"># 2. Revoke in IoT Core (prevents new connections)</span>
+    <span class="ck">for</span> cert <span class="ck">in</span> certs_to_revoke:
+        iot.update_certificate(
+            certificateId=cert[<span class="cv">'certificateId'</span>],
+            newStatus=<span class="cv">'REVOKED'</span>
+        )
+
+    print(<span class="cv">f"Revoked {len(certs_to_revoke)} certs from batch {batch_id}"</span>)
+    <span class="cm"># 3. Next: push emergency OTA to affected VINs</span>
+    <span class="cm"># 4. Next: update OCSP responder CRL</span>
+    <span class="cm"># 5. Next: notify PSIRT & regulatory team</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 04 SKILL MATRIX ══════════ -->
+<section id="skills">
+  <div class="sec-eyebrow">04 · Self-Assessment</div>
+  <h2>Skill Priority Matrix</h2>
+  <p class="sec-intro">
+    Use this matrix as a gap analysis before building your study plan. Critical skills are
+    interview table-stakes. High skills differentiate candidates. Preferred skills close the deal.
+    Be rigorously honest with your current level.
+  </p>
+  <div class="card" style="padding:28px 32px;">
+    <h3 class="sub-head" style="margin-top:0">Critical — Must demonstrate depth</h3>
+    <div class="sm-row"><span class="sm-name">Python (security idioms)</span><div class="sm-bg"><div class="sm-fill fc" style="width:100%"></div></div><span class="sm-lv">CRITICAL</span></div>
+    <div class="sm-row"><span class="sm-name">Linux Hardening (Debian)</span><div class="sm-bg"><div class="sm-fill fc" style="width:100%"></div></div><span class="sm-lv">CRITICAL</span></div>
+    <div class="sm-row"><span class="sm-name">Cryptography Fundamentals</span><div class="sm-bg"><div class="sm-fill fc" style="width:98%"></div></div><span class="sm-lv">CRITICAL</span></div>
+    <div class="sm-row"><span class="sm-name">TLS 1.3 / mTLS / PKI</span><div class="sm-bg"><div class="sm-fill fc" style="width:96%"></div></div><span class="sm-lv">CRITICAL</span></div>
+    <div class="sm-row"><span class="sm-name">Docker (security hardening)</span><div class="sm-bg"><div class="sm-fill fc" style="width:94%"></div></div><span class="sm-lv">CRITICAL</span></div>
+    <div class="sm-row"><span class="sm-name">Ansible (IaC for security)</span><div class="sm-bg"><div class="sm-fill fc" style="width:92%"></div></div><span class="sm-lv">CRITICAL</span></div>
+    <div class="sm-row"><span class="sm-name">Threat Modeling (STRIDE/TARA)</span><div class="sm-bg"><div class="sm-fill fc" style="width:90%"></div></div><span class="sm-lv">CRITICAL</span></div>
+    <div class="sm-row"><span class="sm-name">Go (backend security services)</span><div class="sm-bg"><div class="sm-fill fc" style="width:90%"></div></div><span class="sm-lv">CRITICAL</span></div>
+
+    <h3 class="sub-head">High — Strong differentiators</h3>
+    <div class="sm-row"><span class="sm-name">Kubernetes (RBAC / NetPol)</span><div class="sm-bg"><div class="sm-fill fg" style="width:84%"></div></div><span class="sm-lv">HIGH</span></div>
+    <div class="sm-row"><span class="sm-name">HashiCorp Vault</span><div class="sm-bg"><div class="sm-fill fg" style="width:82%"></div></div><span class="sm-lv">HIGH</span></div>
+    <div class="sm-row"><span class="sm-name">CI/CD Security (SLSA/Sigstore)</span><div class="sm-bg"><div class="sm-fill fg" style="width:82%"></div></div><span class="sm-lv">HIGH</span></div>
+    <div class="sm-row"><span class="sm-name">SBOM / Supply Chain Security</span><div class="sm-bg"><div class="sm-fill fg" style="width:80%"></div></div><span class="sm-lv">HIGH</span></div>
+    <div class="sm-row"><span class="sm-name">Rust (memory-safe systems)</span><div class="sm-bg"><div class="sm-fill fg" style="width:78%"></div></div><span class="sm-lv">HIGH</span></div>
+    <div class="sm-row"><span class="sm-name">Security Monitoring / SIEM</span><div class="sm-bg"><div class="sm-fill fg" style="width:76%"></div></div><span class="sm-lv">HIGH</span></div>
+
+    <h3 class="sub-head">Preferred — Closes the offer</h3>
+    <div class="sm-row"><span class="sm-name">AWS Security (KMS/IAM/IoT)</span><div class="sm-bg"><div class="sm-fill fo" style="width:70%"></div></div><span class="sm-lv">PREFERRED</span></div>
+    <div class="sm-row"><span class="sm-name">OTA Security (Uptane/TUF)</span><div class="sm-bg"><div class="sm-fill fo" style="width:68%"></div></div><span class="sm-lv">PREFERRED</span></div>
+    <div class="sm-row"><span class="sm-name">ISO 21434 / UNECE WP.29</span><div class="sm-bg"><div class="sm-fill fo" style="width:65%"></div></div><span class="sm-lv">PREFERRED</span></div>
+    <div class="sm-row"><span class="sm-name">CAN Bus / SecOC</span><div class="sm-bg"><div class="sm-fill fo" style="width:62%"></div></div><span class="sm-lv">PREFERRED</span></div>
+    <div class="sm-row"><span class="sm-name">HSM / TPM / Secure Boot</span><div class="sm-bg"><div class="sm-fill fo" style="width:60%"></div></div><span class="sm-lv">PREFERRED</span></div>
+    <div class="sm-row"><span class="sm-name">Automotive IDPS / Anomaly Detection</span><div class="sm-bg"><div class="sm-fill fo" style="width:55%"></div></div><span class="sm-lv">PREFERRED</span></div>
+    <div class="sm-row"><span class="sm-name">EKS / Cloud Orchestration</span><div class="sm-bg"><div class="sm-fill fo" style="width:52%"></div></div><span class="sm-lv">PREFERRED</span></div>
+  </div>
+</section>
+
+<!-- ══════════ 05 ROADMAP ══════════ -->
+<section id="roadmap">
+  <div class="sec-eyebrow">05 · Study Plan</div>
+  <h2>24-Week Preparation Roadmap</h2>
+  <p class="sec-intro">
+    A structured 24-week plan organized into four phases. Each phase builds on the previous.
+    Parallel reading and project work is encouraged. Time estimates assume 10–15 hours/week
+    of focused study alongside existing employment.
+  </p>
+
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-phase">Phase 01 · Weeks 1–6</div>
+      <div class="tl-week">Cryptography & Systems Foundation</div>
+      <div class="tl-goal">Goal: Be able to implement correct cryptographic patterns from scratch and explain why each choice was made</div>
+      <div class="two">
+        <ul class="cl">
+          <li><strong>Week 1–2:</strong> Complete Dan Boneh's Cryptography I (Coursera) or Christof Paar's YouTube course. Focus on symmetric, asymmetric, hash functions, and MACs. Take notes on pitfalls (nonce reuse, padding oracle, etc.).</li>
+          <li><strong>Week 2–3:</strong> Build a Python CLI from scratch: generates ECDSA keypair, signs a file, verifies signature. Extend to AES-256-GCM encryption with proper nonce handling and AAD. Handle all error cases.</li>
+          <li><strong>Week 3–4:</strong> Deploy a two-tier PKI using step-ca on two VMs. Issue leaf certificates. Implement certificate validation in Python using the cryptography library. Practice certificate revocation and OCSP.</li>
+          <li><strong>Week 4–5:</strong> Study TLS 1.3 from RFC 8446. Use Wireshark to capture and annotate a TLS 1.3 handshake. Implement mTLS between two Python services. Debug certificate chain issues.</li>
+          <li><strong>Week 5–6:</strong> Deploy a fresh Debian 12 server. Apply full CIS Level 1 hardening manually (no Ansible yet). Run Lynis audit and achieve score above 80. Document every change and why it matters.</li>
+        </ul>
+        <div>
+          <div class="callout cg">
+            <strong>Phase 01 Deliverable</strong>
+            A GitHub repository with: (1) ECDSA firmware signer/verifier CLI, (2) PKI automation scripts,
+            (3) mTLS example with custom CA, (4) Debian hardening checklist with Lynis score screenshot.
+            This becomes your portfolio foundation.
+          </div>
+          <div class="callout ci">
+            <strong>Reading List Phase 01</strong>
+            "Cryptography Engineering" (Ferguson/Schneier) — Chapters 1–8. OpenSSL Cookbook (Ivan Ristić) — free PDF. "The Art of Problem Solving" → TLS 1.3 RFC 8446 (read Section 4 Handshake, Section 7 Key Schedule).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase">Phase 02 · Weeks 7–12</div>
+      <div class="tl-week">Automation, Containers & Cloud Security</div>
+      <div class="tl-goal">Goal: Build a fully automated, security-hardened infrastructure pipeline that can deploy services with codified security controls</div>
+      <div class="two">
+        <ul class="cl">
+          <li><strong>Week 7–8:</strong> Write a comprehensive Ansible role that fully hardens a Debian server: SSH, AppArmor, sysctl, auditd, UFW, AIDE. Include Molecule tests. Run in CI (GitHub Actions). Achieve idempotent, tested infrastructure as code.</li>
+          <li><strong>Week 8–9:</strong> Build a minimal Go HTTP service (simulated OTA endpoint). Containerize with a distroless base image. Apply all Docker security hardening: rootless, read-only FS, seccomp, AppArmor profile, cosign signing.</li>
+          <li><strong>Week 9–10:</strong> Deploy a k3s Kubernetes cluster. Implement: RBAC with minimal permissions, NetworkPolicy default-deny with explicit allows, Pod Security Standards Restricted profile, Secrets encrypted at rest.</li>
+          <li><strong>Week 10–11:</strong> Deploy HashiCorp Vault on Kubernetes. Configure PKI secrets engine to issue short-lived certificates. Configure AppRole authentication for the Go service. Implement automatic certificate rotation.</li>
+          <li><strong>Week 11–12:</strong> Build a complete GitHub Actions CI/CD pipeline: Semgrep SAST → pip-audit SCA → Trivy scan → cosign sign → Ansible deploy. The full supply chain in one workflow. Write a blog post or README explaining every security decision.</li>
+        </ul>
+        <div>
+          <div class="callout cg">
+            <strong>Phase 02 Deliverable</strong>
+            A fully automated infrastructure as code repository: Ansible hardening roles with Molecule tests,
+            Dockerfile with security hardening, Kubernetes manifests with security controls, Vault PKI config,
+            and a complete GitHub Actions pipeline. Deployable end-to-end with one command.
+          </div>
+          <div class="callout cw">
+            <strong>AWS Prep Alongside</strong>
+            Create an AWS free tier account. Work through: IAM least-privilege lab, KMS envelope encryption
+            example, AWS IoT Core device provisioning tutorial. Use Terraform or CDK to codify everything.
+            Aim for AWS Solutions Architect Associate by end of Phase 02.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase">Phase 03 · Weeks 13–18</div>
+      <div class="tl-week">Automotive Domain Depth</div>
+      <div class="tl-goal">Goal: Speak credibly about automotive security architecture, standards, and constraints; demonstrate hands-on automotive tooling experience</div>
+      <div class="two">
+        <ul class="cl">
+          <li><strong>Week 13–14:</strong> Read "The Car Hacker's Handbook" (Craig Smith) cover to cover. Set up a virtual CAN environment (vcan0 on Linux). Use python-can to send/receive CAN frames, simulate injections, and build a basic anomaly detector.</li>
+          <li><strong>Week 14–15:</strong> Study ISO 21434 through publicly available ENISA summaries and the AUTOSAR SecOC specification. Conduct a written TARA exercise on a connected EV charger architecture. Practice the full STRIDE analysis with risk ratings.</li>
+          <li><strong>Week 15–16:</strong> Build a simplified OTA update server in Go that: serves signed firmware packages, requires the client to verify ECDSA signature before applying, implements version anti-rollback via a monotonic counter, and logs all update attempts with HSM-signed audit records.</li>
+          <li><strong>Week 16–17:</strong> Study ARM TrustZone and TPM 2.0 concepts. Walk through a QEMU-emulated secure boot chain (U-Boot + OP-TEE if accessible). Read the UEFI Secure Boot specification section on key hierarchy. Understand measured boot and TPM PCR values.</li>
+          <li><strong>Week 17–18:</strong> Implement a complete threat model for a hypothetical vehicle OTA architecture using OWASP Threat Dragon. Produce a formal TARA document with cybersecurity goals and requirements. Practice presenting it to a non-technical "stakeholder" (friend/colleague).</li>
+        </ul>
+        <div>
+          <div class="callout cg">
+            <strong>Phase 03 Deliverable</strong>
+            (1) CAN IDS simulation code, (2) OTA server with Uptane-inspired signing, (3) Written TARA document
+            for a fictional connected vehicle system, (4) Threat Dragon diagram with full STRIDE analysis.
+            These directly map to the day-1 responsibilities of the role.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase">Phase 04 · Weeks 19–24</div>
+      <div class="tl-week">Integration, Interview Readiness & Portfolio Polish</div>
+      <div class="tl-goal">Goal: Be able to coherently discuss any aspect of the role, have a compelling portfolio, and demonstrate cross-functional communication skills</div>
+      <div class="two">
+        <ul class="cl">
+          <li><strong>Week 19–20:</strong> Build the capstone portfolio project (see Portfolio section). Integrate all previous work into a coherent demonstration. Write a thorough README explaining the security architecture, threat model, and design decisions.</li>
+          <li><strong>Week 20–21:</strong> Complete AWS Security Specialty exam preparation (Stephane Maarek or Jon Bonso practice exams). Take the exam. Alternatively: CKS (Certified Kubernetes Security Specialist) if K8s is the primary gap.</li>
+          <li><strong>Week 21–22:</strong> Conduct 5 mock interview sessions. Cover: (1) deep technical drill on cryptography, (2) system design for secure OTA, (3) behavioral questions on cross-functional conflict, (4) threat modeling whiteboard, (5) "what would you do in week 1?" narrative.</li>
+          <li><strong>Week 22–23:</strong> Read recent automotive security research: Keen Lab reports, Pwn2Own Automotive 2024 disclosures, ENISA "Good Practices for Security of Smart Cars," NCC Group automotive research blog. Be able to discuss current threats in an interview.</li>
+          <li><strong>Week 23–24:</strong> Final polish: ensure GitHub portfolio is clean and public, write 1-page security architecture document for your OTA project, prepare 3 "signature stories" (STAR format) for behavioral questions. Warm up your network for referrals.</li>
+        </ul>
+        <div>
+          <div class="callout ci">
+            <strong>Phase 04 Mindset</strong>
+            At this stage, the technical preparation is largely complete. The gap is usually in
+            storytelling: packaging technical work into compelling narratives. Spend significant
+            time practicing how you explain your projects to someone unfamiliar with automotive
+            security — this is exactly what you'll do with hiring managers.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════ 06 TOOLS ══════════ -->
+<section id="tools">
+  <div class="sec-eyebrow">06 · Stack</div>
+  <h2>Tools & Technology Reference</h2>
+  <p class="sec-intro">Complete tooling reference organized by functional category. Learn each tool in the context of an actual project — not in isolation.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Category</th><th>Tool</th><th>Role Purpose</th><th>Priority</th><th>Get Started</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Languages</td><td>Python 3.12+</td><td>Automation tooling, crypto utilities, cloud SDK integration, test frameworks (pytest), security scripts</td><td><span class="tag t-c">Critical</span></td><td>cryptography.io docs, Real Python security series</td></tr>
+        <tr><td>Languages</td><td>Go 1.22+</td><td>High-performance backend services, CLI security tools, OTA server, compiled artifacts for containers</td><td><span class="tag t-c">Critical</span></td><td>tour.golang.org; "The Go Programming Language" book; govulncheck</td></tr>
+        <tr><td>Languages</td><td>Rust 1.77+</td><td>Memory-safe embedded components, parser security (CAN frames, firmware headers), crypto libs</td><td><span class="tag t-g">High</span></td><td>rustlings.cool; "Programming Rust" O'Reilly; cargo-audit</td></tr>
+        <tr><td>Config Mgmt</td><td>Ansible 2.16+</td><td>Declarative server hardening, factory tooling deployment, drift detection, secrets with Vault</td><td><span class="tag t-c">Critical</span></td><td>docs.ansible.com; Jeff Geerling "Ansible for DevOps"; Molecule for testing</td></tr>
+        <tr><td>Containers</td><td>Docker / Podman</td><td>Hardened service containers; rootless, read-only, seccomp, AppArmor; distroless base images</td><td><span class="tag t-c">Critical</span></td><td>Docker security best practices docs; docker bench-security tool</td></tr>
+        <tr><td>Containers</td><td>Kubernetes (k3s/EKS)</td><td>Orchestrate fleet-scale backend services; RBAC, NetworkPolicy, PSS, sealed-secrets, service mesh</td><td><span class="tag t-g">High</span></td><td>kubernetes.io/docs; CKS exam track; kube-bench</td></tr>
+        <tr><td>Secrets</td><td>HashiCorp Vault</td><td>PKI issuance, dynamic secrets, secret rotation, AppRole auth for services, audit logging</td><td><span class="tag t-g">High</span></td><td>developer.hashicorp.com/vault; Vault on Kubernetes guide</td></tr>
+        <tr><td>Secrets</td><td>AWS Secrets Manager</td><td>Cloud-native secrets storage, automatic rotation, integration with EKS via External Secrets Operator</td><td><span class="tag t-o">Preferred</span></td><td>AWS docs; External Secrets Operator for K8s</td></tr>
+        <tr><td>PKI</td><td>step-ca (SmallStep)</td><td>Build and operate a production-grade two-tier PKI; ACME protocol; OIDC-based issuance</td><td><span class="tag t-g">High</span></td><td>smallstep.com/docs; step CLI reference</td></tr>
+        <tr><td>PKI</td><td>AWS ACM Private CA</td><td>Managed PKI for cloud-issued certificates; fleet device certs, internal service certs, auto-rotation</td><td><span class="tag t-o">Preferred</span></td><td>AWS ACM PCA workshop; integration with IoT Core</td></tr>
+        <tr><td>SAST</td><td>Semgrep</td><td>Static analysis for Python/Go; write custom rules for automotive anti-patterns; CI integration</td><td><span class="tag t-g">High</span></td><td>semgrep.dev; Semgrep rule writing guide; community rules registry</td></tr>
+        <tr><td>SCA</td><td>Trivy</td><td>Container image + filesystem vulnerability scanning; SBOM generation; CI pipeline integration</td><td><span class="tag t-g">High</span></td><td>github.com/aquasecurity/trivy; Trivy GitHub Action</td></tr>
+        <tr><td>SCA</td><td>syft + grype</td><td>SBOM generation (CycloneDX, SPDX) + vulnerability matching; pair with cosign for SBOM attestation</td><td><span class="tag t-g">High</span></td><td>anchore.com/syft; github.com/anchore/grype</td></tr>
+        <tr><td>Signing</td><td>cosign (Sigstore)</td><td>Container image and artifact signing; keyless signing with OIDC; Rekor transparency log; SBOM attestation</td><td><span class="tag t-g">High</span></td><td>docs.sigstore.dev; cosign GitHub Action</td></tr>
+        <tr><td>AWS Security</td><td>AWS KMS</td><td>Key management; envelope encryption for telemetry; CMK rotation; key policies for fleet data</td><td><span class="tag t-o">Preferred</span></td><td>AWS KMS Developer Guide; AWS Security Specialty prep</td></tr>
+        <tr><td>AWS Security</td><td>AWS IoT Core</td><td>Fleet device identity; JITR cert provisioning; IoT policies; MQTT topic ACLs; Device Defender</td><td><span class="tag t-o">Preferred</span></td><td>AWS IoT Core Fleet Provisioning Workshop</td></tr>
+        <tr><td>AWS Security</td><td>GuardDuty + Security Hub</td><td>Threat detection on CloudTrail, VPC flow logs; centralized finding aggregation; compliance reporting</td><td><span class="tag t-o">Preferred</span></td><td>AWS Security Hub workshop; GuardDuty tester tool on GitHub</td></tr>
+        <tr><td>Automotive</td><td>python-can</td><td>Simulate and analyze CAN bus traffic; test anomaly detection; replay attacks; fuzzing vehicle networks</td><td><span class="tag t-o">Preferred</span></td><td>python-can.readthedocs.io; SocketCAN Linux documentation</td></tr>
+        <tr><td>Automotive</td><td>Scapy (automotive)</td><td>Craft and dissect UDS/ISOTP diagnostic packets; test diagnostic authentication implementations</td><td><span class="tag t-o">Preferred</span></td><td>scapy.readthedocs.io/en/latest/layers/automotive.html</td></tr>
+        <tr><td>Monitoring</td><td>auditd</td><td>Kernel-level audit logging; manufacturing process audit trail; file access and exec monitoring</td><td><span class="tag t-c">Critical</span></td><td>Linux Audit System documentation; audit rules writing guide</td></tr>
+        <tr><td>Monitoring</td><td>Falco</td><td>Runtime security for Kubernetes; detect container escapes, unexpected syscalls, network anomalies</td><td><span class="tag t-g">High</span></td><td>falco.org/docs; Falco rules writing guide</td></tr>
+        <tr><td>Compliance</td><td>Lynis</td><td>Linux system security audit tool; CIS benchmark scoring; identify hardening gaps on Debian servers</td><td><span class="tag t-g">High</span></td><td>cisofy.com/lynis; run: sudo lynis audit system</td></tr>
+        <tr><td>Compliance</td><td>kube-bench</td><td>Kubernetes CIS benchmark audit; identify RBAC, pod security, API server configuration issues</td><td><span class="tag t-g">High</span></td><td>github.com/aquasecurity/kube-bench</td></tr>
+        <tr><td>Threat Modeling</td><td>OWASP Threat Dragon</td><td>Visual DFD-based threat modeling; STRIDE analysis per dataflow; export to JSON for review tracking</td><td><span class="tag t-g">High</span></td><td>owasp.org/www-project-threat-dragon; online demo available</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ 07 STANDARDS ══════════ -->
+<section id="standards">
+  <div class="sec-eyebrow">07 · Compliance & Standards</div>
+  <h2>Automotive Security Standards & Requirements</h2>
+  <p class="sec-intro">
+    These standards define the <strong>security requirements for EV and SDV</strong> that OEMs and suppliers must meet.
+    UN R155/R156 and ISO/SAE 21434 are the primary regulatory and engineering frameworks. Knowing them differentiates
+    you from a generic security engineer, shapes the requirements you'll write, and will come up in interviews.
+    You don't need to be a compliance expert — but you need to understand structure and implications.
+  </p>
+
+  <div class="callout ci" style="margin-bottom:28px;">
+    <strong>Security Protocols vs Requirements (Quick Reference)</strong>
+    <strong>Protocols</strong> (how we secure): TLS/mTLS, SecOC (AUTOSAR), Uptane/TUF (OTA), certificate-based device identity, secure boot chain. &nbsp;
+    <strong>Requirements</strong> (what we must satisfy): UN R155 (CSMS), R156 (SUMS), ISO/SAE 21434 (cybersecurity engineering), ISO 26262 (safety where security intersects).
+  </div>
+
+  <div class="card-grid">
+    <div class="card cc">
+      <h3><span class="icon-box">📋</span>ISO/SAE 21434:2021</h3>
+      <p style="color:var(--text-mid);font-size:.9rem;">"Road vehicles — Cybersecurity engineering." The foundational standard for automotive cybersecurity. Defines the full engineering lifecycle: concept, product development, production, operations, maintenance, decommissioning.</p>
+      <div class="sub-head" style="font-size:.85rem;margin:12px 0 8px;border-color:rgba(24,52,72,.4);">Key Clauses to Know</div>
+      <ul class="cl cc" style="font-size:.87rem;">
+        <li>Clause 8: Continual cybersecurity activities (monitoring, vulnerability management)</li>
+        <li>Clause 9: Concept phase — item definition, cybersecurity goals, TARA</li>
+        <li>Clause 10: Product development — cybersecurity specifications, design, implementation</li>
+        <li>Clause 13: Production — ensuring security properties are realized in manufacturing</li>
+        <li>Clause 15: End of cybersecurity support and decommissioning</li>
+      </ul>
+      <div class="tags"><span class="tag t-c">Engineering Lifecycle</span><span class="tag t-c">TARA</span><span class="tag t-c">Governance</span></div>
+    </div>
+
+    <div class="card cg">
+      <h3><span class="icon-box">🌍</span>UNECE WP.29 R155 / R156</h3>
+      <p style="color:var(--text-mid);font-size:.9rem;">UN Economic Commission for Europe regulations. R155 mandates a Cybersecurity Management System (CSMS); R156 mandates a Software Update Management System (SUMS). Mandatory for type approval in EU, Japan, Korea from 2024.</p>
+      <div class="sub-head" style="font-size:.85rem;margin:12px 0 8px;border-color:rgba(24,52,72,.4);">Practical Implications</div>
+      <ul class="cl cg" style="font-size:.87rem;">
+        <li>OEMs must demonstrate CSMS to regulators before vehicle homologation</li>
+        <li>R156 mandates end-to-end secure OTA update capabilities — Uptane/TUF-style</li>
+        <li>Incident reporting obligations: security incidents affecting vehicle safety must be reported to authorities</li>
+        <li>Supplier chain: OEMs must ensure tier-1 and tier-2 suppliers comply with cybersecurity requirements</li>
+      </ul>
+      <div class="tags"><span class="tag t-g">Regulation</span><span class="tag t-g">CSMS</span><span class="tag t-g">OTA</span></div>
+    </div>
+
+    <div class="card co">
+      <h3><span class="icon-box">🔄</span>Uptane / TUF Framework</h3>
+      <p style="color:var(--text-mid);font-size:.9rem;">The Uptane Framework is the industry-standard OTA security specification for automotive, adopted by AGL (Automotive Grade Linux) and multiple OEMs. Built on TUF (The Update Framework) from Linux Foundation.</p>
+      <div class="sub-head" style="font-size:.85rem;margin:12px 0 8px;border-color:rgba(24,52,72,.4);">Architecture</div>
+      <ul class="cl co" style="font-size:.87rem;">
+        <li>Director Repository: vehicle-specific, online. Signs metadata about what updates a specific VIN should receive.</li>
+        <li>Image Repository: offline-capable, high-security. Contains verified firmware images with offline signing key.</li>
+        <li>Four metadata roles: Root (trust anchor), Targets (files), Snapshot (consistent view), Timestamp (freshness)</li>
+        <li>Compromise resilience: compromise of Director alone cannot push unauthorized firmware — Image Repository signature still required</li>
+      </ul>
+      <div class="tags"><span class="tag t-o">OTA Security</span><span class="tag t-o">Supply Chain</span></div>
+    </div>
+
+    <div class="card cy">
+      <h3><span class="icon-box">🔒</span>NIST SP 800-193</h3>
+      <p style="color:var(--text-mid);font-size:.9rem;">Platform Firmware Resiliency Guidelines. Defines three properties: Protection (prevent unauthorized modification), Detection (detect unauthorized changes), Recovery (restore to known-good state). Directly maps to secure boot design.</p>
+      <div class="tags" style="margin-top:14px"><span class="tag t-y">Firmware</span><span class="tag t-y">Secure Boot</span><span class="tag t-y">Recovery</span></div>
+    </div>
+
+    <div class="card cp">
+      <h3><span class="icon-box">🛡️</span>AUTOSAR SecOC</h3>
+      <p style="color:var(--text-mid);font-size:.9rem;">Secure Onboard Communication — AUTOSAR specification for authenticating messages on CAN, LIN, FlexRay, and Ethernet. Adds MAC (CMAC-AES-128 or HMAC) and freshness counter to PDUs (Protocol Data Units).</p>
+      <ul class="cl cp" style="font-size:.87rem;margin-top:10px;">
+        <li>Truncated MAC: typically 24–28 bits appended to PDU. Small to preserve bandwidth on CAN.</li>
+        <li>Freshness counter: monotonically increasing value prevents replay. Synchronization between ECUs is a design challenge.</li>
+        <li>Key distribution: SecOC keys provisioned at manufacturing via HSM. Separate keys per ECU pair.</li>
+      </ul>
+      <div class="tags"><span class="tag t-p">In-Vehicle Network</span><span class="tag t-p">Message Auth</span></div>
+    </div>
+
+    <div class="card cc">
+      <h3><span class="icon-box">📊</span>CIS Benchmarks</h3>
+      <p style="color:var(--text-mid);font-size:.9rem;">Center for Internet Security publishes scored hardening benchmarks for Debian Linux, Ubuntu, Docker, Kubernetes, and AWS. These are the reference configuration standards for manufacturing infrastructure. Free to download.</p>
+      <div class="tags" style="margin-top:14px"><span class="tag t-c">Linux</span><span class="tag t-c">Docker</span><span class="tag t-c">Kubernetes</span><span class="tag t-c">AWS</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 08 DESIGN PATTERNS ══════════ -->
+<section id="patterns">
+  <div class="sec-eyebrow">08 · Architecture</div>
+  <h2>Security Design Patterns to Master</h2>
+  <p class="sec-intro">These architectural patterns appear repeatedly across the manufacturing, vehicle, and cloud domains. Understanding them lets you both recognize their application in existing systems and design them from scratch.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Pattern</th><th>Problem Solved</th><th>Implementation</th><th>Automotive Application</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hardware Root of Trust</td>
+          <td>All software can be compromised — need an unforgeable hardware anchor</td>
+          <td>HSM / TPM stores private keys that never leave hardware. All crypto operations happen inside hardware boundary. Key material is not extractable even by the host OS.</td>
+          <td>ECU identity key provisioned in hardware HSM at manufacturing. OTA signing key in CloudHSM. Attestation quotes from TPM2 to cloud.</td>
+        </tr>
+        <tr>
+          <td>Secure Boot Chain</td>
+          <td>An attacker with physical access could replace firmware with malicious code</td>
+          <td>Each bootloader stage verifies the digital signature of the next stage before execution. Verification key baked into ROM (immutable). Any signature failure halts boot — no fallback to unsigned code.</td>
+          <td>ROM → BL1 (ROM-verified) → BL2 (signed by BL1 key) → Application (signed by BL2 key). Key hierarchy allows updating application signing key without re-provisioning ROM key.</td>
+        </tr>
+        <tr>
+          <td>Envelope Encryption</td>
+          <td>Encrypting large data with an asymmetric key is slow and key rotation is expensive</td>
+          <td>Generate a random symmetric DEK. Encrypt data with DEK (AES-GCM). Encrypt DEK with master key (KMS/RSA/ECIES). Store encrypted DEK alongside ciphertext. Rotate by re-encrypting the DEK.</td>
+          <td>Vehicle telemetry encrypted with per-message DEK; DEK encrypted with KMS CMK. Log files encrypted with DEK; DEK wrapped with HSM-stored fleet key.</td>
+        </tr>
+        <tr>
+          <td>Certificate-Based Device Identity</td>
+          <td>How do you authenticate a million devices without a shared secret?</td>
+          <td>Each device has a unique certificate (X.509) issued by a trusted CA. Device proves identity by signing a challenge with its private key (TLS client auth). No shared secrets — compromise of one device does not affect others.</td>
+          <td>Each ECU has unique certificate issued at manufacturing. Used for mTLS with AWS IoT Core, OTA server, and diagnostic backend.</td>
+        </tr>
+        <tr>
+          <td>A/B Partition Upgrade</td>
+          <td>Firmware updates can fail mid-way, leaving the device unbootable</td>
+          <td>Two firmware partitions: active (A) and standby (B). Update writes to standby and verifies before activation. On next boot, attempt to run B. If health check passes, commit. If boot fails, watchdog rollback to A. Never overwrite the running partition.</td>
+          <td>OTA update writes new firmware to standby partition. Vehicle boots new firmware. After 5 minutes of successful operation, commits update. If any ECU fails startup checks, rolls back to previous firmware automatically.</td>
+        </tr>
+        <tr>
+          <td>Zero Trust Network</td>
+          <td>Perimeter-based security fails when attackers are already inside the network</td>
+          <td>"Never trust, always verify." Every request authenticated and authorized regardless of network origin. mTLS for service-to-service. Short-lived tokens. Continuous validation. Micro-segmentation — no implicit east-west access.</td>
+          <td>Manufacturing floor services authenticate with certificates even on internal network. Vehicle services use IRSA tokens with 1-hour lifetime. No service can call another without explicit RBAC policy.</td>
+        </tr>
+        <tr>
+          <td>Secrets Injection (not baking)</td>
+          <td>Secrets hardcoded in container images or environment variables leak via image scanning or process listing</td>
+          <td>Containers start with no credentials. At runtime, fetch short-lived credentials from Vault or AWS Secrets Manager using a bootstrap identity (IRSA, IAM role, AppRole). Secrets live only in memory, never on disk or in image layers.</td>
+          <td>Diagnostic service starts with an IRSA token. Calls Vault to obtain a 1-hour certificate for mTLS. Calls AWS Secrets Manager for DB credentials. No long-lived secrets in any artifact.</td>
+        </tr>
+        <tr>
+          <td>Phased OTA Rollout with Gates</td>
+          <td>Pushing a bad update to a million vehicles simultaneously is catastrophic</td>
+          <td>Canary → Small cohort (0.1% of fleet) → 1% → 10% → 50% → 100%. At each stage, collect telemetry: error rates, ECU health, crash counts. Automated gates halt rollout if metrics degrade. Human approval required to proceed past 10%.</td>
+          <td>OTA Director targets small VIN cohort first. Monitor vehicle telemetry for 24 hours. AWS Lambda checks error rate metrics; if below threshold, advance rollout. GuardDuty monitors for anomalous vehicle behavior post-update.</td>
+        </tr>
+        <tr>
+          <td>Immutable Infrastructure</td>
+          <td>Patching live servers accumulates configuration drift and makes security posture opaque</td>
+          <td>Never modify running servers. Build new AMI/container image with patches, test, deploy alongside old, drain traffic, terminate old. All configuration is code. State is externalized. Old environments are destroyed, not mutated.</td>
+          <td>Manufacturing tool servers are deployed from a hardened base AMI via Ansible. To apply a security patch: update the AMI, run Packer, deploy new ASG, drain old instances. No SSH patching in production.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ 09 INTERVIEW PREP ══════════ -->
+<section id="interview">
+  <div class="sec-eyebrow">09 · Interview Preparation</div>
+  <h2>Interview Preparation</h2>
+  <p class="sec-intro">
+    This role requires demonstrating both deep technical depth and cross-functional judgment.
+    Interviews will combine technical system design, hands-on coding, threat modeling, and
+    behavioral scenarios. Prepare for all four modes.
+  </p>
+
+  <div class="callout ce">
+    <strong>What This Role Really Evaluates</strong>
+    Beyond technical knowledge, interviewers probe: (1) Can you see the complete picture from firmware to cloud? (2) Can you make pragmatic security decisions under real-world constraints? (3) Can you work with manufacturing, product, and engineering teams who don't speak security fluently? All three are harder to fake than technical knowledge and are what separates good candidates.
+  </div>
+
+  <h3 class="sub-head">System Design Scenarios</h3>
+
+  <div class="scenario">
+    <div class="scenario-label">System Design · Manufacturing</div>
+    <h3>Design a Secure Key Provisioning System for Factory ECU Production</h3>
+    <div class="scenario-q">"Walk me through how you'd design a system to securely provision unique cryptographic identities to 2,000 ECUs per day on a factory production line. Consider throughput, key ceremony, auditability, and recovery from failures."</div>
+    <ol class="answer-steps">
+      <li><strong>Key hierarchy design first:</strong> Offline Root CA (air-gapped, HSM-backed, used only to sign Intermediate CA) → Online Manufacturing Intermediate CA (network HSM, signs device certificates) → Per-ECU leaf certificate (P-256, contains VIN, ECU part number, manufacturing date).</li>
+      <li><strong>HSM network topology:</strong> Dedicated HSM appliances (Thales Luna or AWS CloudHSM) on isolated VLAN. Provisioning workstations connect to HSMs via mutually authenticated connections. No private key material ever leaves HSM hardware boundary. HSM audit logs to immutable storage.</li>
+      <li><strong>Production line integration:</strong> ECU arrives on line → firmware flashing station injects initial boot code → provisioning station sends CSR (Certificate Signing Request) over UART/SPI → provisioning server sends CSR to Manufacturing CA → cert returned and injected into ECU secure storage → ECU performs test signature to prove key pair works → audit record created with VIN, cert serial number, operator ID, timestamp.</li>
+      <li><strong>Throughput:</strong> At 2,000 ECUs/day, that's ~1 ECU every 43 seconds. P-256 ECDSA cert signing takes <1ms on an HSM. Bottleneck is likely the mechanical handling. Design for parallel provisioning stations sharing the same HSM cluster via load balancer.</li>
+      <li><strong>Key ceremony process:</strong> Root CA ceremony requires quorum of key custodians (e.g., 3-of-5 required), hardware tokens, witnessed and video-recorded. Root CA is used only to sign new Intermediate CAs. Intermediate CA rotated annually. Document entire process and maintain in security procedures repository.</li>
+      <li><strong>Failure recovery:</strong> If an ECU fails provisioning, it must be re-initiated from scratch — never partially provisioned ECUs can leave the line. Revocation plan if a provisioning workstation is compromised: revoke all certificates issued after compromise time, re-provision affected vehicles via OTA re-provisioning flow.</li>
+    </ol>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-label">System Design · OTA Security</div>
+    <h3>Design a Secure OTA Update System for a 500,000 Vehicle Fleet</h3>
+    <div class="scenario-q">"Design a production-grade OTA update system that can push firmware updates to 500,000 vehicles globally, with security properties that would satisfy UNECE R156. Consider the Uptane threat model."</div>
+    <ol class="answer-steps">
+      <li><strong>Uptane dual-repository model:</strong> Image Repository (offline signing key, stores all firmware images + cryptographic metadata, append-only) and Director Repository (online, vehicle-specific targets, can be hot-path but with separate signing key). Compromise of Director alone cannot push malicious firmware — Image Repository signature still required.</li>
+      <li><strong>Firmware signing pipeline:</strong> Firmware build produces binary → SAST + SBOM generation → artifact stored in S3 with versioning + object lock → air-gapped signing ceremony with Image Repository key → signed metadata written to Image Repository. Only signed artifacts can be targeted by Director.</li>
+      <li><strong>Vehicle-side client:</strong> Implements Uptane client specification. Fetches metadata from both repositories. Validates: Root → Timestamp → Snapshot → Targets chain on Image Repo. Validates Director targets against Image Repo targets (cross-verification). Verifies firmware hash before applying. Anti-rollback via HSM monotonic counter.</li>
+      <li><strong>Delivery infrastructure:</strong> CloudFront CDN for firmware binary delivery (bandwidth-intensive). API Gateway + Lambda for Director metadata (low-bandwidth, high-availability, per-VIN targeting). Vehicles authenticate with device certificate (mTLS). IoT Core for command/status channel.</li>
+      <li><strong>Phased rollout:</strong> 0.1% canary (randomly selected) → automated telemetry gates check for error rate increase → 1% → 10% with human approval gate → 50% → 100%. Rollout can be paused or aborted at any stage. Individual VINs can be excluded (e.g., fleet vehicles, press vehicles).</li>
+      <li><strong>Monitoring + kill switch:</strong> Vehicle publishes update status (downloading/verifying/applying/success/failure) to IoT Core. Dashboard shows real-time rollout progress. Kill switch halts all Director targets immediately. Anomalous rollback rate triggers alert to on-call engineer.</li>
+    </ol>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-label">Security vs. Business Trade-off</div>
+    <h3>Navigating a Security vs. Launch Velocity Conflict</h3>
+    <div class="scenario-q">"Your manufacturing team needs to ship 10,000 vehicles in two weeks for a critical launch. They want to bypass the SecOC message authentication on the powertrain CAN bus because the freshness counter synchronization between ECUs isn't working reliably. How do you respond?"</div>
+    <ol class="answer-steps">
+      <li><strong>Understand the ask precisely:</strong> What is "bypass" — disabling authentication entirely, or accepting stale freshness values? The technical scope changes the risk significantly. Clarify before deciding.</li>
+      <li><strong>Quantify the actual risk:</strong> SecOC on powertrain CAN protects against injection of fake brake/throttle/steering commands. Without it, physical access to the CAN bus (e.g., via OBD port or wiring harness) allows spoofing safety-critical commands. This is a safety risk, not just a security risk — which triggers different regulatory implications.</li>
+      <li><strong>Propose compensating controls if accepting:</strong> (a) Disable the OBD diagnostic port on these vehicles — reduces physical access attack surface. (b) Add monitoring for anomalous CAN message patterns via the gateway. (c) Define a hard timeline: all 10,000 vehicles receive an OTA fix within 60 days or are recalled. (d) Legal and regulatory team notified of the temporary deviation.</li>
+      <li><strong>Push to fix the root cause:</strong> The freshness counter sync issue is a solvable engineering problem. Offer resources: pair with the ECU team to diagnose. A one-week delay to fix properly is much better than a fleet recall. Document the exact failure mode.</li>
+      <li><strong>If escalated and overridden:</strong> Document your recommendation in writing with the technical risk clearly stated. Get explicit sign-off from the VP-level decision maker. Create a tracked remediation item with a deadline. You advised correctly — it's now a business decision with informed risk acceptance.</li>
+      <li><strong>Follow through:</strong> Own the remediation OTA. Don't let it slip. This is the "drive projects to completion" aspect of the role — you're not just a consultant who raises concerns and walks away.</li>
+    </ol>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-label">Incident Response</div>
+    <h3>Responding to a Suspected Firmware Integrity Incident</h3>
+    <div class="scenario-q">"At 2am, GuardDuty triggers an alert: an unusual IAM role has called the KMS Decrypt API 47,000 times in 30 minutes against your vehicle telemetry key. Simultaneously, a vehicle monitoring alert fires: 200 vehicles are reporting unexpected ECU restarts. Are these related? What do you do?"</div>
+    <ol class="answer-steps">
+      <li><strong>Parallel response tracks — don't assume correlation yet:</strong> Stand up incident response immediately. Assign one engineer to the cloud KMS anomaly, another to the vehicle fleet anomaly. They report to you as incident commander. Announce in incident Slack channel.</li>
+      <li><strong>Cloud track — contain first:</strong> Immediately revoke the suspicious IAM role's active sessions (aws sts) and disable the role. Check CloudTrail: what actions did this role take, from what source IP, and what did the Decrypt calls return? If source IP is unexpected, assume credential compromise. Rotate all credentials for that role's associated application.</li>
+      <li><strong>Vehicle track — assess safety implication:</strong> ECU restarts could be a software defect, bad OTA update, or attack (e.g., DoS via CAN flooding). Pull telemetry from the 200 affected vehicles: same firmware version? Same geographic region? Same time of last OTA update? A pattern suggests a common cause.</li>
+      <li><strong>Assess correlation:</strong> If the 200 vehicles received an OTA update in the last 6 hours AND the KMS anomaly correlates with the OTA update delivery timestamps → possible supply chain or delivery compromise. Immediately pause all OTA rollouts as a precaution.</li>
+      <li><strong>Communicate early, often:</strong> 30 minutes in: brief VP of Security with what you know and don't know. Do not wait until you have all answers. Regulatory team on standby if vehicle safety is involved (R155 incident notification may be required).</li>
+      <li><strong>Post-incident:</strong> Formal timeline, 5-whys root cause analysis, blameless post-mortem within 5 days. Systemic fix — not just remediation of this specific incident. Update runbooks for future incidents of this class.</li>
+    </ol>
+  </div>
+
+  <h3 class="sub-head">Behavioral Questions (STAR Format)</h3>
+  <div class="card-grid">
+    <div class="card cc">
+      <h3><span class="icon-box">🗣️</span>Cross-Functional Influence</h3>
+      <div class="scenario-q" style="font-size:.88rem;padding:10px 14px;margin-bottom:0">"Tell me about a time you identified a critical security issue that stakeholders were dismissing. How did you change the outcome?"</div>
+      <ul class="cl cc" style="margin-top:12px;font-size:.88rem;">
+        <li><strong>Setup:</strong> Frame the technical severity clearly — what was the actual blast radius if exploited?</li>
+        <li><strong>Stakeholder resistance:</strong> What was their objection? Cost? Timeline? Doubting the risk?</li>
+        <li><strong>Your approach:</strong> Did you translate technical risk into business/safety language? Did you bring external evidence? Did you propose a phased fix that reduced cost?</li>
+        <li><strong>Outcome:</strong> What changed? What did you learn about building cross-functional credibility?</li>
+      </ul>
+    </div>
+    <div class="card cg">
+      <h3><span class="icon-box">🔭</span>Learning an Unfamiliar Domain</h3>
+      <div class="scenario-q" style="font-size:.88rem;padding:10px 14px;margin-bottom:0">"Describe a time you had to quickly become effective in a deeply technical domain you had no prior experience in."</div>
+      <ul class="cl cg" style="margin-top:12px;font-size:.88rem;">
+        <li><strong>The domain:</strong> Be specific about what you didn't know and why it mattered.</li>
+        <li><strong>Your learning process:</strong> What resources? Who did you learn from? How did you know when you knew enough?</li>
+        <li><strong>Productive output:</strong> What did you build or decide based on this new knowledge?</li>
+        <li><strong>Relevance to role:</strong> This role explicitly requires comfort with "unfamiliar deeply technical topics" — this story is critical to tell well.</li>
+      </ul>
+    </div>
+    <div class="card co">
+      <h3><span class="icon-box">⚙️</span>End-to-End Execution</h3>
+      <div class="scenario-q" style="font-size:.88rem;padding:10px 14px;margin-bottom:0">"Tell me about a complex cross-functional project you drove from concept to production. What were the hardest parts?"</div>
+      <ul class="cl co" style="margin-top:12px;font-size:.88rem;">
+        <li><strong>Scope and stakeholders:</strong> Who was involved? What were the competing priorities?</li>
+        <li><strong>Obstacles:</strong> Technical blockers? Organizational resistance? Ambiguous requirements?</li>
+        <li><strong>Your execution:</strong> How did you maintain momentum? How did you handle slipping timelines?</li>
+        <li><strong>Outcome:</strong> What shipped? What would you do differently?</li>
+      </ul>
+    </div>
+    <div class="card cy">
+      <h3><span class="icon-box">📐</span>Security Pragmatism</h3>
+      <div class="scenario-q" style="font-size:.88rem;padding:10px 14px;margin-bottom:0">"Give an example of a security control you recommended but then scaled back or deferred. What was your reasoning?"</div>
+      <ul class="cl cy" style="margin-top:12px;font-size:.88rem;">
+        <li><strong>The ideal control:</strong> What were you trying to achieve? What was the threat?</li>
+        <li><strong>The constraint:</strong> Cost? Engineering complexity? Timeline? Existing architecture?</li>
+        <li><strong>The compromise:</strong> What compensating controls did you propose? How did you document residual risk?</li>
+        <li><strong>The principle:</strong> Show you understand that shipped software with pragmatic security beats unshipped software with perfect security — and that you know where the line is.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="sub-head">Technical Depth Questions — Expected Answers</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Question</th><th>What They're Testing</th><th>Key Points to Cover</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>"Why is CBC mode dangerous without a MAC?"</td>
+          <td>Crypto fundamentals — avoid known anti-patterns</td>
+          <td>Padding oracle attack (BEAST, POODLE). CBC-MAC is not authentication. Encrypt-then-MAC vs MAC-then-Encrypt. AES-GCM is the answer: AEAD provides both.</td>
+        </tr>
+        <tr>
+          <td>"What's the difference between authentication and authorization?"</td>
+          <td>Security fundamentals, IAM design</td>
+          <td>AuthN: proving identity (certificates, tokens, passwords). AuthZ: proving permission to act (RBAC policies, IAM, capability systems). Both required; neither is sufficient alone. In vehicle context: ECU presents cert (AuthN), gateway checks allowed message types (AuthZ).</td>
+        </tr>
+        <tr>
+          <td>"How would you design RBAC for a manufacturing tool that 50 operators use?"</td>
+          <td>Authorization design, operational security</td>
+          <td>Roles: LineOperator (read status, initiate standard provisioning), QA (read + audit reports), TechLead (all ops + override), Admin (IAM changes only, not production access). Principle of least privilege. Separation of duties: person who manages IAM cannot perform provisioning. Audit log every action with role + operator ID.</td>
+        </tr>
+        <tr>
+          <td>"Explain forward secrecy and why it matters for OTA."</td>
+          <td>Crypto depth, threat modeling</td>
+          <td>Forward secrecy (FS): compromise of long-term private key does not decrypt previously captured traffic. Achieved via ephemeral key exchange (ECDHE in TLS 1.3). For OTA: if the vehicle's identity certificate is later compromised, historical OTA sessions cannot be decrypted by an attacker who recorded traffic. Critical for long-lived vehicles.</td>
+        </tr>
+        <tr>
+          <td>"What is a timing side-channel and where might it appear in this role?"</td>
+          <td>Advanced security depth</td>
+          <td>Timing side-channel: code execution time leaks information about secret data. Example: string comparison using == returns early on first mismatch — allows byte-by-byte secret recovery. In role: HMAC verification must use constant-time comparison (hmac.compare_digest in Python). Seed-key challenge-response in UDS must use constant-time comparison. HSMs handle this internally.</td>
+        </tr>
+        <tr>
+          <td>"What is the difference between seccomp, AppArmor, and namespaces?"</td>
+          <td>Linux security layers depth</td>
+          <td>Namespaces: process isolation (PID, network, mount, user). Limits what a process can see. AppArmor: MAC policy controlling file/network/capability access by path and process. Operates at OS level regardless of process view. Seccomp: kernel-level syscall filter. Prevents processes from calling specific system calls entirely — limits damage if code execution is achieved. All three are complementary layers.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ 10 PORTFOLIO ══════════ -->
+<section id="projects">
+  <div class="sec-eyebrow">10 · Portfolio Projects</div>
+  <h2>Portfolio Project Guide</h2>
+  <p class="sec-intro">
+    Build these projects in public GitHub repositories with thorough READMEs. They serve as
+    talking points in interviews ("let me show you the code") and demonstrate that you can
+    execute — not just discuss — the skills required for the role.
+  </p>
+
+  <div class="card-grid">
+
+    <div class="card cc" style="grid-column: span 2;">
+      <h3><span class="icon-box">🚀</span>Capstone: End-to-End Vehicle Security Platform</h3>
+      <p style="color:var(--text-mid);font-size:.93rem;">
+        The single most impactful portfolio project. Integrates cryptography, PKI, Linux hardening,
+        Ansible, Docker, Kubernetes, Go, and cloud security in one coherent system. This directly
+        mirrors what the role requires day-to-day.
+      </p>
+      <div class="sub-head" style="font-size:.85rem;margin:14px 0 10px">Components to Build</div>
+      <div class="two">
+        <ul class="cl cc">
+          <li><strong>PKI layer:</strong> Two-tier CA using step-ca. Automated cert issuance for services. OCSP responder. Certificate rotation workflow.</li>
+          <li><strong>Firmware signing service:</strong> Go CLI that signs firmware binaries with ECDSA, producing a detached signature + metadata JSON. Verification CLI that validates signature chain back to root CA.</li>
+          <li><strong>OTA update server:</strong> Go HTTP server that serves signed firmware. Implements Uptane-inspired metadata (Root, Targets, Snapshot, Timestamp). Vehicles (simulated) must validate all metadata before downloading firmware.</li>
+          <li><strong>Provisioning simulator:</strong> Python script that simulates ECU provisioning: generates CSR, submits to Manufacturing CA, receives certificate, stores in simulated secure storage, generates audit record signed with HSM key (use software HSM for lab).</li>
+        </ul>
+        <ul class="cl cc">
+          <li><strong>Infrastructure layer:</strong> All services containerized with security hardening. Deployed to k3s via Ansible. Vault provides PKI and secrets. NetworkPolicy restricts service-to-service communication. Falco for runtime security monitoring.</li>
+          <li><strong>CI/CD pipeline:</strong> GitHub Actions: Semgrep → govulncheck → Trivy → syft SBOM → cosign sign. All images in registry are signed before deployment pipeline accepts them.</li>
+          <li><strong>Monitoring stack:</strong> Prometheus + Grafana for service metrics. Loki for log aggregation. Alert on: certificate expiry <30 days, provisioning failure rate spike, anomalous API call patterns.</li>
+          <li><strong>Threat model doc:</strong> OWASP Threat Dragon diagram of the full system. Written TARA for the OTA update flow. Cybersecurity goals and requirements for each identified high/critical risk.</li>
+        </ul>
+      </div>
+      <div class="tags">
+        <span class="tag t-c">Python</span><span class="tag t-c">Go</span><span class="tag t-c">Ansible</span>
+        <span class="tag t-c">Docker</span><span class="tag t-c">K8s</span><span class="tag t-c">Vault</span>
+        <span class="tag t-c">PKI</span><span class="tag t-c">ECDSA</span><span class="tag t-c">Sigstore</span>
+      </div>
+    </div>
+
+    <div class="card cg">
+      <h3><span class="icon-box">🚗</span>CAN Bus Security Lab</h3>
+      <p style="color:var(--text-mid);font-size:.9rem;">
+        Build a virtual CAN bus environment and implement both an attacker (injection simulation) and a defender (anomaly detection IDS). Document the threat model and demonstrate the defense.
+      </p>
+      <ul class="cl cg" style="font-size:.87rem;margin-top:10px;">
+        <li>Set up vcan0 virtual interface on Linux</li>
+        <li>Write python-can scripts for normal traffic simulation (speed sensor, gear position, battery SOC)</li>
+        <li>Write attack scripts: message injection, replay, bus flooding (DoS)</li>
+        <li>Implement a rule-based IDS: detect unknown CAN IDs, message rate anomalies, out-of-range values</li>
+        <li>Implement a simple SecOC-inspired CMAC authentication for a critical message ID</li>
+        <li>Write a report: attack, detection rate, false positive rate, proposed mitigations</li>
+      </ul>
+      <div class="tags"><span class="tag t-g">python-can</span><span class="tag t-g">SecOC</span><span class="tag t-g">CMAC</span></div>
+    </div>
+
+    <div class="card co">
+      <h3><span class="icon-box">🔍</span>Debian Hardening Automation Suite</h3>
+      <p style="color:var(--text-mid);font-size:.9rem;">
+        A production-quality Ansible collection that brings a vanilla Debian 12 server to CIS Level 2 compliance, fully tested with Molecule, and includes a CI pipeline.
+      </p>
+      <ul class="cl co" style="font-size:.87rem;margin-top:10px;">
+        <li>Roles: base hardening, SSH config, AppArmor profiles, auditd rules, UFW firewall, AIDE IDS setup, Lynis audit</li>
+        <li>Molecule tests for each role using Docker containers</li>
+        <li>GitHub Actions CI: lint (ansible-lint) → Molecule test → Lynis score assertion (must be >80)</li>
+        <li>Document every sysctl parameter choice with the threat it mitigates</li>
+        <li>Include a "revert" role that undoes hardening for dev environments — shows operational maturity</li>
+      </ul>
+      <div class="tags"><span class="tag t-o">Ansible</span><span class="tag t-o">Molecule</span><span class="tag t-o">CIS</span><span class="tag t-o">Lynis</span></div>
+    </div>
+
+    <div class="card cy">
+      <h3><span class="icon-box">☁️</span>AWS Vehicle Fleet Security Lab</h3>
+      <p style="color:var(--text-mid);font-size:.9rem;">
+        Terraform-codified AWS infrastructure demonstrating fleet device identity, encrypted telemetry, and automated security monitoring. Deploy with one command from a GitHub Actions pipeline.
+      </p>
+      <ul class="cl cy" style="font-size:.87rem;margin-top:10px;">
+        <li>AWS IoT Core with fleet provisioning template; simulated device connects via Python and receives unique certificate</li>
+        <li>Lambda for JITR: validates cert attributes, attaches appropriate IoT policy based on VIN prefix</li>
+        <li>KMS envelope encryption for all telemetry data written to S3</li>
+        <li>GuardDuty + Security Hub enabled; EventBridge rule routes critical findings to SNS → Slack</li>
+        <li>IAM Access Analyzer running; SCP preventing any account from disabling CloudTrail</li>
+        <li>All infrastructure in Terraform; deployed via GitHub Actions with OIDC (no static AWS credentials)</li>
+      </ul>
+      <div class="tags"><span class="tag t-y">AWS IoT</span><span class="tag t-y">KMS</span><span class="tag t-y">Terraform</span></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════ 11 RESOURCES ══════════ -->
+<section id="resources">
+  <div class="sec-eyebrow">11 · Learning Resources</div>
+  <h2>Curated Learning Resources</h2>
+  <p class="sec-intro">
+    Every resource here is specifically selected for relevance to this role. Organized by
+    type and priority. "Foundational" = do these first. "Domain-specific" = once foundations
+    are solid. "Advanced" = for continuous learning in role.
+  </p>
+
+  <h3 class="sub-head">Essential Books</h3>
+  <div class="two">
+    <div>
+      <div class="res-card">
+        <div class="res-icon">📘</div>
+        <div class="res-body">
+          <div class="res-title">Cryptography Engineering</div>
+          <div class="res-author">Ferguson, Schneier, Kohno · O'Reilly</div>
+          <div class="res-desc">The best practical cryptography book for engineers who implement crypto systems rather than design algorithms. Explains when to use what, and critically, what not to do. Chapters on key management and protocols are directly applicable to vehicle security design.</div>
+          <span class="res-type" style="color:var(--accent);border-color:rgba(0,229,255,.3)">Foundational · Buy/Library</span>
+        </div>
+      </div>
+      <div class="res-card">
+        <div class="res-icon">📕</div>
+        <div class="res-body">
+          <div class="res-title">The Car Hacker's Handbook</div>
+          <div class="res-author">Craig Smith · No Starch Press</div>
+          <div class="res-desc">Freely available online at opengarages.org. Covers CAN bus analysis, OBD-II diagnostics, UDS protocol, infotainment attacks, telematics hacking, and radio frequency attacks. The foundational automotive security offensive reference. Read cover to cover before your first interview.</div>
+          <span class="res-type" style="color:var(--accent2);border-color:rgba(57,255,106,.3)">Foundational · Free Online</span>
+        </div>
+      </div>
+      <div class="res-card">
+        <div class="res-icon">📗</div>
+        <div class="res-body">
+          <div class="res-title">The Linux Command Line (3rd Ed.)</div>
+          <div class="res-author">William Shotts · No Starch Press</div>
+          <div class="res-desc">Master the shell before anything else. Free at linuxcommand.org. Covers bash scripting, file system, processes, networking, and package management — all essential for the Linux hardening work this role requires.</div>
+          <span class="res-type" style="color:var(--accent2);border-color:rgba(57,255,106,.3)">Foundational · Free Online</span>
+        </div>
+      </div>
+      <div class="res-card">
+        <div class="res-icon">📙</div>
+        <div class="res-body">
+          <div class="res-title">Hacking: The Art of Exploitation (2nd Ed.)</div>
+          <div class="res-author">Jon Erickson · No Starch Press</div>
+          <div class="res-desc">Understand what you're defending against at a deep level. Memory corruption, buffer overflows, shellcode, network attacks. Particularly relevant for understanding why memory-safe languages (Rust, Go) and compiler hardening flags matter in embedded contexts.</div>
+          <span class="res-type" style="color:var(--warn);border-color:rgba(255,209,102,.3)">Domain Depth · Buy</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="res-card">
+        <div class="res-icon">📘</div>
+        <div class="res-body">
+          <div class="res-title">Ansible for DevOps (2nd Ed.)</div>
+          <div class="res-author">Jeff Geerling · LeanPub</div>
+          <div class="res-desc">The most practical Ansible book available. Covers everything from basic playbooks to roles, vault, testing with Molecule, and deploying containerized services. Directly applicable to the IaC automation work this role requires.</div>
+          <span class="res-type" style="color:var(--accent);border-color:rgba(0,229,255,.3)">Foundational · Buy LeanPub</span>
+        </div>
+      </div>
+      <div class="res-card">
+        <div class="res-icon">📕</div>
+        <div class="res-body">
+          <div class="res-title">OpenSSL Cookbook (4th Ed.)</div>
+          <div class="res-author">Ivan Ristić · Feisty Duck</div>
+          <div class="res-desc">Free PDF at feistyduck.com. Practical guide to TLS configuration, certificate management, and OpenSSL CLI. Essential for the PKI work you'll do: creating CAs, issuing certs, debugging TLS handshakes, testing configurations.</div>
+          <span class="res-type" style="color:var(--accent2);border-color:rgba(57,255,106,.3)">Foundational · Free PDF</span>
+        </div>
+      </div>
+      <div class="res-card">
+        <div class="res-icon">📗</div>
+        <div class="res-body">
+          <div class="res-title">AWS Security Cookbook</div>
+          <div class="res-author">Heartin Kanikathottu · Packt</div>
+          <div class="res-desc">Recipe-based coverage of AWS IAM, KMS, CloudTrail, GuardDuty, Security Hub, WAF, and VPC security. Practical code examples in Python and CLI. Directly maps to the cloud security preferred qualifications.</div>
+          <span class="res-type" style="color:var(--warn);border-color:rgba(255,209,102,.3)">Domain Depth · Buy</span>
+        </div>
+      </div>
+      <div class="res-card">
+        <div class="res-icon">📙</div>
+        <div class="res-body">
+          <div class="res-title">Programming Rust (2nd Ed.)</div>
+          <div class="res-author">Blandy, Orendorff · O'Reilly</div>
+          <div class="res-desc">The definitive Rust reference. Focus on the ownership model and unsafe code chapter — understanding these is essential for security-critical Rust work in embedded and systems contexts.</div>
+          <span class="res-type" style="color:var(--warn);border-color:rgba(255,209,102,.3)">Domain Depth · Buy/Safari</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-head">Online Courses</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Course</th><th>Platform</th><th>Why Take It</th><th>Priority</th></tr></thead>
+      <tbody>
+        <tr><td>Cryptography I (Dan Boneh)</td><td>Coursera (Stanford)</td><td>The best free academic cryptography course. Rigorous, mathematical, practical. Weeks 1–6 are essential. Certificate optional.</td><td><span class="tag t-c">Foundational</span></td></tr>
+        <tr><td>AWS Security Specialty (SCS-C02)</td><td>Udemy (Maarek)</td><td>Comprehensive prep for AWS SCS exam. Covers every AWS security service in depth. Even without the cert, the content maps directly to preferred qualifications.</td><td><span class="tag t-o">High Priority</span></td></tr>
+        <tr><td>Kubernetes Security (CKS prep)</td><td>Killer.sh / A Cloud Guru</td><td>CKS is the most respected Kubernetes security credential. Hands-on exam. Directly maps to K8s security responsibilities in the role.</td><td><span class="tag t-o">High Priority</span></td></tr>
+        <tr><td>Linux Security &amp; Hardening</td><td>Linux Foundation (LFS416)</td><td>Official Linux Foundation course. Covers auditd, AppArmor, SELinux, kernel security, network security. Expensive but comprehensive.</td><td><span class="tag t-g">Recommended</span></td></tr>
+        <tr><td>Automotive Cybersecurity Fundamentals</td><td>VDI VDE / Vector Informatik</td><td>Industry-recognized automotive security courses. Covers ISO 21434, TARA methodology, secure design for automotive. Expensive but directly relevant to preferred qualifications.</td><td><span class="tag t-g">Recommended</span></td></tr>
+        <tr><td>Ethical Hacking / CEH / OSCP</td><td>Offensive Security / EC-Council</td><td>OSCP is the gold standard for demonstrating attacker mindset. Directly improves your ability to threat model, write security requirements, and understand what attackers actually do. Time-intensive but differentiating.</td><td><span class="tag t-y">Differentiator</span></td></tr>
+        <tr><td>HashiCorp Vault Associate</td><td>HashiCorp / freeCodeCamp</td><td>Validates Vault knowledge for secrets management and PKI. Free study resources. Inexpensive exam. Directly demonstrates Vault capability required for this role.</td><td><span class="tag t-g">Recommended</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-head">Key Standards & Reports to Read</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Document</th><th>Source</th><th>What to Extract</th></tr></thead>
+      <tbody>
+        <tr><td>ISO/SAE 21434:2021 Summary</td><td>ENISA, SAE (free summaries available)</td><td>Clause structure, TARA methodology, cybersecurity goal definition, supplier requirement process</td></tr>
+        <tr><td>UNECE WP.29 R155 / R156 Text</td><td>UNECE website (free PDF)</td><td>CSMS requirements, OTA security requirements, incident reporting obligations, supplier chain requirements</td></tr>
+        <tr><td>Uptane Standard Specification</td><td>uptane.github.io (free)</td><td>Full OTA security architecture: dual repository model, metadata roles, compromise resilience, implementation guide</td></tr>
+        <tr><td>ENISA "Good Practices for Security of Smart Cars"</td><td>ENISA (free PDF)</td><td>Comprehensive threat taxonomy, security measures mapped to ETSI/ISO standards, reference architecture</td></tr>
+        <tr><td>NIST SP 800-193 Platform Firmware Resiliency</td><td>NIST (free PDF)</td><td>Protection/Detection/Recovery framework, firmware security requirements, supply chain guidelines</td></tr>
+        <tr><td>CIS Benchmarks (Debian, Docker, K8s, AWS)</td><td>cisecurity.org (free with registration)</td><td>Specific hardening parameters with rationale, scoring methodology, remediation procedures</td></tr>
+        <tr><td>Pwn2Own Automotive 2024 Results</td><td>Trend Micro ZDI blog (free)</td><td>Specific vulnerability classes found in EVSEs, IVI systems, automotive OS — the real threat landscape</td></tr>
+        <tr><td>Keen Lab Tencent Tesla Research Reports</td><td>Keen Lab GitHub / blog (free)</td><td>Deep technical automotive attack research: autopilot, CAN bus, infotainment — the state of the art in vehicle security research</td></tr>
+        <tr><td>SLSA Supply Chain Levels</td><td>slsa.dev (free)</td><td>Supply chain integrity levels, provenance requirements, build system requirements for each level</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-head">Hands-On Practice Platforms</h3>
+  <div class="three">
+    <div class="card cc">
+      <h3><span class="icon-box">💻</span>HackTheBox / TryHackMe</h3>
+      <p style="color:var(--text-mid);font-size:.87rem;">Linux privilege escalation labs, cryptography challenges, web vulnerabilities. Essential for building attacker mindset. Focus on Linux boxes and crypto challenges for this role.</p>
+      <div class="tags"><span class="tag t-c">Linux</span><span class="tag t-c">Crypto</span><span class="tag t-c">Networks</span></div>
+    </div>
+    <div class="card cg">
+      <h3><span class="icon-box">☸️</span>Kubernetes Goat</h3>
+      <p style="color:var(--text-mid);font-size:.87rem;">Intentionally vulnerable Kubernetes cluster with 25 scenarios: RBAC misconfig, container escape, secret exposure, network policy bypass. Perfect for CKS prep.</p>
+      <div class="tags"><span class="tag t-g">Kubernetes</span><span class="tag t-g">RBAC</span><span class="tag t-g">Container</span></div>
+    </div>
+    <div class="card co">
+      <h3><span class="icon-box">☁️</span>AWS Well-Architected Labs</h3>
+      <p style="color:var(--text-mid);font-size:.87rem;">Official AWS hands-on labs for the Security Pillar. Covers IAM, KMS, detective controls, incident response. Free in your own AWS account.</p>
+      <div class="tags"><span class="tag t-o">IAM</span><span class="tag t-o">KMS</span><span class="tag t-o">GuardDuty</span></div>
+    </div>
+    <div class="card cy">
+      <h3><span class="icon-box">🚗</span>ICSRange / AutoSec CTFs</h3>
+      <p style="color:var(--text-mid);font-size:.87rem;">Automotive and ICS/SCADA security CTF challenges. Work on CAN bus analysis, SOME/IP fuzzing, automotive network challenges. Limited but growing platform.</p>
+      <div class="tags"><span class="tag t-y">CAN</span><span class="tag t-y">SOME/IP</span><span class="tag t-y">ICS</span></div>
+    </div>
+    <div class="card cp">
+      <h3><span class="icon-box">🔐</span>Cryptopals Challenges</h3>
+      <p style="color:var(--text-mid);font-size:.87rem;">The most respected crypto implementation challenge series. Implement real attacks on real crypto (CBC padding oracle, MT19937, SHA-1 extension). Builds genuine crypto depth beyond textbook knowledge.</p>
+      <div class="tags"><span class="tag t-p">Crypto</span><span class="tag t-p">Python</span><span class="tag t-p">Attacks</span></div>
+    </div>
+    <div class="card cc">
+      <h3><span class="icon-box">🔓</span>OWASP WebGoat</h3>
+      <p style="color:var(--text-mid);font-size:.87rem;">Deliberately insecure web app for learning common vulnerabilities. Relevant for the web APIs and backend services you'll build and secure in this role (authentication bypass, injection, XXE).</p>
+      <div class="tags"><span class="tag t-c">Web Security</span><span class="tag t-c">OWASP</span></div>
+    </div>
+  </div>
+
+  <h3 class="sub-head">Certifications — Prioritized</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Certification</th><th>Body</th><th>Relevance to Role</th><th>Timing</th><th>Difficulty</th></tr></thead>
+      <tbody>
+        <tr><td>AWS Security Specialty (SCS-C02)</td><td>AWS</td><td>Directly validates cloud security preferred qualifications. Covers every AWS security service referenced in the role.</td><td>Phase 2-3 (Weeks 8–16)</td><td><span class="tag t-o">Medium-High</span></td></tr>
+        <tr><td>CKS (Certified Kubernetes Security Specialist)</td><td>CNCF</td><td>Hands-on Kubernetes security exam. Validates real K8s security implementation skill — no memorization, all practical.</td><td>Phase 2-3 (Weeks 10–18)</td><td><span class="tag t-o">Hard</span></td></tr>
+        <tr><td>CompTIA Security+</td><td>CompTIA</td><td>Foundational security domains: crypto, networking, threats, identity management. Good starting credential if new to security field.</td><td>Phase 1 (Weeks 4–8)</td><td><span class="tag t-g">Entry Level</span></td></tr>
+        <tr><td>HashiCorp Vault Associate</td><td>HashiCorp</td><td>Validates Vault secrets management and PKI knowledge. Inexpensive, respected in DevSecOps community.</td><td>Phase 2 (Weeks 8–12)</td><td><span class="tag t-g">Medium</span></td></tr>
+        <tr><td>OSCP (Offensive Security Certified Professional)</td><td>Offensive Security</td><td>The gold standard for attacker mindset. Not required but highly differentiating. Shows you deeply understand what you're defending against.</td><td>Phase 3-4 (Weeks 14–24+)</td><td><span class="tag t-c">Very Hard</span></td></tr>
+        <tr><td>TISAX / ISO 21434 Awareness</td><td>VDA QMC / DEKRA / TÜV</td><td>Automotive-specific. Validates knowledge of TISAX framework (German automotive security baseline) and ISO 21434 processes. Differentiates you from non-automotive candidates.</td><td>Phase 3 (Weeks 14–20)</td><td><span class="tag t-g">Medium</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout cg" style="margin-top:28px">
+    <strong>Final Advice: Build in Public</strong>
+    Everything you build during this preparation should be on GitHub with clear, thorough READMEs.
+    Link your repositories in your resume. A candidate who can say "here is the OTA server I built,
+    here is the threat model I wrote, here is the CI pipeline I designed" is categorically different
+    from one who can only discuss concepts. The code is your evidence. Build the evidence.
+  </div>
+</section>
+
+</div><!-- /wrap -->
+
+<footer>
+  <span>EV Cybersecurity</span> · Security Protocols & Requirements · Technical Education Guide for New Engineers (EV & SDV) · Companion: <a href="ev_protocols.html" style="color:var(--accent);text-decoration:underline;">Vehicle Protocol Architecture</a> · For Educational Use
+</footer>
+
+</body>
+</html>

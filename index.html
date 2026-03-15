@@ -97,6 +97,11 @@
             transform: translateY(-12px) scale(1.03);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
+
+        /* Embed sections: no hover transform so iframe view stays stable */
+        .embed-section:hover {
+            transform: none;
+        }
         
         .glass-card {
             background: rgba(255, 255, 255, 0.7);
@@ -226,9 +231,8 @@
             </p>
         </header>
 
-        <!-- Top Section: Hardware & Setup and ML/DL and Web Apps -->
+        <!-- Top Section: Hardware & Setup + CVML (stacked) | Web Apps & Demos -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch mb-8 lg:mb-12">
-            
             <div class="flex flex-col gap-6 lg:gap-8">
 
                 <!-- Hardware & Setup Section -->
@@ -252,33 +256,27 @@
                     </a>
                 </div>
 
-
-                <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover animate-fade-in-up animate-delay-100 flex-1">
+                <!-- CVML Project Section -->
+                <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover animate-fade-in-up animate-delay-200 flex-none">
                     <div class="flex items-center gap-3 mb-6 lg:mb-8">
-                        <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100/80">ML / DL</span>
-                        <h3 class="text-xl sm:text-2xl font-bold text-slate-800">Research & Analytics</h3>
+                        <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100/80">CV / ML</span>
+                        <h3 class="text-xl sm:text-2xl font-bold text-slate-800">CVML Project</h3>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-5">
-                        <a href="https://github.com/vgandhi1/Big-Data-Analytics-in-Healthcare/tree/main" target="_blank" class="project-card glass-card hover:bg-gradient-to-br hover:from-indigo-500 hover:to-purple-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl h-full flex flex-col justify-between ripple group">
-                            <div class="mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-600 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white transition-all icon-float">🏥</div>
-                                <h4 class="font-bold text-base lg:text-lg text-slate-900 group-hover:text-white transition-colors mb-2">Healthcare Analytics</h4>
+                    <a href="CVML_Project_Overview.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-amber-500 hover:to-orange-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 ripple group block">
+                        <div class="flex items-center gap-4 lg:gap-6">
+                            <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-amber-100 to-orange-200 text-amber-600 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float">👁️</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-lg lg:text-xl text-slate-900 group-hover:text-white transition-colors mb-2">Computer Vision ML — Manufacturing Quality Inspection</h4>
+                                <p class="text-slate-600 text-sm lg:text-base leading-relaxed group-hover:text-amber-50 transition-colors">
+                                    CVML project overview: computer vision and ML for manufacturing quality inspection.
+                                </p>
                             </div>
-                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed group-hover:text-indigo-50 transition-colors">Scalable ETL and Deep Learning (PyTorch/PySpark) for healthcare big data analytics.</p>
-                        </a>
-
-                        <a href="https://github.com/vgandhi1/LLSPIN-Project" target="_blank" class="project-card glass-card hover:bg-gradient-to-br hover:from-indigo-500 hover:to-purple-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl h-full flex flex-col justify-between ripple group">
-                            <div class="mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-600 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white transition-all icon-float" style="animation-delay: 0.5s;">🧠</div>
-                                <h4 class="font-bold text-base lg:text-lg text-slate-900 group-hover:text-white transition-colors mb-2">LLSPIN Project</h4>
-                            </div>
-                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed group-hover:text-indigo-50 transition-colors">Interpretable neural networks implementation for feature selection and prediction.</p>
-                        </a>
-                    </div>
+                            <div class="ml-auto text-amber-500 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl lg:text-3xl font-bold">→</div>
+                        </div>
+                    </a>
                 </div>
 
-                
             </div>
 
             <div class="h-full">
@@ -333,15 +331,55 @@
 
         </div>
 
-        <!-- ETL Data Pipeline Section -->
-        <div class="mt-8 lg:mt-12 animate-fade-in-up animate-delay-250">
-            <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover">
-                <div class="flex items-center gap-3 mb-6 lg:mb-8">
-                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/80">ETL</span>
-                    <h3 class="text-xl sm:text-2xl font-bold text-slate-800">ETL Data Pipeline</h3>
+        <!-- Research & Analytics + ETL Data Pipeline (side by side, same as top row) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch mt-8 lg:mt-12 mb-8 lg:mb-12">
+            <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover animate-fade-in-up animate-delay-100 h-full flex flex-col">
+                <div class="flex items-center gap-3 mb-5 lg:mb-6">
+                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100/80">ML / DL</span>
+                    <h3 class="text-lg sm:text-xl font-semibold text-slate-800 tracking-tight">Research & Analytics</h3>
                 </div>
-
-                <div class="flex flex-col gap-4 lg:gap-5">
+                <div class="flex flex-col gap-4 lg:gap-5 flex-1 min-h-0">
+                    <a href="https://github.com/vgandhi1/Big-Data-Analytics-in-Healthcare/tree/main" target="_blank" class="project-card glass-card hover:bg-gradient-to-br hover:from-indigo-500 hover:to-purple-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 ripple group block flex-shrink-0">
+                        <div class="flex items-center gap-4 lg:gap-5">
+                            <div class="w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl lg:text-3xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float">🏥</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-semibold text-base lg:text-lg text-slate-900 group-hover:text-white transition-colors mb-1.5">Healthcare Analytics</h4>
+                                <p class="text-slate-600 text-sm leading-relaxed group-hover:text-indigo-50 transition-colors">
+                                    Scalable ETL and Deep Learning (PyTorch/PySpark) for healthcare big data: ingestion, feature pipelines, and model training for clinical and operational analytics.
+                                </p>
+                                <div class="flex items-center gap-2 mt-2.5 flex-wrap">
+                                    <span class="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 group-hover:bg-white/20 group-hover:text-indigo-50 font-medium">PyTorch</span>
+                                    <span class="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 group-hover:bg-white/20 group-hover:text-indigo-50 font-medium">PySpark</span>
+                                    <span class="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 group-hover:bg-white/20 group-hover:text-indigo-50 font-medium">ETL</span>
+                                </div>
+                            </div>
+                            <div class="ml-auto text-indigo-500 group-hover:text-white group-hover:translate-x-2 transition-all text-xl lg:text-2xl font-bold shrink-0">→</div>
+                        </div>
+                    </a>
+                    <a href="https://github.com/vgandhi1/LLSPIN-Project" target="_blank" class="project-card glass-card hover:bg-gradient-to-br hover:from-indigo-500 hover:to-purple-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 ripple group block flex-shrink-0">
+                        <div class="flex items-center gap-4 lg:gap-5">
+                            <div class="w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl lg:text-3xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" style="animation-delay: 0.5s;">🧠</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-semibold text-base lg:text-lg text-slate-900 group-hover:text-white transition-colors mb-1.5">LLSPIN Project</h4>
+                                <p class="text-slate-600 text-sm leading-relaxed group-hover:text-indigo-50 transition-colors">
+                                    Interpretable neural networks for feature selection and prediction: learning sparse, interpretable inputs for high-stakes decision support.
+                                </p>
+                                <div class="flex items-center gap-2 mt-2.5 flex-wrap">
+                                    <span class="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 group-hover:bg-white/20 group-hover:text-indigo-50 font-medium">Interpretability</span>
+                                    <span class="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 group-hover:bg-white/20 group-hover:text-indigo-50 font-medium">Deep Learning</span>
+                                </div>
+                            </div>
+                            <div class="ml-auto text-indigo-500 group-hover:text-white group-hover:translate-x-2 transition-all text-xl lg:text-2xl font-bold shrink-0">→</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover animate-fade-in-up animate-delay-250 h-full flex flex-col">
+                <div class="flex items-center gap-3 mb-5 lg:mb-6">
+                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/80">ETL</span>
+                    <h3 class="text-lg sm:text-xl font-semibold text-slate-800 tracking-tight">ETL Data Pipeline</h3>
+                </div>
+                <div class="flex flex-col gap-4 lg:gap-5 flex-1 min-h-0">
                     <a href="https://github.com/vgandhi1/MARKET_MOOD_RING" target="_blank" class="project-card glass-card hover:bg-gradient-to-br hover:from-emerald-500 hover:to-teal-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 ripple group block">
                         <div class="flex items-center gap-4 lg:gap-6">
                             <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-emerald-100 to-teal-200 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float">🦍</div>
@@ -359,7 +397,6 @@
                             <div class="ml-auto text-emerald-500 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl lg:text-3xl font-bold">→</div>
                         </div>
                     </a>
-
                     <a href="https://github.com/vgandhi1/Crypto-Data-ETL" target="_blank" class="project-card glass-card hover:bg-gradient-to-br hover:from-emerald-500 hover:to-teal-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 ripple group block">
                         <div class="flex items-center gap-4 lg:gap-6">
                             <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-emerald-100 to-teal-200 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float">⚡</div>
@@ -435,18 +472,51 @@
 
         <!-- Embedded EV Protocols Deep Dive -->
         <div class="mt-8 lg:mt-12 animate-fade-in-up animate-delay-300">
-            <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover">
-                <div class="flex items-center gap-3 mb-6 lg:mb-8">
-                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100/80">Deep Dive</span>
-                    <h3 class="text-xl sm:text-2xl font-bold text-slate-800">Vehicle Protocol Architecture</h3>
+            <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 embed-section">
+                <div class="flex items-center justify-between gap-3 mb-6 lg:mb-8 flex-wrap">
+                    <div class="flex items-center gap-3">
+                        <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100/80">Deep Dive</span>
+                        <h3 class="text-xl sm:text-2xl font-bold text-slate-800">Vehicle Protocol Architecture</h3>
+                    </div>
+                    <a href="ev_protocols.html" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors shrink-0">
+                        Open in new tab
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
                 </div>
                 <p class="text-slate-600 text-sm lg:text-base leading-relaxed mb-4">
-                    Interactive study reference on CAN, LIN, FlexRay, and DoIP — embedded directly in this hub.
+                    Interactive study reference on CAN, LIN, FlexRay, and DoIP — embedded below or open the link above.
                 </p>
-                <div class="w-full rounded-3xl overflow-hidden border border-slate-300/60 shadow-lg bg-slate-900/90">
+                <div class="w-full rounded-3xl overflow-hidden border border-slate-300/60 shadow-lg bg-slate-900/90 embed-iframe-wrap">
                     <iframe 
                         src="ev_protocols.html" 
-                        title="Vehicle Protocol Architecture — EV Software Systems"
+                        title="Vehicle Protocol Architecture — EV & SDV"
+                        loading="lazy"
+                        class="w-full h-[720px] sm:h-[800px] border-0">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- Embedded EV Cybersecurity Guide -->
+        <div class="mt-8 lg:mt-12 animate-fade-in-up animate-delay-300">
+            <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 embed-section">
+                <div class="flex items-center justify-between gap-3 mb-6 lg:mb-8 flex-wrap">
+                    <div class="flex items-center gap-3">
+                        <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/80">Security</span>
+                        <h3 class="text-xl sm:text-2xl font-bold text-slate-800">EV Cybersecurity — Security Protocols & Requirements</h3>
+                    </div>
+                    <a href="ev-cybersecurity.html" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shrink-0">
+                        Open in new tab
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                </div>
+                <p class="text-slate-600 text-sm lg:text-base leading-relaxed mb-4">
+                    Security protocols and requirements for EV and software-defined vehicles: SecOC, secure boot, UN R155/R156, ISO 21434, key provisioning, OTA security — embedded below or open the link above.
+                </p>
+                <div class="w-full rounded-3xl overflow-hidden border border-slate-300/60 shadow-lg bg-slate-900/90 embed-iframe-wrap">
+                    <iframe 
+                        src="ev-cybersecurity.html" 
+                        title="EV Cybersecurity — Security Protocols & Requirements"
                         loading="lazy"
                         class="w-full h-[720px] sm:h-[800px] border-0">
                     </iframe>
