@@ -3,41 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CVML — Portfolio Presentation · Manufacturing Quality Inspection</title>
-<meta name="description" content="Portfolio case study: End-to-end CV/ML quality inspection system — Raspberry Pi, MQTT, AWS EC2 ResNet50, RabbitMQ, MES &amp; SCADA. &lt;4s latency, 94.5% accuracy.">
-<meta property="og:title" content="CVML — Computer Vision ML · Manufacturing Quality Inspection">
-<meta property="og:description" content="Portfolio case study: Edge-to-cloud ML inspection pipeline, &lt;4s latency, 94.5% accuracy. RPi, MQTT, EC2, ResNet50, MES/SCADA.">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="CVML — Manufacturing Quality Inspection (Portfolio)">
+<title>CVML — Extensive Report · Computer Vision ML · Manufacturing Quality Inspection</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800&family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ─── TOKENS — light raspberry / blush (RPi-inspired rose tones) ────── */
 :root {
-  /* Legacy names (--navy, --white, --ice): values tuned for rose UI, not literal color names. */
-  --navy:        #e5c2c9;
-  --navy-mid:    #dbb0ba;
-  --panel:       #c895a0;
+  /* Names below are legacy aliases; values are tuned for muted rose UI (not literal navy/white). */
+  --navy:        #e5c2c9;   /* page gradient start — blush */
+  --navy-mid:    #dbb0ba;  /* gradient mid */
+  --panel:       #c895a0;  /* secondary panels — dusty rose */
   --card:        #f3e8ea;
   --card-soft:   #eddfe2;
   --border:      #b88894;
   --border-soft: rgba(90, 30, 45, 0.12);
+  --border-row:  rgba(90, 30, 45, 0.08);
   --border2:     #9a6a76;
   --orange:      #d97706;
-  --amber:       #c26512;
+  --amber:       #b45309; /* dark amber for small text on --card (AA contrast) */
   --blue:        #1d4ed8;
   --mid:         #5c6b7a;
-  --ice:         #1e40af;
+  --ice:         #1e40af; /* accent blue for headings on light (was light “ice” on dark theme) */
   --green:       #15803d;
   --red:         #b91c1c;
   --purple:      #7c3aed;
   --text:        #1e293b;
   --muted:       #5a6570;
   --heading:     #0f172a;
-  --white:       #f1f5f9;
+  --white:       #f1f5f9; /* cool off-white for text on orange/dark chips */
   --cream:       #e8e4dc;
   --shadow-sm:   0 2px 8px rgba(60, 25, 35, 0.1);
-  --shadow-md:   0 8px 32px rgba(60, 25, 35, 0.14);
   --ff-display: 'Barlow Condensed', sans-serif;
   --ff-mono:    'Share Tech Mono', monospace;
   --ff-body:    'Barlow', sans-serif;
@@ -47,225 +41,16 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  background: var(--navy);
   color: var(--text);
   font-family: var(--ff-body);
   line-height: 1.6;
   overflow-x: hidden;
-}
-/* Presentation deck (full-screen slides) */
-body.deck-mode {
-  overflow: hidden;
-  height: 100vh;
-  width: 100vw;
-  margin: 0;
-}
-.deck {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  height: 100dvh;
-}
-.slide {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.45s ease;
-  overflow: hidden;
-  background:
-    radial-gradient(ellipse 100% 80% at 50% -30%, rgba(197, 45, 75, 0.08), transparent 55%),
-    radial-gradient(ellipse 80% 50% at 100% 50%, rgba(160, 70, 90, 0.06), transparent 45%),
-    linear-gradient(165deg, var(--navy) 0%, var(--navy-mid) 48%, #cfa8b0 100%);
-}
-.slide.active {
-  opacity: 1;
-  pointer-events: all;
-  z-index: 1;
-}
-.slide-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 48px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: linear-gradient(180deg, rgba(55, 24, 34, 0.94) 0%, rgba(50, 22, 30, 0.88) 100%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  flex-shrink: 0;
-  z-index: 10;
-  box-shadow: var(--shadow-sm), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
-}
-.deck-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.deck-brand-icon {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(145deg, #ea8c3c 0%, var(--orange) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  border-radius: 6px;
-  color: var(--white);
-  font-weight: 800;
-  font-family: var(--ff-display);
-  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
-}
-.deck-brand-text {
-  font-family: var(--ff-mono);
-  font-size: 10px;
-  color: #94a3b8;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  max-width: min(420px, 55vw);
-}
-.slide-num {
-  font-family: var(--ff-mono);
-  font-size: 11px;
-  color: #94a3b8;
-  letter-spacing: 0.12em;
-}
-/* Scroll on slide-body (Monitron pattern) — content clears fixed bottom nav */
-.slide-body {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 32px 48px 120px;
-  -webkit-overflow-scrolling: touch;
-}
-.slide-body::-webkit-scrollbar { width: 8px; }
-.slide-body::-webkit-scrollbar-track { background: transparent; }
-.slide-body::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
-  border-radius: 10px;
-}
-.slide-body::-webkit-scrollbar-thumb:hover { background-color: #7c8a9a; }
-.slide-body > .wrap {
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 0;
-}
-.slide .section {
-  padding: 0 0 24px;
-  border-bottom: none;
-}
-.slide .hero {
-  min-height: 0;
-  border-bottom: none;
-  padding: 0;
-}
-.slide .hero-content {
-  padding: 16px 0 32px;
-}
-/* Deck content: soft depth & glass on flow strip */
-body.deck-mode .project-flow-visual {
-  background: rgba(55, 24, 34, 0.22);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-}
-body.deck-mode .pipe-node,
-body.deck-mode .kpi-cell,
-body.deck-mode .flow-node,
-body.deck-mode .result-card,
-body.deck-mode .limit-card,
-body.deck-mode .sec-card {
-  box-shadow: var(--shadow-sm);
-}
-body.deck-mode .flow-node {
-  border-color: rgba(255, 255, 255, 0.15) !important;
-}
-body.deck-mode .hero-bg svg {
-  opacity: 0.14;
-}
-/* Bottom slide controls — dark frosted glass (easier on eyes than bright white) */
-.nav {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: rgba(62, 22, 32, 0.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 40px;
-  padding: 12px 24px;
-  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  z-index: 9999;
-}
-.nav .nav-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #e2e8f0;
-  font-family: var(--ff-mono);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 8px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: border-color .2s, color .2s, background .2s, box-shadow .2s;
-  letter-spacing: 0.05em;
-}
-.nav .nav-btn:hover:not(:disabled) {
-  border-color: rgba(234, 140, 60, 0.65);
-  color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.25);
-}
-.nav .nav-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-.nav .nav-counter {
-  font-family: var(--ff-mono);
-  font-size: 13px;
-  font-weight: 600;
-  color: #cbd5e1;
-  min-width: 50px;
-  text-align: center;
-  letter-spacing: 0.1em;
-}
-.nav .pip-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  max-width: min(320px, 52vw);
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.nav .pip {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
-  transition: background 0.3s, transform 0.2s;
-  cursor: pointer;
-  border: none;
-  padding: 0;
-  flex-shrink: 0;
-}
-.nav .pip.on {
-  background: linear-gradient(145deg, #ea8c3c, var(--orange));
-  box-shadow: 0 0 10px rgba(217, 119, 6, 0.45);
-}
-.nav .pip:focus-visible { outline: 2px solid rgba(234, 140, 60, 0.8); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) {
-  .slide { transition: none; }
+  background-color: var(--navy-mid);
+  background-image: linear-gradient(165deg, var(--navy) 0%, var(--navy-mid) 48%, #cfa8b0 100%);
+  background-attachment: fixed;
 }
 
-/* ─── GRID BG — subtle, low-contrast ───────────────────────────────────── */
+/* ─── GRID BG ─────────────────────────────────────────────────────────── */
 body::before {
   content: '';
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -286,9 +71,11 @@ body::before {
 /* ─── NAV ─────────────────────────────────────────────────────────────── */
 nav {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(255, 242, 245, 0.94);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  background: rgba(62, 22, 32, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-sm), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
 }
 .nav-inner {
   display: flex; align-items: center; justify-content: space-between;
@@ -298,15 +85,26 @@ nav {
   font-family: var(--ff-display); font-size: 20px; font-weight: 800;
   letter-spacing: 3px; color: var(--orange); text-decoration: none;
 }
-.nav-logo span { color: var(--muted); font-weight: 300; }
+.nav-logo span { color: #94a3b8; font-weight: 300; }
 .nav-links { display: flex; gap: 28px; list-style: none; }
 .nav-links a {
   font-family: var(--ff-mono); font-size: 11px; letter-spacing: 1.5px;
-  color: var(--muted); text-decoration: none; text-transform: uppercase;
+  color: #cbd5e1; text-decoration: none; text-transform: uppercase;
   transition: color .2s;
 }
-.nav-links a:hover { color: var(--amber); }
-.nav-links a:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; color: var(--amber); }
+.nav-links a:hover { color: #fbbf24; }
+
+/* Surfaces: soft depth (aligned with overview) */
+.kpi-cell,
+.pipe-node,
+.arch-block,
+.tech-card,
+.train-step-body,
+.result-card,
+.limit-card,
+.sec-card {
+  box-shadow: var(--shadow-sm);
+}
 
 /* ─── HERO ────────────────────────────────────────────────────────────── */
 .hero {
@@ -317,7 +115,7 @@ nav {
 .hero-bg {
   position: absolute; inset: 0; z-index: 0; overflow: hidden;
 }
-.hero-bg svg { width: 100%; height: 100%; opacity: .12; }
+.hero-bg svg { width: 100%; height: 100%; opacity: 0.14; }
 .hero-content { position: relative; z-index: 1; padding: 80px 0; }
 .hero-eyebrow {
   font-family: var(--ff-mono); font-size: 11px; letter-spacing: 4px;
@@ -490,37 +288,6 @@ h2.section-title {
   color: var(--amber); padding: 2px 8px; border-radius: 3px; font-size: 10px;
 }
 
-/* ─── PROJECT FLOW VISUAL ─────────────────────────────────────────────── */
-.project-flow-visual {
-  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
-  gap: 0; margin-top: 32px; padding: 24px 16px;
-  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-}
-.flow-node {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-width: 72px; max-width: 100px; padding: 12px 10px;
-  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
-  text-align: center; transition: border-color .2s, box-shadow .2s;
-}
-.flow-node:hover { border-color: var(--orange); box-shadow: 0 0 16px -4px rgba(224,123,48,.4); }
-.flow-node-icon { font-size: 20px; margin-bottom: 6px; line-height: 1; }
-.flow-node-label { font-family: var(--ff-mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
-.flow-node-name { font-family: var(--ff-display); font-size: 11px; font-weight: 700; color: var(--heading); line-height: 1.2; }
-.flow-connector {
-  flex-shrink: 0; width: 28px; height: 2px; margin: 0 2px;
-  background: linear-gradient(90deg, var(--border2), var(--orange));
-  position: relative;
-}
-.flow-connector::after {
-  content: '›'; position: absolute; right: -2px; top: 50%; transform: translateY(-50%);
-  font-size: 14px; color: var(--orange); font-weight: 700;
-}
-@media (max-width: 900px) {
-  .project-flow-visual { flex-direction: column; gap: 12px; }
-  .flow-connector { width: 2px; height: 20px; margin: 0; background: linear-gradient(180deg, var(--border2), var(--orange)); }
-  .flow-connector::after { content: '∨'; right: auto; top: auto; bottom: -2px; left: 50%; transform: translateX(-50%); }
-}
-
 /* ─── S3 SECTION ──────────────────────────────────────────────────────── */
 .s3-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; margin-top: 48px; }
 .s3-bucket {
@@ -556,7 +323,7 @@ h2.section-title {
   padding: 14px 20px; border-bottom: 1px solid var(--border);
   transition: background .15s;
 }
-.write-step:hover { background: rgba(15,23,42,.03); }
+.write-step:hover { background: rgba(15, 23, 42, 0.04); }
 .write-step:last-child { border-bottom: none; }
 .write-num {
   width: 26px; height: 26px; border-radius: 4px; flex-shrink: 0;
@@ -651,7 +418,7 @@ h2.section-title {
   text-transform: uppercase; color: var(--muted);
   border-bottom: 1px solid var(--border);
 }
-.latency-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid rgba(15,23,42,.06); vertical-align: middle; }
+.latency-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border-row); vertical-align: middle; }
 .latency-table tr:hover td { background: rgba(15,23,42,.03); }
 .latency-bar-wrap { width: 220px; }
 .latency-bar {
@@ -691,10 +458,10 @@ h2.section-title {
 }
 .ba-row {
   display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 1fr;
-  padding: 10px 20px; border-bottom: 1px solid rgba(15,23,42,.06);
+  padding: 10px 20px; border-bottom: 1px solid var(--border-row);
   font-size: 13px; align-items: center; transition: background .15s;
 }
-.ba-row:hover { background: rgba(15,23,42,.03); }
+.ba-row:hover { background: rgba(15, 23, 42, 0.03); }
 .ba-row:last-child { border-bottom: none; }
 .ba-metric { color: var(--heading); font-weight: 500; }
 .ba-before { color: var(--muted); }
@@ -778,39 +545,6 @@ h2.section-title {
 .tech-role { font-size: 12px; color: var(--muted); }
 .tech-host { font-family: var(--ff-mono); font-size: 10px; margin-top: 6px; }
 
-/* Tech stack architecture diagram */
-.tech-arch {
-  display: grid; grid-template-columns: repeat(5, 1fr);
-  gap: 2px; background: var(--border); border: 1px solid var(--border);
-  border-radius: 10px; overflow: hidden; margin-top: 24px;
-}
-.tech-arch-col { background: var(--panel); display: flex; flex-direction: column; }
-.tech-arch-header {
-  padding: 10px 8px; text-align: center;
-  font-family: var(--ff-mono); font-size: 9px; letter-spacing: 1.5px;
-  text-transform: uppercase; font-weight: 700;
-}
-.tech-arch-body { flex: 1; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
-.tech-arch-item {
-  font-size: 11px; color: var(--text); line-height: 1.4;
-  padding: 6px 8px; background: var(--card); border-radius: 4px;
-  border-left: 3px solid var(--border);
-}
-.tech-arch-item strong { color: var(--ice); font-size: 10.5px; }
-.tech-arch-col.col-edge .tech-arch-header { background: rgba(61,106,158,.25); color: var(--blue); }
-.tech-arch-col.col-edge .tech-arch-item { border-left-color: var(--blue); }
-.tech-arch-col.col-mqtt .tech-arch-header { background: rgba(93,62,140,.25); color: var(--purple); }
-.tech-arch-col.col-mqtt .tech-arch-item { border-left-color: var(--purple); }
-.tech-arch-col.col-cloud .tech-arch-header { background: rgba(224,123,48,.2); color: var(--orange); }
-.tech-arch-col.col-cloud .tech-arch-item { border-left-color: var(--orange); }
-.tech-arch-col.col-bridge .tech-arch-header { background: rgba(46,74,110,.3); color: var(--ice); }
-.tech-arch-col.col-bridge .tech-arch-item { border-left-color: var(--mid); }
-.tech-arch-col.col-plant .tech-arch-header { background: rgba(58,140,92,.2); color: var(--green); }
-.tech-arch-col.col-plant .tech-arch-item { border-left-color: var(--green); }
-@media (max-width: 900px) {
-  .tech-arch { grid-template-columns: 1fr; }
-}
-
 /* ─── FOOTER ──────────────────────────────────────────────────────────── */
 footer {
   border-top: 1px solid var(--border); padding: 40px 0;
@@ -881,10 +615,10 @@ footer span { color: var(--orange); }
 }
 .version-table td {
   padding: 10px 14px; font-size: 12.5px;
-  border-bottom: 1px solid rgba(15,23,42,.06); vertical-align: middle;
+  border-bottom: 1px solid var(--border-row); vertical-align: middle;
 }
 .version-table tr:last-child td { border-bottom: none; }
-.version-table tr:hover td { background: rgba(15,23,42,.03); }
+.version-table tr:hover td { background: rgba(15, 23, 42, 0.03); }
 .version-badge {
   font-family: var(--ff-mono); font-size: 11px; font-weight: 700;
   padding: 2px 10px; border-radius: 3px; display: inline-block;
@@ -914,15 +648,6 @@ footer span { color: var(--orange); }
   border-radius: 6px; padding: 8px 14px; margin-top: 10px;
   font-family: var(--ff-mono); font-size: 10px; color: var(--red);
 }
-
-/* ─── SKIP LINK (a11y) ────────────────────────────────────────────────── */
-.skip-link {
-  position: absolute; top: -60px; left: 16px; z-index: 1000;
-  padding: 10px 16px; background: var(--orange); color: var(--white);
-  font-family: var(--ff-mono); font-size: 11px; text-decoration: none;
-  border-radius: 4px; transition: top .2s;
-}
-.skip-link:focus { top: 12px; outline: 2px solid var(--amber); outline-offset: 2px; }
 
 /* ─── S3 FLOW DIAGRAM ─────────────────────────────────────────────────── */
 .s3-flow-diagram {
@@ -972,9 +697,9 @@ footer span { color: var(--orange); }
 }
 .fault-table td {
   padding: 11px 16px; font-size: 13px;
-  border-bottom: 1px solid rgba(15,23,42,.06); vertical-align: top;
+  border-bottom: 1px solid var(--border-row); vertical-align: top;
 }
-.fault-table tr:hover td { background: rgba(15,23,42,.03); }
+.fault-table tr:hover td { background: rgba(15, 23, 42, 0.03); }
 .fault-table tr:last-child td { border-bottom: none; }
 .fault-name { color: var(--red); font-weight: 600; }
 .fault-impact { color: var(--orange); font-size: 12px; }
@@ -988,38 +713,10 @@ footer span { color: var(--orange); }
 .sev-med  { background: rgba(224,123,48,.15); color: var(--orange); border: 1px solid rgba(224,123,48,.35); }
 .sev-low  { background: rgba(58,140,92,.12); color: var(--green); border: 1px solid rgba(58,140,92,.3); }
 
-/* ─── REDUCED MOTION ──────────────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .scanline { animation: none; opacity: 0; }
-  .reveal { opacity: 1; transform: none; transition: none; }
-  .reveal.visible { opacity: 1; }
-}
-
-/* ─── PRINT ───────────────────────────────────────────────────────────── */
-@media print {
-  .nav[role="navigation"] { display: none !important; }
-  body.deck-mode { overflow: visible !important; height: auto !important; }
-  .deck { height: auto !important; position: relative; }
-  .slide { position: relative !important; inset: auto !important; opacity: 1 !important; pointer-events: auto !important; page-break-after: always; min-height: 0 !important; }
-  .slide:last-of-type { page-break-after: auto; }
-  .scanline, nav, .nav-inner, .hero-eyebrow::before { display: none !important; }
-  body { background: #fff !important; color: #111 !important; }
-  body::before { display: none !important; }
-  .section { break-inside: avoid; padding: 32px 0; border-bottom-color: #ddd !important; }
-  .section-label { color: #b35a1a !important; }
-  h2.section-title, .pipe-title, .flow-node-name, .tech-name { color: #111 !important; }
-  .section-sub, .hero-desc, .limit-body, .sec-body ul li, .pipe-items li, p { color: #333 !important; }
-  .wrap { max-width: 100%; }
-  a[href^="#"] { color: #111 !important; }
-  .kpi-cell, .result-card, .flow-node, .pipe-node, .tech-card { break-inside: avoid; }
-  .hero { min-height: auto; padding: 24px 0; }
-  .tag, .flow-label { border-color: #999 !important; color: #333 !important; }
-}
-
 /* ─── RESPONSIVE ──────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .nav-inner { flex-wrap: wrap; padding: 12px 20px; height: auto; min-height: 56px; }
-  .nav-links { flex-wrap: wrap; gap: 12px 20px; }
+  .nav-inner { flex-wrap: wrap; height: auto; min-height: 56px; padding: 10px 20px; gap: 8px; }
+  .nav-links { flex-wrap: wrap; gap: 10px 14px; justify-content: flex-end; }
   .training-grid { grid-template-columns: 1fr; }
   .security-grid { grid-template-columns: 1fr; }
   .s3-flow-lanes { grid-template-columns: 1fr; }
@@ -1034,25 +731,35 @@ footer span { color: var(--orange); }
   .tech-grid    { grid-template-columns: repeat(2,1fr); }
   .ba-header, .ba-row { grid-template-columns: 2fr 1fr 1fr; }
   .ba-before, .ba-header-before { display: none; }
-  #exec-summary [style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
 }
 </style>
 </head>
-<body class="deck-mode">
+<body>
+<div class="scanline"></div>
 
-<div class="deck" id="deck" role="region" aria-label="CVML presentation slides">
-
-<!-- SLIDE 1 — TITLE -->
-<div class="slide active" id="s1" data-title="Overview">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · Manufacturing Quality Inspection · Portfolio</div>
-    </div>
-    <div class="slide-num"><span class="sn-cur">1</span> / <span class="sn-total">12</span></div>
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">CVML <span>· Manufacturing</span></a>
+    <ul class="nav-links">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#training">Training</a></li>
+      <li><a href="#storage">S3 Storage</a></li>
+      <li><a href="#s3flow">S3 Flow</a></li>
+      <li><a href="#security">Security</a></li>
+      <li><a href="#decision">Decision Flow</a></li>
+      <li><a href="#fault">Fault Tolerance</a></li>
+      <li><a href="#latency">Latency</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#limitations">Limitations</a></li>
+      <li><a href="#nextgen">Next-Gen</a></li>
+      <li><a href="#techstack">Tech Stack</a></li>
+    </ul>
   </div>
-  <div class="slide-body">
-    <div class="wrap">
+</nav>
+
+<!-- HERO -->
 <section class="hero" id="overview">
   <div class="hero-bg">
     <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
@@ -1081,7 +788,7 @@ footer span { color: var(--orange); }
     </svg>
   </div>
   <div class="wrap hero-content">
-    <div class="hero-eyebrow">Portfolio case study · 2020–2021</div>
+    <div class="hero-eyebrow">Extensive Report · Detailed Reference · 2020–2021</div>
     <h1 class="hero-title">
       <span class="accent">CVML</span><br>
       Computer Vision<br>
@@ -1101,7 +808,7 @@ footer span { color: var(--orange); }
       <span class="tag tag-blue">Ignition SCADA</span>
       <span class="tag tag-orange">AWS S3</span>
     </div>
-    <div class="kpi-strip">
+    <div class="kpi-strip reveal">
       <div class="kpi-cell">
         <div class="kpi-val">&lt; 4s</div>
         <div class="kpi-label">End-to-End Latency<br>Capture → MES</div>
@@ -1121,148 +828,18 @@ footer span { color: var(--orange); }
     </div>
   </div>
 </section>
-    </div>
-  </div>
-</div>
 
-<!-- SLIDE 2 — PROJECT FLOW -->
-<div class="slide" id="s2" data-title="Project Flow">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · End-to-End Inspection Path</div>
-    </div>
-    <div class="slide-num"><span class="sn-cur">2</span> / <span class="sn-total">12</span></div>
-  </div>
-  <div class="slide-body">
-    <div class="wrap">
-<section class="section" id="flow">
-    <div>
-      <div class="section-label">End-to-End</div>
-      <h2 class="section-title">Project Flow — Inspection Path</h2>
-      <p class="section-sub">Visual path of an inspection from sensor trigger to MES record and SCADA update. Total latency &lt;4 seconds.</p>
-    </div>
-    <div class="project-flow-visual">
-      <div class="flow-node" style="border-top:3px solid var(--blue);">
-        <div class="flow-node-icon">📷</div>
-        <div class="flow-node-label">Step 1</div>
-        <div class="flow-node-name">Sensor → RPi</div>
-      </div>
-      <div class="flow-connector"></div>
-      <div class="flow-node" style="border-top:3px solid var(--blue);">
-        <div class="flow-node-icon">🖼</div>
-        <div class="flow-node-label">Step 2</div>
-        <div class="flow-node-name">Capture &amp; Encode</div>
-      </div>
-      <div class="flow-connector"></div>
-      <div class="flow-node" style="border-top:3px solid var(--purple);">
-        <div class="flow-node-icon">📡</div>
-        <div class="flow-node-label">Step 3</div>
-        <div class="flow-node-name">MQTT Publish</div>
-      </div>
-      <div class="flow-connector"></div>
-      <div class="flow-node" style="border-top:3px solid var(--purple);">
-        <div class="flow-node-icon">☁</div>
-        <div class="flow-node-label">Step 4</div>
-        <div class="flow-node-name">Mosquitto → EC2</div>
-      </div>
-      <div class="flow-connector"></div>
-      <div class="flow-node" style="border-top:3px solid var(--orange);">
-        <div class="flow-node-icon">🧠</div>
-        <div class="flow-node-label">Step 5</div>
-        <div class="flow-node-name">ResNet50 Inference</div>
-      </div>
-      <div class="flow-connector"></div>
-      <div class="flow-node" style="border-top:3px solid var(--mid);">
-        <div class="flow-node-icon">🐇</div>
-        <div class="flow-node-label">Step 6</div>
-        <div class="flow-node-name">RabbitMQ</div>
-      </div>
-      <div class="flow-connector"></div>
-      <div class="flow-node" style="border-top:3px solid var(--green);">
-        <div class="flow-node-icon">📋</div>
-        <div class="flow-node-label">Step 7</div>
-        <div class="flow-node-name">MES Write</div>
-      </div>
-      <div class="flow-connector"></div>
-      <div class="flow-node" style="border-top:3px solid var(--green);">
-        <div class="flow-node-icon">📺</div>
-        <div class="flow-node-label">Step 8</div>
-        <div class="flow-node-name">SCADA Update</div>
-      </div>
-    </div>
-    <div style="margin-top:20px; text-align:center; font-family:var(--ff-mono); font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase;">Trigger → Preprocess → Transport → Cloud inference → Result routing → MES record → Operator HMI · &lt;4s</div>
-</section>
-    </div>
-  </div>
-</div>
-
-<!-- SLIDE 3 — EXECUTIVE SUMMARY -->
-<div class="slide" id="s3" data-title="Summary">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · Executive Summary</div>
-    </div>
-    <div class="slide-num"><span class="sn-cur">3</span> / <span class="sn-total">12</span></div>
-  </div>
-  <div class="slide-body">
-    <div class="wrap">
-<section class="section" id="exec-summary">
-    <div>
-      <div class="section-label">Executive Summary</div>
-      <h2 class="section-title">CVML Quality Inspection</h2>
-      <p class="section-sub"><strong>Project scope:</strong> Deployment of an automated visual inspection system across six production lines to replace manual quality checks. End-to-end latency: &lt;4 seconds from capture to MES record.</p>
-    </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:32px;">
-      <div style="background:var(--card); border:1px solid var(--border); border-radius:8px; padding:20px 24px;">
-        <div style="font-family:var(--ff-display); font-size:15px; font-weight:700; color:var(--orange); margin-bottom:12px;">1. Core Technical Architecture</div>
-        <p style="font-size:13px; color:var(--text); line-height:1.7;">Five-layer integrated OT/IT pipeline: <strong style="color:var(--ice)">Edge</strong> — Raspberry Pi 4 + HQ Camera captures and preprocesses 224×224 images via OpenCV. <strong style="color:var(--ice)">Transport</strong> — Paho-MQTT to Mosquitto broker (TLS 1.2). <strong style="color:var(--ice)">Cloud</strong> — AWS EC2 runs ResNet50 transfer-learning model for PASS/FAIL. <strong style="color:var(--ice)">Bridge</strong> — RabbitMQ (AMQP) routes results to plant. <strong style="color:var(--ice)">Execution</strong> — MES record entry and Ignition SCADA HMI updates in under 4 seconds.</p>
-      </div>
-      <div style="background:var(--card); border:1px solid var(--border); border-radius:8px; padding:20px 24px;">
-        <div style="font-family:var(--ff-display); font-size:15px; font-weight:700; color:var(--orange); margin-bottom:12px;">2. Performance &amp; Operational Impact</div>
-        <ul style="list-style:none; font-size:13px; color:var(--text); line-height:2;">
-          <li><strong style="color:var(--ice)">Speed:</strong> Inspection cycle 8–12 min → &lt;4 sec</li>
-          <li><strong style="color:var(--ice)">Accuracy:</strong> 94.5% classification (v1.1)</li>
-          <li><strong style="color:var(--ice)">Quality:</strong> 28% reduction in defect escape rate</li>
-          <li><strong style="color:var(--ice)">Efficiency:</strong> 50% fewer QC personnel per shift</li>
-        </ul>
-      </div>
-    </div>
-    <div style="margin-top:24px; background:var(--panel); border:1px solid var(--border); border-left:3px solid var(--amber); border-radius:8px; padding:18px 24px;">
-      <div style="font-family:var(--ff-display); font-size:15px; font-weight:700; color:var(--amber); margin-bottom:10px;">3. Critical Lessons &amp; Evolution</div>
-      <ul style="list-style:none; font-size:13px; color:var(--text); line-height:2;">
-        <li><strong style="color:var(--ice)">Resilience:</strong> Move from single-point-of-failure (on-premise brokers) to AWS IoT Core.</li>
-        <li><strong style="color:var(--ice)">Scalability:</strong> Replace persistent EC2 with serverless SageMaker GPU endpoints to remove 1.5s inference bottleneck.</li>
-        <li><strong style="color:var(--ice)">Integrity:</strong> Automated drift monitoring and MLOps pipelines to prevent silent accuracy degradation.</li>
-        <li><strong style="color:var(--ice)">Security:</strong> Per-device X.509 identities and formal DMZ segmentation.</li>
-      </ul>
-    </div>
-</section>
-    </div>
-  </div>
-</div>
-
-<!-- SLIDE 4 — ARCHITECTURE -->
-<div class="slide" id="s4" data-title="Architecture">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · Edge to Action · Legacy 2020–2021</div>
-    </div>
-    <div class="slide-num"><span class="sn-cur">4</span> / <span class="sn-total">12</span></div>
-  </div>
-  <div class="slide-body">
-    <div class="wrap">
+<!-- ARCHITECTURE -->
 <section class="section" id="architecture">
-    <div>
+  <div class="wrap">
+    <div class="reveal">
       <div class="section-label">Legacy System · 2020–2021</div>
-      <h2 class="section-title">End-to-End Architecture — Edge to Action</h2>
-      <p class="section-sub">Single integrated pipeline from sensor trigger to MES write. Messaging brokers (Mosquitto + RabbitMQ) were co-hosted on the Ignition Server — the OT/IT hub and primary single point of failure.</p>
+      <h2 class="section-title">System Architecture</h2>
+      <p class="section-sub">Five-layer pipeline from edge device through cloud inference to plant execution systems. All messaging brokers co-hosted on the Ignition Server acting as the OT/IT integration hub.</p>
     </div>
 
     <!-- Pipeline flow -->
-    <div class="pipeline">
+    <div class="pipeline reveal">
       <div class="pipe-node pipe-color-edge">
         <div class="pipe-step">Layer 1 · Edge</div>
         <div class="pipe-title">Raspberry Pi 4<br>+ HQ Camera</div>
@@ -1330,10 +907,17 @@ footer span { color: var(--orange); }
       </div>
     </div>
 
-    <div style="margin-top:20px; font-size:13px; color:var(--muted);">Ignition Server hosted both Mosquitto and RabbitMQ — one integration boundary and the primary single point of failure.</div>
+    <!-- Ignition Server hub callout -->
+    <div class="reveal" style="margin-top:24px; background:var(--panel); border:1px solid var(--border2); border-left:3px solid var(--blue); border-radius:8px; padding:16px 22px; display:flex; align-items:flex-start; gap:16px;">
+      <div style="font-size:24px; flex-shrink:0;">🏗</div>
+      <div>
+        <div style="font-family:var(--ff-display); font-size:16px; font-weight:700; color:var(--heading); margin-bottom:5px;">Ignition Server — The OT/IT Integration Hub</div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.7;">The Ignition SCADA server acted as the central integration hub by hosting <strong style="color:var(--ice)">both Mosquitto (OT-side MQTT) and RabbitMQ (IT-side AMQP)</strong> alongside Ignition SCADA itself. This deliberately co-located architecture made Ignition the explicit bridge between device-level OT messaging and enterprise-level IT messaging — translating raw inspection events into structured quality records. One server. Two brokers. One integration boundary. A deliberate simplification for 2020–21 — and the primary single point of failure.</div>
+      </div>
+    </div>
 
     <!-- Flow banner -->
-    <div class="flow-banner" style="margin-top:20px;">
+    <div class="flow-banner reveal" style="margin-top:20px;">
       <span class="dot" style="background:var(--blue)"></span>
       <span class="flow-step">RPi Capture</span>
       <span class="flow-arrow">→</span>
@@ -1353,44 +937,98 @@ footer span { color: var(--orange); }
       <span class="flow-arrow">→</span>
       <span class="flow-step">MES Write + SCADA Update</span>
     </div>
-    <div class="section-label" style="margin-top:24px; padding-top:16px; border-top:1px solid var(--border);">Data Architecture</div>
-    <p class="section-sub" style="margin-top:8px;">AWS S3: central repository for ~85K training images, versioned model artifacts (.h5), and live inference archives for quality auditing.</p>
+  </div>
 </section>
-    </div>
-  </div>
-</div>
 
-<!-- SLIDE 5 — TRAINING -->
-<div class="slide" id="s5" data-title="Training">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · Training Pipeline &amp; Model Versioning</div>
-    </div>
-    <div class="slide-num"><span class="sn-cur">5</span> / <span class="sn-total">12</span></div>
-  </div>
-  <div class="slide-body">
-    <div class="wrap">
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- TRAINING PIPELINE + MODEL VERSIONING                                  -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
 <section class="section" id="training">
-    <div>
+  <div class="wrap">
+    <div class="reveal">
       <div class="section-label">ML Model Lifecycle</div>
       <h2 class="section-title">Training Pipeline &amp; Model Versioning</h2>
       <p class="section-sub">How the ResNet50 model was built, evaluated, versioned, and deployed to EC2 — from raw labeled images to live inference in 2020–2021.</p>
     </div>
-    <div class="training-grid">
+    <div class="training-grid reveal">
 
-      <!-- Left: Training pipeline (compact) -->
+      <!-- Left: Training pipeline steps -->
       <div>
-        <div style="font-family:var(--ff-display); font-size:18px; font-weight:700; color:var(--heading); margin-bottom:16px;">Training Pipeline</div>
-        <div style="background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px 20px;">
-          <ol style="list-style:none; counter-reset:step; display:flex; flex-direction:column; gap:10px;">
-            <li style="font-size:12.5px; color:var(--text); padding-left:24px; position:relative; counter-increment:step;"><span style="position:absolute;left:0; font-family:var(--ff-mono); font-weight:700; color:var(--orange);">1</span> <strong style="color:var(--ice)">Labeling</strong> — Label Studio, ~85K images, 5 classes (pass + scratch/dim/foreign/other). JSON → S3.</li>
-            <li style="font-size:12.5px; color:var(--text); padding-left:24px; position:relative; counter-increment:step;"><span style="position:absolute;left:0; font-family:var(--ff-mono); font-weight:700; color:var(--blue);">2</span> <strong style="color:var(--ice)">Prep &amp; augmentation</strong> — S3 load, train/val/test 70/15/15. Rotation, brightness, noise, flip. class_weight for imbalance.</li>
-            <li style="font-size:12.5px; color:var(--text); padding-left:24px; position:relative; counter-increment:step;"><span style="position:absolute;left:0; font-family:var(--ff-mono); font-weight:700; color:var(--purple);">3</span> <strong style="color:var(--ice)">ResNet50 transfer learning</strong> — Frozen base, custom head (GAP → Dense(256) → Dropout → Dense(5)). Train head then fine-tune last 30 layers.</li>
-            <li style="font-size:12.5px; color:var(--text); padding-left:24px; position:relative; counter-increment:step;"><span style="position:absolute;left:0; font-family:var(--ff-mono); font-weight:700; color:var(--orange);">4</span> <strong style="color:var(--ice)">Evaluation gate</strong> — Accuracy ≥ 93%, FAIL recall ≥ 91%. Confusion matrix sign-off.</li>
-            <li style="font-size:12.5px; color:var(--text); padding-left:24px; position:relative; counter-increment:step;"><span style="position:absolute;left:0; font-family:var(--ff-mono); font-weight:700; color:var(--green);">5</span> <strong style="color:var(--ice)">S3 artifact</strong> — model_v{N}.h5 + metadata JSON to s3://.../model-artifacts/v{N}/.</li>
-            <li style="font-size:12.5px; color:var(--text); padding-left:24px; position:relative; counter-increment:step;"><span style="position:absolute;left:0; font-family:var(--ff-mono); font-weight:700; color:var(--mid);">6</span> <strong style="color:var(--ice)">EC2 deploy</strong> — SSH, boto3 pull from S3, restart inference process. model_version in every MES record.</li>
-          </ol>
+        <div style="font-family:var(--ff-display); font-size:18px; font-weight:700; color:var(--heading); margin-bottom:20px;">Training Pipeline</div>
+        <div class="train-pipeline">
+
+          <div class="train-step">
+            <div class="train-step-left">
+              <div class="train-step-circle" style="border-color:var(--orange); color:var(--orange)">1</div>
+              <div class="train-step-line" style="background:linear-gradient(var(--orange),var(--blue))"></div>
+            </div>
+            <div class="train-step-body">
+              <div class="train-step-title">Dataset Labeling</div>
+              <div class="train-step-detail">Quality engineers labeled ~85K images captured from production lines using Label Studio. 5 defect classes: pass, scratch, dimensional, foreign material, other. Images exported as JSON annotations linked to image paths in S3.</div>
+              <span class="train-step-code">Label Studio → S3 JSON annotations</span>
+            </div>
+          </div>
+
+          <div class="train-step">
+            <div class="train-step-left">
+              <div class="train-step-circle" style="border-color:var(--blue); color:var(--blue)">2</div>
+              <div class="train-step-line" style="background:linear-gradient(var(--blue),var(--purple))"></div>
+            </div>
+            <div class="train-step-body">
+              <div class="train-step-title">Data Preparation &amp; Augmentation</div>
+              <div class="train-step-detail">Python script loads images from S3, splits into train/val/test (70/15/15). Augmentation applied: rotation ±15°, brightness jitter ±20%, Gaussian noise, horizontal flip — addresses class imbalance (FAIL images ~50% of PASS count).</div>
+              <span class="train-step-code">TF ImageDataGenerator · class_weight balancing</span>
+            </div>
+          </div>
+
+          <div class="train-step">
+            <div class="train-step-left">
+              <div class="train-step-circle" style="border-color:var(--purple); color:var(--purple)">3</div>
+              <div class="train-step-line" style="background:linear-gradient(var(--purple),var(--orange))"></div>
+            </div>
+            <div class="train-step-body">
+              <div class="train-step-title">Transfer Learning — ResNet50</div>
+              <div class="train-step-detail">ImageNet pre-trained ResNet50 base frozen. Custom classification head added: GlobalAveragePooling → Dense(256, ReLU) → Dropout(0.4) → Dense(5, Softmax). Phase 1: train head only (10 epochs). Phase 2: unfreeze last 30 layers, fine-tune (20 epochs, lr=1e-5).</div>
+              <span class="train-step-code">TensorFlow 2.x · Keras · ResNet50 · GPU EC2</span>
+            </div>
+          </div>
+
+          <div class="train-step">
+            <div class="train-step-left">
+              <div class="train-step-circle" style="border-color:var(--orange); color:var(--orange)">4</div>
+              <div class="train-step-line" style="background:linear-gradient(var(--orange),var(--green))"></div>
+            </div>
+            <div class="train-step-body">
+              <div class="train-step-title">Model Evaluation &amp; Acceptance Gate</div>
+              <div class="train-step-detail">Evaluated on held-out test set. Promotion criteria: overall accuracy ≥ 93%, FAIL class recall ≥ 91% (critical — missing FAILs is worse than false alarms). Confusion matrix reviewed by quality engineering lead before sign-off.</div>
+              <span class="train-step-code">sklearn classification_report · confusion matrix</span>
+            </div>
+          </div>
+
+          <div class="train-step">
+            <div class="train-step-left">
+              <div class="train-step-circle" style="border-color:var(--green); color:var(--green)">5</div>
+              <div class="train-step-line" style="background:linear-gradient(var(--green),var(--mid))"></div>
+            </div>
+            <div class="train-step-body">
+              <div class="train-step-title">Model Artifact Storage — S3</div>
+              <div class="train-step-detail">Approved model saved as <code style="font-family:var(--ff-mono);font-size:10px;color:var(--amber)">model_v{N}.h5</code> and uploaded to <code style="font-family:var(--ff-mono);font-size:10px;color:var(--amber)">s3://cvml-manufacturing-2020/model-artifacts/v{N}/</code>. Companion metadata JSON: accuracy, recall, training date, dataset hash, engineer sign-off name.</div>
+              <span class="train-step-code">boto3 upload · model_v1.0.h5 · model_v1.1.h5</span>
+            </div>
+          </div>
+
+          <div class="train-step">
+            <div class="train-step-left">
+              <div class="train-step-circle" style="border-color:var(--mid); color:var(--mid)">6</div>
+              <div class="train-step-line" style="background:var(--border); height:0"></div>
+            </div>
+            <div class="train-step-body">
+              <div class="train-step-title">Deployment to EC2</div>
+              <div class="train-step-detail">EC2 inference process loads model on startup via <code style="font-family:var(--ff-mono);font-size:10px;color:var(--amber)">tf.keras.models.load_model()</code> from local disk. Updated model deployed by: (1) SSH to EC2, (2) boto3 download from S3, (3) restart Python inference process. Version string logged in every MES inspection record.</div>
+              <span class="train-step-code">Manual SSH deploy · model_version logged in MES</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -1454,30 +1092,277 @@ footer span { color: var(--orange); }
         </div>
       </div>
     </div>
+  </div>
 </section>
-    </div>
-  </div>
-</div>
 
-<!-- SLIDE 6 — SECURITY -->
-<div class="slide" id="s6" data-title="Security">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · Security Layer — Legacy &amp; Gaps</div>
+
+
+<!-- S3 STORAGE -->
+<section class="section" id="storage">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="section-label">Data Architecture</div>
+      <h2 class="section-title">AWS S3 — Primary Image Storage</h2>
+      <p class="section-sub">S3 served as the primary store for training data, model artifacts, and live inference images. In the legacy system, the inference image write path was implemented in a later patch — not original design — creating key reliability gaps.</p>
     </div>
-    <div class="slide-num"><span class="sn-cur">6</span> / <span class="sn-total">12</span></div>
+    <div class="s3-grid reveal">
+      <!-- Bucket tree -->
+      <div class="s3-bucket">
+        <div class="s3-bucket-header">
+          <span class="icon">🪣</span>
+          <span>s3://cvml-manufacturing-2020</span>
+        </div>
+        <div class="s3-tree">
+          <div class="s3-row" style="background:rgba(224,123,48,.06)">
+            <div class="s3-indent"><div class="s3-indent-bar" style="background:var(--orange)"></div></div>
+            <div class="s3-path" style="color:var(--orange); font-weight:700; font-size:12px;">training-data/</div>
+            <div class="s3-desc">Labeled defect images — primary ML dataset</div>
+          </div>
+          <div class="s3-row">
+            <div class="s3-indent"><div style="width:12px"></div><div class="s3-indent-bar" style="background:var(--green)"></div></div>
+            <div class="s3-path" style="color:var(--green); padding-left:22px;">/pass/ &nbsp;&nbsp;&nbsp; ~42,000 imgs</div>
+            <div class="s3-desc">Confirmed good parts</div>
+          </div>
+          <div class="s3-row">
+            <div class="s3-indent"><div style="width:12px"></div><div class="s3-indent-bar" style="background:var(--red)"></div></div>
+            <div class="s3-path" style="color:var(--red); padding-left:22px;">/fail/scratch/ ~18,000 imgs</div>
+            <div class="s3-desc">Surface scratch defects</div>
+          </div>
+          <div class="s3-row">
+            <div class="s3-indent"><div style="width:12px"></div><div class="s3-indent-bar" style="background:var(--red)"></div></div>
+            <div class="s3-path" style="color:var(--red); padding-left:22px;">/fail/dim/ &nbsp;&nbsp; ~12,000 imgs</div>
+            <div class="s3-desc">Dimensional non-conformance</div>
+          </div>
+          <div class="s3-row">
+            <div class="s3-indent"><div style="width:12px"></div><div class="s3-indent-bar" style="background:var(--red)"></div></div>
+            <div class="s3-path" style="color:var(--red); padding-left:22px;">/fail/foreign/ ~8,000 imgs</div>
+            <div class="s3-desc">Foreign material</div>
+          </div>
+          <div class="s3-row">
+            <div class="s3-indent"><div style="width:12px"></div><div class="s3-indent-bar" style="background:var(--red)"></div></div>
+            <div class="s3-path" style="color:var(--red); padding-left:22px;">/fail/other/ &nbsp; ~5,000 imgs</div>
+            <div class="s3-desc">Other defect categories</div>
+          </div>
+          <div class="s3-row" style="background:rgba(61,106,158,.06)">
+            <div class="s3-indent"><div class="s3-indent-bar" style="background:var(--blue)"></div></div>
+            <div class="s3-path" style="color:var(--blue); font-weight:700;">model-artifacts/</div>
+            <div class="s3-desc">Versioned .h5 TF model files</div>
+          </div>
+          <div class="s3-row">
+            <div class="s3-indent"><div style="width:12px"></div><div class="s3-indent-bar" style="background:var(--mid)"></div></div>
+            <div class="s3-path" style="color:var(--muted); padding-left:22px;">/v1.0/model.h5 (2020)</div>
+            <div class="s3-desc">88.3% accuracy — baseline (Jun 2020)</div>
+          </div>
+          <div class="s3-row">
+            <div class="s3-indent"><div style="width:12px"></div><div class="s3-indent-bar" style="background:var(--mid)"></div></div>
+            <div class="s3-path" style="color:var(--muted); padding-left:22px;">/v1.1/model.h5 (patch)</div>
+            <div class="s3-desc">94.5% accuracy — lighting fix</div>
+          </div>
+          <div class="s3-row" style="background:rgba(245,166,35,.06)">
+            <div class="s3-indent"><div class="s3-indent-bar" style="background:var(--amber)"></div></div>
+            <div class="s3-path" style="color:var(--amber); font-weight:700;">inference-images/</div>
+            <div class="s3-desc" style="color:var(--orange)">⚠ INCONSISTENTLY populated</div>
+          </div>
+          <div class="s3-row">
+            <div class="s3-indent"><div style="width:12px"></div><div class="s3-indent-bar" style="background:var(--muted)"></div></div>
+            <div class="s3-path" style="color:var(--muted); padding-left:22px;">/{date}/{station_id}/</div>
+            <div class="s3-desc">Date + station partition (v1.1+)</div>
+          </div>
+          <div class="s3-row">
+            <div class="s3-indent"><div style="width:12px"></div><div class="s3-indent-bar" style="background:var(--muted)"></div></div>
+            <div class="s3-path" style="color:var(--muted); padding-left:22px;">/{serial}_result.json</div>
+            <div class="s3-desc">Companion JSON: result + confidence</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: write path + gaps -->
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div class="s3-bucket">
+          <div class="s3-bucket-header" style="background:var(--blue);">
+            <span class="icon">☁</span>
+            <span>Image Write Path (EC2 → S3)</span>
+          </div>
+          <div class="s3-write">
+            <div class="write-step">
+              <div class="write-num" style="background:var(--blue)">1</div>
+              <div class="write-content">
+                <div class="write-title">RPi captures + preprocesses</div>
+                <div class="write-detail">224×224 px · base64 encoded · metadata appended</div>
+              </div>
+            </div>
+            <div class="write-step">
+              <div class="write-num" style="background:var(--purple)">2</div>
+              <div class="write-content">
+                <div class="write-title">MQTT publish → EC2 receives</div>
+                <div class="write-detail">Image payload arrives in EC2 MQTT subscriber in memory</div>
+              </div>
+            </div>
+            <div class="write-step">
+              <div class="write-num" style="background:var(--mid)">3</div>
+              <div class="write-content">
+                <div class="write-title">EC2 runs inference</div>
+                <div class="write-detail">model.predict() → PASS/FAIL + confidence score</div>
+              </div>
+            </div>
+            <div class="write-step" style="background:rgba(224,123,48,.06);">
+              <div class="write-num" style="background:var(--orange)">4</div>
+              <div class="write-content">
+                <div class="write-title" style="color:var(--orange)">EC2 writes image to S3 ⚠</div>
+                <div class="write-detail">boto3 put_object() → inference-images/{date}/{station}/</div>
+                <div class="write-critical">Critical step — no retry in v1.0. Disk full, network drop, or expired credentials = silent image loss.</div>
+              </div>
+            </div>
+            <div class="write-step">
+              <div class="write-num" style="background:var(--mid)">5</div>
+              <div class="write-content">
+                <div class="write-title">EC2 writes companion JSON to S3</div>
+                <div class="write-detail">result, confidence, station_id, part_serial, timestamp</div>
+              </div>
+            </div>
+            <div class="write-step">
+              <div class="write-num" style="background:var(--green)">6</div>
+              <div class="write-content">
+                <div class="write-title">S3 presigned URL → RabbitMQ message</div>
+                <div class="write-detail">URL embedded in JSON result → MES stores as image reference</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(192,57,43,.08); border:1px solid rgba(192,57,43,.3); border-radius:8px; padding:16px 20px;">
+          <div style="font-family:var(--ff-display); font-size:16px; font-weight:700; color:var(--red); margin-bottom:12px;">Storage Gaps — Legacy System</div>
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:7px;">
+            <li style="font-size:12.5px; color:var(--muted); padding-left:16px; position:relative;"><span style="position:absolute;left:0;color:var(--red)">✕</span> No S3 lifecycle policy — ~65–200 GB/yr cost growth unmonitored</li>
+            <li style="font-size:12.5px; color:var(--muted); padding-left:16px; position:relative;"><span style="position:absolute;left:0;color:var(--red)">✕</span> Non-atomic write — S3 upload and MES record written separately; failures left dangling URLs in MES</li>
+            <li style="font-size:12.5px; color:var(--muted); padding-left:16px; position:relative;"><span style="position:absolute;left:0;color:var(--red)">✕</span> FAIL images not prioritised — no selective retention for retraining pipeline</li>
+            <li style="font-size:12.5px; color:var(--muted); padding-left:16px; position:relative;"><span style="position:absolute;left:0;color:var(--red)">✕</span> EC2 local disk as unintended staging area — images stranded after crashes</li>
+            <li style="font-size:12.5px; color:var(--muted); padding-left:16px; position:relative;"><span style="position:absolute;left:0;color:var(--red)">✕</span> No image validation — MES stored S3 URL without confirming object exists</li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="slide-body">
-    <div class="wrap">
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- S3 STORAGE FLOW DIAGRAM                                               -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="s3flow" style="padding-top:0; border-top:none;">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="section-label">Storage Architecture Detail</div>
+      <h2 class="section-title">S3 Data Flow — Clarified</h2>
+      <p class="section-sub">Two distinct S3 data flows co-existed in the legacy system: the <strong style="color:var(--orange)">training pipeline</strong> (offline, batch) and the <strong style="color:var(--blue)">live inference archive</strong> (real-time, per-part). Understanding which images go where — and when — eliminates common architecture confusion.</p>
+    </div>
+
+    <div class="s3-flow-diagram reveal">
+      <div class="s3-flow-title">S3 Data Flow — Training vs Live Inference</div>
+      <div class="s3-flow-lanes">
+
+        <!-- Lane A: Training flow -->
+        <div>
+          <div class="s3-flow-lane-label" style="color:var(--orange)">🔬 Training Data Flow (Offline / Batch)</div>
+          <div class="s3-flow-nodes">
+            <div class="s3-flow-node">
+              <div class="s3-flow-node-left">
+                <div class="s3-flow-dot" style="border-color:var(--blue); color:var(--blue)">Pi</div>
+                <div class="s3-flow-connector" style="background:var(--blue)"></div>
+              </div>
+              <div class="s3-flow-text"><strong>Raspberry Pi (Station)</strong><span>Captures labeled training images during dedicated collection sessions — separate from production runs</span></div>
+            </div>
+            <div class="s3-flow-node">
+              <div class="s3-flow-node-left">
+                <div class="s3-flow-dot" style="border-color:var(--purple); color:var(--purple)">LS</div>
+                <div class="s3-flow-connector" style="background:var(--purple)"></div>
+              </div>
+              <div class="s3-flow-text"><strong>Label Studio (Labeling)</strong><span>Quality engineers annotate images — defect class, bounding box notes. Annotations exported as JSON</span></div>
+            </div>
+            <div class="s3-flow-node">
+              <div class="s3-flow-node-left">
+                <div class="s3-flow-dot" style="border-color:var(--orange); color:var(--orange)">S3</div>
+                <div class="s3-flow-connector" style="background:var(--orange)"></div>
+              </div>
+              <div class="s3-flow-text"><strong style="color:var(--orange)">S3: training-data/</strong><span>Labeled images stored by class: /pass/, /fail/scratch/, /fail/dim/, etc. ~85K images total</span></div>
+            </div>
+            <div class="s3-flow-node">
+              <div class="s3-flow-node-left">
+                <div class="s3-flow-dot" style="border-color:var(--orange); color:var(--orange)">EC2</div>
+                <div class="s3-flow-connector" style="background:var(--orange)"></div>
+              </div>
+              <div class="s3-flow-text"><strong>EC2 Training Run</strong><span>boto3 downloads dataset from S3. TF training pipeline runs. Model evaluated against acceptance criteria</span></div>
+            </div>
+            <div class="s3-flow-node">
+              <div class="s3-flow-node-left">
+                <div class="s3-flow-dot" style="border-color:var(--green); color:var(--green)">S3</div>
+                <div class="s3-flow-connector" style="background:transparent; height:0"></div>
+              </div>
+              <div class="s3-flow-text"><strong style="color:var(--green)">S3: model-artifacts/v{N}/model.h5</strong><span>Approved model saved to S3. Version string + metadata JSON alongside. EC2 downloads on next deployment</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lane B: Live inference flow -->
+        <div>
+          <div class="s3-flow-lane-label" style="color:var(--blue)">⚡ Live Inference Flow (Real-Time, Per-Part)</div>
+          <div class="s3-flow-nodes">
+            <div class="s3-flow-node">
+              <div class="s3-flow-node-left">
+                <div class="s3-flow-dot" style="border-color:var(--blue); color:var(--blue)">Pi</div>
+                <div class="s3-flow-connector" style="background:var(--blue)"></div>
+              </div>
+              <div class="s3-flow-text"><strong>Raspberry Pi → MQTT Publish</strong><span>Base64-encoded image + metadata published to Mosquitto. Image is in MQTT payload — not yet in S3</span></div>
+            </div>
+            <div class="s3-flow-node">
+              <div class="s3-flow-node-left">
+                <div class="s3-flow-dot" style="border-color:var(--purple); color:var(--purple)">EC2</div>
+                <div class="s3-flow-connector" style="background:var(--purple)"></div>
+              </div>
+              <div class="s3-flow-text"><strong>EC2 receives + runs inference</strong><span>Image decoded in memory. model.predict() returns PASS/FAIL. Image still only in EC2 RAM at this point</span></div>
+            </div>
+            <div class="s3-flow-node">
+              <div class="s3-flow-node-left">
+                <div class="s3-flow-dot" style="border-color:var(--orange); color:var(--orange); font-size:8px;">S3↑</div>
+                <div class="s3-flow-connector" style="background:var(--orange)"></div>
+              </div>
+              <div class="s3-flow-text"><strong style="color:var(--orange)">⚠ EC2 → S3: inference-images/</strong><span>boto3 put_object() writes image to S3. <em style="color:var(--red)">Critical step — patched in v1.1. No retry in v1.0. Silent failure risk.</em></span></div>
+            </div>
+            <div class="s3-flow-node">
+              <div class="s3-flow-node-left">
+                <div class="s3-flow-dot" style="border-color:var(--mid); color:var(--mid)">RMQ</div>
+                <div class="s3-flow-connector" style="background:var(--mid)"></div>
+              </div>
+              <div class="s3-flow-text"><strong>EC2 → RabbitMQ (JSON result)</strong><span>Prediction JSON includes S3 presigned URL for the image. RabbitMQ routes to MES adapter + Ignition</span></div>
+            </div>
+            <div class="s3-flow-node">
+              <div class="s3-flow-node-left">
+                <div class="s3-flow-dot" style="border-color:var(--green); color:var(--green)">MES</div>
+                <div class="s3-flow-connector" style="background:transparent; height:0"></div>
+              </div>
+              <div class="s3-flow-text"><strong style="color:var(--green)">MES inspection record stores S3 URL</strong><span>Inspection record: result, confidence, defect_type, model_version, image_s3_url. URL is fragile if S3 write failed</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECURITY LAYER                                                        -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
 <section class="section" id="security">
-    <div>
+  <div class="wrap">
+    <div class="reveal">
       <div class="section-label">Security Architecture</div>
       <h2 class="section-title">Security Layer — Legacy &amp; Known Gaps</h2>
       <p class="section-sub">What security controls were in place in 2020–21, and where the architecture fell short against modern OT/IT security standards. Understanding the gaps is the foundation for the next-generation redesign.</p>
     </div>
 
-    <div class="security-grid">
+    <div class="security-grid reveal">
 
       <div class="sec-card">
         <div class="sec-header" style="background:rgba(61,106,158,.12);">
@@ -1542,7 +1427,7 @@ footer span { color: var(--orange); }
     </div>
 
     <!-- Security comparison: Legacy vs Next-Gen -->
-    <div style="margin-top:24px; background:var(--card); border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+    <div class="reveal" style="margin-top:24px; background:var(--card); border:1px solid var(--border); border-radius:8px; overflow:hidden;">
       <div style="background:var(--panel); padding:12px 20px; font-family:var(--ff-display); font-size:15px; font-weight:700; color:var(--heading); border-bottom:1px solid var(--border);">Security Gap Summary — Legacy vs Next-Generation</div>
       <div style="overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse;">
@@ -1554,37 +1439,289 @@ footer span { color: var(--orange); }
             </tr>
           </thead>
           <tbody>
-            <tr style="border-bottom:1px solid rgba(15,23,42,.06)"><td style="padding:9px 16px; font-size:13px; color:var(--heading)">Device Identity</td><td style="padding:9px 16px; font-size:12px; color:var(--red)">Shared username/password across all RPi units</td><td style="padding:9px 16px; font-size:12px; color:var(--green)">Per-device X.509 certificates via AWS IoT Core CA</td></tr>
-            <tr style="border-bottom:1px solid rgba(15,23,42,.06)"><td style="padding:9px 16px; font-size:13px; color:var(--heading)">MQTT Broker</td><td style="padding:9px 16px; font-size:12px; color:var(--red)">Self-managed Mosquitto on Ignition Server</td><td style="padding:9px 16px; font-size:12px; color:var(--green)">AWS IoT Core — managed, auditable, scalable</td></tr>
-            <tr style="border-bottom:1px solid rgba(15,23,42,.06)"><td style="padding:9px 16px; font-size:13px; color:var(--heading)">IT/OT Boundary</td><td style="padding:9px 16px; font-size:12px; color:var(--red)">Direct bridge from OT → public EC2 IP, no DMZ</td><td style="padding:9px 16px; font-size:12px; color:var(--green)">DMZ with dedicated RabbitMQ, VPN gateway, no inbound OT ports</td></tr>
-            <tr><td style="padding:9px 16px; font-size:13px; color:var(--heading)">VPC Isolation</td><td style="padding:9px 16px; font-size:12px; color:var(--red)">EC2 in public subnet, default VPC</td><td style="padding:9px 16px; font-size:12px; color:var(--green)">Private subnet, NAT gateway, VPC endpoints for S3/SageMaker</td></tr>
+            <tr style="border-bottom:1px solid rgba(15,23,42,.06)"><td style="padding:9px 16px; font-size:13px; color:var(--ice)">Device Identity</td><td style="padding:9px 16px; font-size:12px; color:var(--red)">Shared username/password across all RPi units</td><td style="padding:9px 16px; font-size:12px; color:var(--green)">Per-device X.509 certificates via AWS IoT Core CA</td></tr>
+            <tr style="border-bottom:1px solid rgba(15,23,42,.06)"><td style="padding:9px 16px; font-size:13px; color:var(--ice)">MQTT Broker</td><td style="padding:9px 16px; font-size:12px; color:var(--red)">Self-managed Mosquitto on Ignition Server</td><td style="padding:9px 16px; font-size:12px; color:var(--green)">AWS IoT Core — managed, auditable, scalable</td></tr>
+            <tr style="border-bottom:1px solid rgba(15,23,42,.06)"><td style="padding:9px 16px; font-size:13px; color:var(--ice)">IT/OT Boundary</td><td style="padding:9px 16px; font-size:12px; color:var(--red)">Direct bridge from OT → public EC2 IP, no DMZ</td><td style="padding:9px 16px; font-size:12px; color:var(--green)">DMZ with dedicated RabbitMQ, VPN gateway, no inbound OT ports</td></tr>
+            <tr style="border-bottom:1px solid rgba(15,23,42,.06)"><td style="padding:9px 16px; font-size:13px; color:var(--ice)">Cloud IAM</td><td style="padding:9px 16px; font-size:12px; color:var(--orange)">EC2 IAM role — scoped to bucket but broad</td><td style="padding:9px 16px; font-size:12px; color:var(--green)">Least-privilege per service: Lambda, SageMaker, S3 isolated roles</td></tr>
+            <tr style="border-bottom:1px solid rgba(15,23,42,.06)"><td style="padding:9px 16px; font-size:13px; color:var(--ice)">VPC Isolation</td><td style="padding:9px 16px; font-size:12px; color:var(--red)">EC2 in public subnet, default VPC</td><td style="padding:9px 16px; font-size:12px; color:var(--green)">Private subnet, NAT gateway, VPC endpoints for S3/SageMaker</td></tr>
+            <tr><td style="padding:9px 16px; font-size:13px; color:var(--ice)">Traffic Monitoring</td><td style="padding:9px 16px; font-size:12px; color:var(--red)">No IDS, no traffic logging on OT VLAN</td><td style="padding:9px 16px; font-size:12px; color:var(--green)">AWS CloudTrail + VPC Flow Logs + IoT Core audit logging</td></tr>
           </tbody>
         </table>
       </div>
     </div>
+  </div>
 </section>
-    </div>
-  </div>
-</div>
 
-<!-- SLIDE 7 — LATENCY -->
-<div class="slide" id="s7" data-title="Latency">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · Performance · End-to-End Latency</div>
+
+
+<!-- DECISION FLOW -->
+<section class="section" id="decision">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="section-label">Quality Logic</div>
+      <h2 class="section-title">PASS / FAIL Decision Flow</h2>
+      <p class="section-sub">Eight sequential steps from photoelectric sensor trigger to MES inspection record write. Total elapsed time: 3.2–4.0 seconds.</p>
     </div>
-    <div class="slide-num"><span class="sn-cur">7</span> / <span class="sn-total">12</span></div>
+
+    <div class="decision-grid reveal">
+      <div class="decision-step" style="border-top:3px solid var(--blue)">
+        <div class="decision-step-num">01</div>
+        <div class="decision-header">
+          <div class="decision-step-label" style="color:var(--blue)">Trigger</div>
+          <div class="decision-step-title">Sensor → GPIO</div>
+        </div>
+        <div class="decision-body">Photoelectric sensor detects part in position → GPIO pin goes HIGH → RPi Python interrupt fires camera capture routine.</div>
+      </div>
+      <div class="decision-step" style="border-top:3px solid var(--blue)">
+        <div class="decision-step-num">02</div>
+        <div class="decision-header">
+          <div class="decision-step-label" style="color:var(--blue)">Capture</div>
+          <div class="decision-step-title">Image + Preprocess</div>
+        </div>
+        <div class="decision-body">12MP capture → resize 224×224 → Gaussian blur (3×3) → histogram equalization → base64 encode → assemble JSON payload with station_id, part_serial, timestamp.</div>
+      </div>
+      <div class="decision-step" style="border-top:3px solid var(--purple)">
+        <div class="decision-step-num">03</div>
+        <div class="decision-header">
+          <div class="decision-step-label" style="color:var(--purple)">Transport</div>
+          <div class="decision-step-title">MQTT Publish</div>
+        </div>
+        <div class="decision-body">Paho-MQTT publishes to <code style="font-family:var(--ff-mono); font-size:11px; color:var(--amber)">plant/{line}/stn{id}/inspection</code>. QoS Level 1. Mosquitto receives on Ignition Server.</div>
+      </div>
+      <div class="decision-step" style="border-top:3px solid var(--purple)">
+        <div class="decision-step-num">04</div>
+        <div class="decision-header">
+          <div class="decision-step-label" style="color:var(--purple)">Bridge</div>
+          <div class="decision-step-title">Mosquitto → EC2</div>
+        </div>
+        <div class="decision-body">Mosquitto bridge plugin forwards message to EC2 Paho-MQTT subscriber over Internet (TLS). EC2 process is a persistent long-running subscriber — the key reason Lambda was not used.</div>
+      </div>
+      <div class="decision-step" style="border-top:3px solid var(--orange)">
+        <div class="decision-step-num">05</div>
+        <div class="decision-header">
+          <div class="decision-step-label" style="color:var(--orange)">Inference</div>
+          <div class="decision-step-title">ResNet50 ML Model</div>
+        </div>
+        <div class="decision-body">base64 decode → NumPy tensor → TF preprocessing → ResNet50 model.predict() → class label (PASS/FAIL) + confidence float (0.00–1.00). Largest single latency contributor: 1.0–1.5 sec on CPU.</div>
+      </div>
+      <div class="decision-step" style="border-top:3px solid var(--orange)">
+        <div class="decision-step-num">06</div>
+        <div class="decision-header">
+          <div class="decision-step-label" style="color:var(--orange)">Routing</div>
+          <div class="decision-step-title">Result → RabbitMQ</div>
+        </div>
+        <div class="decision-body">EC2 AMQP client publishes JSON result to RabbitMQ on Ignition Server. Routing key: <code style="font-family:var(--ff-mono); font-size:11px; color:var(--amber)">{station_id}.{result}</code>. MES adapter + Ignition both consume simultaneously.</div>
+      </div>
+      <div class="decision-step" style="border-top:3px solid var(--green)">
+        <div class="decision-step-num">07</div>
+        <div class="decision-header">
+          <div class="decision-step-label" style="color:var(--green)">MES Write</div>
+          <div class="decision-step-title">Adapter Consumer</div>
+        </div>
+        <div class="decision-body">Python MES adapter consumes AMQP queue → reads Work Order + Part Serial from MES → writes inspection record via stored procedure → ACK sent only after successful write.</div>
+      </div>
+      <div class="decision-step" style="border-top:3px solid var(--blue)">
+        <div class="decision-step-num">08</div>
+        <div class="decision-header">
+          <div class="decision-step-label" style="color:var(--blue)">SCADA</div>
+          <div class="decision-step-title">Ignition Update</div>
+        </div>
+        <div class="decision-body">Ignition MQTT Engine populates OPC-UA tags per station. Operator HMI updates with result + image. 3× consecutive FAILs triggers Line Stop alarm to supervisor.</div>
+      </div>
+    </div>
+
+    <!-- Outcomes -->
+    <div class="outcome-row reveal" style="margin-top:24px;">
+      <div class="outcome-pass">
+        <div class="outcome-label">✓ PASS</div>
+        <div class="outcome-items">
+          Inspection record written to MES<br>
+          Part serial → next operation<br>
+          SCADA passed counter +1<br>
+          OEE quality factor updated
+        </div>
+      </div>
+      <div class="outcome-fail">
+        <div class="outcome-label">✕ FAIL</div>
+        <div class="outcome-items">
+          NCR auto-created in MES<br>
+          Part routed to rework queue<br>
+          Ignition FAIL alarm raised<br>
+          Shift supervisor notified
+        </div>
+      </div>
+    </div>
+
+    <!-- Scenario -->
+    <div class="reveal" style="margin-top:48px;">
+      <div class="section-label">Live Example</div>
+      <h2 class="section-title" style="font-size:clamp(24px,3vw,38px)">Inspection Scenario — Station 3, Line B</h2>
+    </div>
+    <div class="scenario-banner reveal">
+      <strong>Scenario:</strong> Automotive bracket assembly. Station 3 inspects for missing retaining clip — a defect causing field failure. Confidence threshold: 0.85. Part serial: <strong>BR-2021-084471</strong>
+    </div>
+    <div class="scenario-grid reveal">
+      <div class="event-card" style="border-left-color:var(--blue);">
+        <div class="event-time">T + 0.00s</div>
+        <div class="event-who">📍 Station 3</div>
+        <div class="event-title">Bracket BR-084471 arrives at fixture</div>
+        <div class="event-detail">Conveyor stops. Photoelectric sensor detects part in position → GPIO HIGH.</div>
+      </div>
+      <div class="event-card" style="border-left-color:var(--blue);">
+        <div class="event-time">T + 0.05s</div>
+        <div class="event-who">📷 Raspberry Pi</div>
+        <div class="event-title">GPIO HIGH → Camera shutter triggered</div>
+        <div class="event-detail">12MP image captured. OpenCV: resize → blur → equalize → base64 encode.</div>
+      </div>
+      <div class="event-card" style="border-left-color:var(--purple);">
+        <div class="event-time">T + 0.45s</div>
+        <div class="event-who">📡 Mosquitto</div>
+        <div class="event-title">MQTT published to plant/lineB/stn3/inspection</div>
+        <div class="event-detail">Payload: <code style="font-family:var(--ff-mono); font-size:10px;">{ image_b64, station: 'STN3', serial: 'BR-084471', ts: '2021-06-14T09:22:18Z' }</code></div>
+      </div>
+      <div class="event-card" style="border-left-color:var(--orange);">
+        <div class="event-time">T + 0.72s</div>
+        <div class="event-who">☁ AWS EC2</div>
+        <div class="event-title">Mosquitto bridge delivers to EC2 subscriber</div>
+        <div class="event-detail">Image decoded, tensor preprocessed, passed to ResNet50 model.predict().</div>
+      </div>
+      <div class="event-card" style="border-left-color:var(--orange); background:rgba(192,57,43,.05);">
+        <div class="event-time">T + 1.95s</div>
+        <div class="event-who">🧠 AWS EC2 — Inference</div>
+        <div class="event-title" style="color:var(--red)">FAIL detected — confidence: 0.93</div>
+        <div class="event-detail">Missing retaining clip. Result: <code style="font-family:var(--ff-mono); font-size:10px;">{ result:'FAIL', defect:'missing_clip', confidence:0.93 }</code></div>
+      </div>
+      <div class="event-card" style="border-left-color:var(--mid);">
+        <div class="event-time">T + 2.10s</div>
+        <div class="event-who">🐇 RabbitMQ</div>
+        <div class="event-title">FAIL result published to AMQP queue</div>
+        <div class="event-detail">Direct exchange routing key: STN3.FAIL. MES adapter + Ignition MQTT Engine both receive simultaneously.</div>
+      </div>
+      <div class="event-card" style="border-left-color:var(--green);">
+        <div class="event-time">T + 2.65s</div>
+        <div class="event-who">🏭 MES</div>
+        <div class="event-title">Inspection record written + NCR auto-created</div>
+        <div class="event-detail">FAIL logged against BR-084471 / WO-4471. <strong style="color:var(--red)">NCR-20210614-0032</strong> created. Part routed to rework queue.</div>
+      </div>
+      <div class="event-card" style="border-left-color:var(--blue);">
+        <div class="event-time">T + 2.70s</div>
+        <div class="event-who">📺 Ignition SCADA</div>
+        <div class="event-title">Operator HMI updated — alarm raised</div>
+        <div class="event-detail">Station 3 indicator turns RED. FAIL image displayed with 'missing clip' label. Consecutive FAIL counter: 1.</div>
+      </div>
+    </div>
   </div>
-  <div class="slide-body">
-    <div class="wrap">
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- FAULT TOLERANCE                                                       -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="fault">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="section-label">Operational Resilience</div>
+      <h2 class="section-title">Failure Modes &amp; Fault Tolerance</h2>
+      <p class="section-sub">Factories require explicit fault handling for every system component. Below is the complete failure mode matrix for the legacy CVML system — what was handled, what wasn't, and the consequences on the production floor.</p>
+    </div>
+
+    <table class="fault-table reveal">
+      <thead>
+        <tr>
+          <th style="width:160px;">Failure Mode</th>
+          <th style="width:70px;">Severity</th>
+          <th>Production Impact</th>
+          <th>Legacy Handling</th>
+          <th>Gaps / What Was Missing</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="fault-name">Plant Wi-Fi Drop</span></td>
+          <td><span class="severity-pill sev-med">MEDIUM</span></td>
+          <td class="fault-impact">Inspections queued but not sent. Parts hold at station until reconnect.</td>
+          <td class="fault-handling">✓ SQLite local buffer on RPi (added v1.1). Images stored up to 10-min age gate, then replayed on reconnect.</td>
+          <td class="fault-gap">Not in v1.0 — data loss during Wi-Fi outages pre-patch. No alerting to supervisor that station was in offline mode.</td>
+        </tr>
+        <tr>
+          <td><span class="fault-name">EC2 Process Crash</span></td>
+          <td><span class="severity-pill sev-high">HIGH</span></td>
+          <td class="fault-impact">All inference halted. MQTT messages accumulate in Mosquitto. No PASS/FAIL issued. Station holds.</td>
+          <td class="fault-handling">✗ No auto-restart. Mosquitto persisted messages. EC2 restart by SSH — manual intervention required.</td>
+          <td class="fault-gap">No process supervisor (systemd / supervisor). No CloudWatch alarm on EC2 health. Average recovery time: 15–45 min depending on engineer availability.</td>
+        </tr>
+        <tr>
+          <td><span class="fault-name">MES Unavailable</span></td>
+          <td><span class="severity-pill sev-high">HIGH</span></td>
+          <td class="fault-impact">Inspection results computed but not written to MES. No inspection records for parts processed during outage.</td>
+          <td class="fault-handling">✗ RabbitMQ held messages in durable queue. But MES adapter Python script had no retry — messages consumed and discarded on write failure in v1.0.</td>
+          <td class="fault-gap">Retry logic added in v1.1 patch (3 retries, 30s backoff). But no dead-letter queue — messages still lost after 3 failures. No audit log of lost records.</td>
+        </tr>
+        <tr>
+          <td><span class="fault-name">Ignition Server Down</span></td>
+          <td><span class="severity-pill sev-high">HIGH</span></td>
+          <td class="fault-impact">Entire plant-side pipeline halted. Both Mosquitto and RabbitMQ offline. No image transport, no result routing, no SCADA visibility.</td>
+          <td class="fault-handling">✗ Single point of failure — no redundancy. Mosquitto and RabbitMQ both hosted here. SCADA also down.</td>
+          <td class="fault-gap">Root cause of the worst architectural decision. No failover broker. No secondary Ignition server. Planned maintenance required full production stop.</td>
+        </tr>
+        <tr>
+          <td><span class="fault-name">Camera Failure</span></td>
+          <td><span class="severity-pill sev-med">MEDIUM</span></td>
+          <td class="fault-impact">Station goes dark — no images captured. Parts pass through with no quality check.</td>
+          <td class="fault-handling">✓ Python capture script raised exception on camera open failure. MQTT message with error code published. Ignition alarm triggered for station.</td>
+          <td class="fault-gap">Alarm was informational only — no automated conveyor stop. Parts could still pass station without inspection until operator responded.</td>
+        </tr>
+        <tr>
+          <td><span class="fault-name">S3 Write Failure</span></td>
+          <td><span class="severity-pill sev-med">MEDIUM</span></td>
+          <td class="fault-impact">Inference result still produced and sent to MES. But inspection record in MES contains broken image URL.</td>
+          <td class="fault-handling">✗ v1.0: boto3 exception silently swallowed — no retry, no alert. Result sent anyway with null image_url field.</td>
+          <td class="fault-gap">v1.1 added basic exception logging to EC2 log file. But no automated alert, no MES record correction, no reconciliation job. Broken URLs accumulated silently.</td>
+        </tr>
+        <tr>
+          <td><span class="fault-name">Model Accuracy Drift</span></td>
+          <td><span class="severity-pill sev-high">HIGH</span></td>
+          <td class="fault-impact">PASS/FAIL decisions degrade silently. Defect escapes increase without any system alert.</td>
+          <td class="fault-handling">✗ No automated drift detection. Only identified through weekly manual quality audit comparing MES defect rate vs customer complaints.</td>
+          <td class="fault-gap">In one incident (Q3 2021), drift was undetected for ~3 weeks after supplier changed surface finish. ~1,200 parts inspected with degraded model before retraining triggered.</td>
+        </tr>
+        <tr>
+          <td><span class="fault-name">RPi SD Card Failure</span></td>
+          <td><span class="severity-pill sev-low">LOW</span></td>
+          <td class="fault-impact">Station offline until card replaced and OS + software re-imaged.</td>
+          <td class="fault-handling">✓ Spare RPi units kept per line. Ansible playbook for re-imaging (added after first card failure in Oct 2020). Recovery time: ~45 min.</td>
+          <td class="fault-gap">No remote health monitoring of SD card wear. No proactive replacement schedule. Failures only discovered reactively when station went offline.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Summary callout -->
+    <div class="reveal" style="margin-top:20px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <div style="background:rgba(192,57,43,.1); border:1px solid rgba(192,57,43,.3); border-radius:8px; padding:16px 20px; text-align:center;">
+        <div style="font-family:var(--ff-display); font-size:32px; font-weight:800; color:var(--red);">3</div>
+        <div style="font-family:var(--ff-mono); font-size:10px; letter-spacing:1.5px; color:var(--muted); text-transform:uppercase; margin-top:4px;">HIGH severity gaps<br>with no auto-handling</div>
+      </div>
+      <div style="background:rgba(224,123,48,.1); border:1px solid rgba(224,123,48,.3); border-radius:8px; padding:16px 20px; text-align:center;">
+        <div style="font-family:var(--ff-display); font-size:32px; font-weight:800; color:var(--orange);">45 min</div>
+        <div style="font-family:var(--ff-mono); font-size:10px; letter-spacing:1.5px; color:var(--muted); text-transform:uppercase; margin-top:4px;">Avg EC2 recovery time<br>manual intervention required</div>
+      </div>
+      <div style="background:rgba(245,166,35,.08); border:1px solid rgba(245,166,35,.25); border-radius:8px; padding:16px 20px; text-align:center;">
+        <div style="font-family:var(--ff-display); font-size:32px; font-weight:800; color:var(--amber);">~1,200</div>
+        <div style="font-family:var(--ff-mono); font-size:10px; letter-spacing:1.5px; color:var(--muted); text-transform:uppercase; margin-top:4px;">Parts inspected with<br>drifted model before detection</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- LATENCY -->
 <section class="section" id="latency">
-    <div>
+  <div class="wrap">
+    <div class="reveal">
       <div class="section-label">Performance Analysis</div>
       <h2 class="section-title">End-to-End Latency — Where the 4 Seconds Go</h2>
       <p class="section-sub">Measured at Station 3, 2021. Total observed: 3.2–4.0 seconds from capture trigger to MES record write.</p>
     </div>
-    <table class="latency-table">
+    <table class="latency-table reveal">
       <thead>
         <tr>
           <th style="width:30px">#</th>
@@ -1653,34 +1790,25 @@ footer span { color: var(--orange); }
         </tr>
       </tbody>
     </table>
-    <div class="key-finding">
+    <div class="key-finding reveal">
       <strong>Key Finding:</strong> Inference (step 5, CPU-only EC2) and MES write (step 7) account for ~65% of total latency. GPU-enabled SageMaker endpoint would cut step 5 from 1.0–1.5s to ~200ms. Async MES write with retry queue would eliminate step 7 blocking entirely.
     </div>
-    <p class="section-sub" style="margin-top:12px; font-size:12px; color:var(--muted); font-style:italic;">Eight stages are listed here (including SCADA) to match the eight-step decision flow; some older materials group these as seven pipeline stages.</p>
+    <p class="section-sub reveal" style="margin-top:12px; font-size:13px; color:var(--muted); font-style:italic;">
+      Note: This report lists eight latency stages, including SCADA/HMI (row 8), to align with the eight-step decision flow. Some older slide decks summarise seven pipeline stages only (excluding SCADA as a separate timing row).
+    </p>
+  </div>
 </section>
-    </div>
-  </div>
-</div>
 
-<!-- SLIDE 8 — RESULTS -->
-<div class="slide" id="s8" data-title="Results">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · Results &amp; Business Impact</div>
-    </div>
-    <div class="slide-num"><span class="sn-cur">8</span> / <span class="sn-total">12</span></div>
-  </div>
-  <div class="slide-body">
-    <div class="wrap">
+<!-- RESULTS -->
 <section class="section" id="results">
-    <div>
+  <div class="wrap">
+    <div class="reveal">
       <div class="section-label">Operational Outcomes · 2020–2021</div>
       <h2 class="section-title">Results & Business Impact</h2>
       <p class="section-sub">Measured impact from Phase 1 deployment across 6 inspection stations during the first year of operation.</p>
     </div>
 
-    <div class="results-grid">
+    <div class="results-grid reveal">
       <div class="result-card" style="background:rgba(61,106,158,.12); border:1px solid rgba(61,106,158,.3);">
         <div class="result-val" style="color:var(--blue)">&lt;4s</div>
         <div class="result-label" style="color:var(--muted)">Inspection Latency<br>vs 8–12 min manual</div>
@@ -1699,7 +1827,7 @@ footer span { color: var(--orange); }
       </div>
     </div>
 
-    <div class="before-after" style="margin-top:32px;">
+    <div class="before-after reveal" style="margin-top:32px;">
       <div class="ba-header">
         <span>Metric</span>
         <span class="ba-header-before">Before CVML</span>
@@ -1713,29 +1841,18 @@ footer span { color: var(--orange); }
       <div class="ba-row"><span class="ba-metric">False positive rate</span><span class="ba-before">~13% (subjective)</span><span class="ba-after">~5.5% (ML + review)</span><span class="ba-change">−58%</span></div>
       <div class="ba-row"><span class="ba-metric">Line stops (quality)</span><span class="ba-before">Avg. 3× per shift</span><span class="ba-after">Avg. 1.5× per shift</span><span class="ba-change">−50%</span></div>
     </div>
+  </div>
 </section>
-    </div>
-  </div>
-</div>
 
-<!-- SLIDE 9 — LIMITATIONS -->
-<div class="slide" id="s9" data-title="Limitations">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · Known Limitations &amp; Lessons</div>
-    </div>
-    <div class="slide-num"><span class="sn-cur">9</span> / <span class="sn-total">12</span></div>
-  </div>
-  <div class="slide-body">
-    <div class="wrap">
+<!-- LIMITATIONS -->
 <section class="section" id="limitations">
-    <div>
+  <div class="wrap">
+    <div class="reveal">
       <div class="section-label">Engineering Honesty</div>
       <h2 class="section-title">Known Limitations — Legacy Architecture</h2>
       <p class="section-sub">An honest assessment of the 2020–21 design decisions and their operational consequences. These limitations directly motivated the next-generation architecture.</p>
     </div>
-    <div class="limits-grid">
+    <div class="limits-grid reveal">
       <div class="limit-card" style="border-left-color:var(--red);">
         <div class="limit-title" style="color:var(--red)">Single Point of Failure — Ignition Server</div>
         <div class="limit-body">Both Mosquitto and RabbitMQ were hosted on the Ignition Server. Any planned or unplanned server downtime halted the entire inspection pipeline — image transport, result routing, and SCADA visibility all stopped simultaneously. No redundancy or failover.</div>
@@ -1761,56 +1878,37 @@ footer span { color: var(--orange); }
         <div class="limit-body">MES adapter was a Python script with direct stored procedure writes. Any MES schema change or upgrade broke the adapter. No retry logic — failed writes in v1.0 were silently discarded. No dead-letter queue or error tracking.</div>
       </div>
     </div>
-    <div style="margin-top:28px; background:var(--panel); border:1px solid var(--border); border-left:3px solid var(--amber); border-radius:8px; padding:18px 24px;">
-      <div style="font-family:var(--ff-display); font-size:14px; font-weight:700; color:var(--amber); margin-bottom:10px;">Lessons Learned</div>
-      <ul style="list-style:none; font-size:13px; color:var(--text); line-height:1.9;">
-        <li><strong style="color:var(--ice)">SPOF:</strong> Ignition Server hosted both brokers — no failover. Next: AWS IoT Core + dedicated DMZ broker.</li>
-        <li><strong style="color:var(--ice)">Model drift:</strong> No automated detection; drift found only via manual audits. Next: MLOps pipelines and drift monitoring.</li>
-        <li><strong style="color:var(--ice)">EC2 inference:</strong> 1.5s CPU bottleneck, manual restart on crash. Next: SageMaker GPU endpoints, auto-scaling.</li>
-        <li><strong style="color:var(--ice)">Security:</strong> Shared credentials, no DMZ. Next: Per-device X.509, formal OT/IT segmentation.</li>
-      </ul>
-    </div>
+  </div>
 </section>
-    </div>
-  </div>
-</div>
 
-<!-- SLIDE 10 — NEXT GEN -->
-<div class="slide" id="s10" data-title="Next-Gen">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · Roadmap &amp; What I Would Do Differently</div>
-    </div>
-    <div class="slide-num"><span class="sn-cur">10</span> / <span class="sn-total">12</span></div>
-  </div>
-  <div class="slide-body">
-    <div class="wrap">
+<!-- NEXT GEN -->
 <section class="section" id="nextgen">
-    <div>
+  <div class="wrap">
+    <div class="reveal">
       <div class="section-label">Forward Thinking · Improvement Roadmap</div>
       <h2 class="section-title">What I Would Do Differently</h2>
       <p class="section-sub">Next-generation architecture addressing every 2020–21 limitation. Each change maps directly to a known gap in the legacy system.</p>
     </div>
-    <div class="nextgen-grid">
+    <div class="nextgen-grid reveal">
       <table class="compare-table">
         <thead>
           <tr>
             <th>Legacy (2020–21)</th>
             <th></th>
             <th>Next-Generation</th>
+            <th>Why</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td class="td-legacy">Mosquitto on Ignition Server</td><td class="td-arrow">→</td><td class="td-next">AWS IoT Core</td></tr>
-          <tr><td class="td-legacy">EC2 persistent MQTT process</td><td class="td-arrow">→</td><td class="td-next">IoT Core + Lambda trigger</td></tr>
-          <tr><td class="td-legacy">EC2 Flask + ResNet50 (CPU)</td><td class="td-arrow">→</td><td class="td-next">SageMaker Real-Time Endpoint</td></tr>
-          <tr><td class="td-legacy">Base64 image in MQTT payload</td><td class="td-arrow">→</td><td class="td-next">Image → S3, URL in MQTT</td></tr>
-          <tr><td class="td-legacy">RabbitMQ on Ignition Server</td><td class="td-arrow">→</td><td class="td-next">RabbitMQ in dedicated DMZ</td></tr>
-          <tr><td class="td-legacy">MES adapter (Python script)</td><td class="td-arrow">→</td><td class="td-next">MES microservice + retry queue</td></tr>
-          <tr><td class="td-legacy">Manual model retraining</td><td class="td-arrow">→</td><td class="td-next">SageMaker Pipelines CI/CD</td></tr>
-          <tr><td class="td-legacy">No S3 lifecycle policy</td><td class="td-arrow">→</td><td class="td-next">S3 + Kinesis Firehose data lake</td></tr>
-          <tr><td class="td-legacy">No OT/IT segmentation</td><td class="td-arrow">→</td><td class="td-next">DMZ + IoT Core + VPN gateway</td></tr>
+          <tr><td class="td-legacy">Mosquitto on Ignition Server</td><td class="td-arrow">→</td><td class="td-next">AWS IoT Core</td><td class="td-why">Managed, X.509 certs, Rules Engine, Device Shadow</td></tr>
+          <tr><td class="td-legacy">EC2 persistent MQTT process</td><td class="td-arrow">→</td><td class="td-next">IoT Core + Lambda trigger</td><td class="td-why">Serverless, auto-scaling, no SSH management</td></tr>
+          <tr><td class="td-legacy">EC2 Flask + ResNet50 (CPU)</td><td class="td-arrow">→</td><td class="td-next">SageMaker Real-Time Endpoint</td><td class="td-why">GPU inference, model versioning, 1–5 auto-scaling</td></tr>
+          <tr><td class="td-legacy">Base64 image in MQTT payload</td><td class="td-arrow">→</td><td class="td-next">Image → S3, URL in MQTT</td><td class="td-why">Eliminates 33% overhead, decouples transport</td></tr>
+          <tr><td class="td-legacy">RabbitMQ on Ignition Server</td><td class="td-arrow">→</td><td class="td-next">RabbitMQ in dedicated DMZ</td><td class="td-why">Eliminates SPOF, proper IT/OT security boundary</td></tr>
+          <tr><td class="td-legacy">MES adapter (Python script)</td><td class="td-arrow">→</td><td class="td-next">MES microservice + retry queue</td><td class="td-why">Resilient, decoupled, no silent failures</td></tr>
+          <tr><td class="td-legacy">Manual model retraining</td><td class="td-arrow">→</td><td class="td-next">SageMaker Pipelines CI/CD</td><td class="td-why">Drift detect → retrain → evaluate → deploy</td></tr>
+          <tr><td class="td-legacy">No S3 lifecycle policy</td><td class="td-arrow">→</td><td class="td-next">S3 + Kinesis Firehose data lake</td><td class="td-why">Partitioned, Athena queryable, Power BI</td></tr>
+          <tr><td class="td-legacy">No OT/IT segmentation</td><td class="td-arrow">→</td><td class="td-next">DMZ + IoT Core + VPN gateway</td><td class="td-why">Zero inbound OT ports, per-device cert auth</td></tr>
         </tbody>
       </table>
 
@@ -1848,201 +1946,98 @@ footer span { color: var(--orange); }
         </div>
       </div>
     </div>
+  </div>
 </section>
-    </div>
-  </div>
-</div>
 
-<!-- SLIDE 11 — TECH STACK -->
-<div class="slide" id="s11" data-title="Tech Stack">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · Technology Stack 2020–2021</div>
-    </div>
-    <div class="slide-num"><span class="sn-cur">11</span> / <span class="sn-total">12</span></div>
-  </div>
-  <div class="slide-body">
-    <div class="wrap">
+<!-- TECH STACK -->
 <section class="section" id="techstack">
-    <div>
+  <div class="wrap">
+    <div class="reveal">
       <div class="section-label">Complete Component Reference</div>
       <h2 class="section-title">Technology Stack — 2020–2021</h2>
-      <p class="section-sub">Five-layer architecture and the components in each layer. Data flows left to right: Edge → Transport → Cloud → Bridge → Plant.</p>
     </div>
-
-    <!-- Architecture diagram: stack by layer -->
-    <div class="tech-arch">
-      <div class="tech-arch-col col-edge">
-        <div class="tech-arch-header">1 · Edge</div>
-        <div class="tech-arch-body">
-          <div class="tech-arch-item"><strong>Raspberry Pi 4</strong> (4GB)</div>
-          <div class="tech-arch-item"><strong>RPi HQ Camera</strong> (12MP)</div>
-          <div class="tech-arch-item"><strong>Python 3.8</strong> + OpenCV 4.x</div>
-          <div class="tech-arch-item"><strong>Paho-MQTT</strong> 1.5.x</div>
-        </div>
-      </div>
-      <div class="tech-arch-col col-mqtt">
-        <div class="tech-arch-header">2 · Transport</div>
-        <div class="tech-arch-body">
-          <div class="tech-arch-item"><strong>Eclipse Mosquitto</strong> 1.6.x</div>
-          <div class="tech-arch-item">TLS 1.2 · Port 8883</div>
-          <div class="tech-arch-item">Bridge → EC2</div>
-        </div>
-      </div>
-      <div class="tech-arch-col col-cloud">
-        <div class="tech-arch-header">3 · Cloud</div>
-        <div class="tech-arch-body">
-          <div class="tech-arch-item"><strong>AWS EC2</strong> t3.large</div>
-          <div class="tech-arch-item"><strong>TensorFlow 2.x</strong> / Keras</div>
-          <div class="tech-arch-item"><strong>ResNet50</strong> (.h5)</div>
-          <div class="tech-arch-item"><strong>AWS S3</strong></div>
-        </div>
-      </div>
-      <div class="tech-arch-col col-bridge">
-        <div class="tech-arch-header">4 · Bridge</div>
-        <div class="tech-arch-body">
-          <div class="tech-arch-item"><strong>RabbitMQ</strong> 3.8.x</div>
-          <div class="tech-arch-item">AMQP 0-9-1</div>
-          <div class="tech-arch-item">Fan-out MES + SCADA</div>
-        </div>
-      </div>
-      <div class="tech-arch-col col-plant">
-        <div class="tech-arch-header">5 · Plant</div>
-        <div class="tech-arch-body">
-          <div class="tech-arch-item"><strong>Ignition</strong> 8.0.x SCADA</div>
-          <div class="tech-arch-item"><strong>SAP ME</strong> / Sepasoft</div>
-          <div class="tech-arch-item">MES adapter · OPC-UA</div>
-        </div>
-      </div>
+    <div class="tech-grid reveal">
+      <div class="tech-card"><div class="tech-cat" style="color:var(--blue)">Edge Hardware</div><div class="tech-name">Raspberry Pi 4 Model B (4GB)</div><div class="tech-role">Image capture + GPIO I/O at each station</div><div class="tech-host" style="color:var(--muted)">Plant floor</div></div>
+      <div class="tech-card"><div class="tech-cat" style="color:var(--blue)">Camera</div><div class="tech-name">RPi HQ Camera Module (12MP)</div><div class="tech-role">Inspection image capture mounted on fixture</div><div class="tech-host" style="color:var(--muted)">Plant floor</div></div>
+      <div class="tech-card"><div class="tech-cat" style="color:var(--blue)">Edge Software</div><div class="tech-name">Python 3.8 + OpenCV 4.x</div><div class="tech-role">Image preprocessing pipeline + GPIO control</div><div class="tech-host" style="color:var(--muted)">Raspberry Pi local</div></div>
+      <div class="tech-card"><div class="tech-cat" style="color:var(--blue)">MQTT Client</div><div class="tech-name">Paho-MQTT 1.5.x</div><div class="tech-role">Publish images to Mosquitto broker</div><div class="tech-host" style="color:var(--muted)">Raspberry Pi local</div></div>
+      <div class="tech-card"><div class="tech-cat" style="color:var(--purple)">MQTT Broker</div><div class="tech-name">Eclipse Mosquitto 1.6.x</div><div class="tech-role">Receive RPi images, bridge to AWS EC2</div><div class="tech-host" style="color:var(--muted)">Ignition Server (on-premise)</div></div>
+      <div class="tech-card"><div class="tech-cat" style="color:var(--orange)">Cloud Platform</div><div class="tech-name">AWS EC2 t3.large (Ubuntu 20.04)</div><div class="tech-role">MQTT subscriber + ML inference engine</div><div class="tech-host" style="color:var(--muted)">AWS Cloud — single instance</div></div>
+      <div class="tech-card"><div class="tech-cat" style="color:var(--orange)">ML Framework</div><div class="tech-name">TensorFlow 2.x / Keras</div><div class="tech-role">ResNet50 transfer learning + inference</div><div class="tech-host" style="color:var(--muted)">AWS EC2</div></div>
+      <div class="tech-card"><div class="tech-cat" style="color:var(--orange)">ML Model</div><div class="tech-name">ResNet50 CNN (.h5)</div><div class="tech-role">Fine-tuned on ~85K labeled images (pass + defect classes)</div><div class="tech-host" style="color:var(--muted)">AWS EC2 + S3</div></div>
+      <div class="tech-card"><div class="tech-cat" style="color:var(--orange)">Storage</div><div class="tech-name">AWS S3</div><div class="tech-role">Training data, model artifacts, inference images</div><div class="tech-host" style="color:var(--muted)">AWS Cloud</div></div>
+      <div class="tech-card"><div class="tech-cat" style="color:var(--mid)">Result Broker</div><div class="tech-name">RabbitMQ 3.8.x (AMQP)</div><div class="tech-role">Route JSON result → MES + SCADA</div><div class="tech-host" style="color:var(--muted)">Ignition Server (on-premise)</div></div>
+      <div class="tech-card"><div class="tech-cat" style="color:var(--green)">SCADA Platform</div><div class="tech-name">Ignition 8.0.x (Inductive Automation)</div><div class="tech-role">Operator dashboards + OPC-UA gateway</div><div class="tech-host" style="color:var(--muted)">Ignition Server (on-premise)</div></div>
+      <div class="tech-card"><div class="tech-cat" style="color:var(--green)">MES</div><div class="tech-name">SAP ME / Ignition Sepasoft</div><div class="tech-role">Quality records, NCR creation, OEE quality</div><div class="tech-host" style="color:var(--muted)">Plant data center</div></div>
     </div>
-
-    <div style="overflow-x:auto;">
-      <table class="compare-table" style="margin-top:32px;">
-        <thead>
-          <tr>
-            <th style="width:22%">Category</th>
-            <th style="width:38%">Component</th>
-            <th>Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td style="color:var(--blue)">Edge Hardware</td><td>Raspberry Pi 4 Model B (4GB)</td><td>Image capture + GPIO I/O at each station · Plant floor</td></tr>
-          <tr><td style="color:var(--blue)">Camera</td><td>RPi HQ Camera Module (12MP)</td><td>Inspection image capture mounted on fixture · Plant floor</td></tr>
-          <tr><td style="color:var(--blue)">Edge Software</td><td>Python 3.8 + OpenCV 4.x</td><td>Image preprocessing pipeline + GPIO control · Raspberry Pi local</td></tr>
-          <tr><td style="color:var(--blue)">MQTT Client</td><td>Paho-MQTT 1.5.x</td><td>Publish images to Mosquitto broker · Raspberry Pi local</td></tr>
-          <tr><td style="color:var(--purple)">MQTT Broker</td><td>Eclipse Mosquitto 1.6.x</td><td>Receive RPi images, bridge to AWS EC2 · Ignition Server (on-premise)</td></tr>
-          <tr><td style="color:var(--orange)">Cloud Platform</td><td>AWS EC2 t3.large (Ubuntu 20.04)</td><td>MQTT subscriber + ML inference engine · AWS Cloud — single instance</td></tr>
-          <tr><td style="color:var(--orange)">ML Framework</td><td>TensorFlow 2.x / Keras</td><td>ResNet50 transfer learning + inference · AWS EC2</td></tr>
-          <tr><td style="color:var(--orange)">ML Model</td><td>ResNet50 CNN (.h5)</td><td>Fine-tuned on ~85K labeled images (pass + defect classes) · AWS EC2 + S3</td></tr>
-          <tr><td style="color:var(--orange)">Storage</td><td>AWS S3</td><td>Training data, model artifacts, inference images · AWS Cloud</td></tr>
-          <tr><td style="color:var(--mid)">Result Broker</td><td>RabbitMQ 3.8.x (AMQP)</td><td>Route JSON result → MES + SCADA · Ignition Server (on-premise)</td></tr>
-          <tr><td style="color:var(--green)">SCADA Platform</td><td>Ignition 8.0.x (Inductive Automation)</td><td>Operator dashboards + OPC-UA gateway · Ignition Server (on-premise)</td></tr>
-          <tr><td style="color:var(--green)">MES</td><td>SAP ME / Ignition Sepasoft</td><td>Quality records, NCR creation, OEE quality · Plant data center</td></tr>
-        </tbody>
-      </table>
-    </div>
+  </div>
 </section>
-    </div>
-  </div>
-</div>
 
-<!-- SLIDE 12 — CLOSING -->
-<div class="slide" id="s12" data-title="Thank you">
-  <div class="slide-header">
-    <div class="deck-brand">
-      <div class="deck-brand-icon">CV</div>
-      <div class="deck-brand-text">CVML · Portfolio Case Study</div>
-    </div>
-    <div class="slide-num"><span class="sn-cur">12</span> / <span class="sn-total">12</span></div>
-  </div>
-  <div class="slide-body">
-    <div class="wrap" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-height:50vh;">
-      <div style="font-family:var(--ff-display); font-size:clamp(28px,4vw,44px); font-weight:800; color:var(--heading); margin-bottom:16px;">CVML</div>
-      <p style="font-size:16px; color:var(--muted); max-width:520px; line-height:1.7; margin-bottom:28px;">Computer Vision Machine Learning · Manufacturing Quality Inspection — edge-to-cloud pipeline, 2020–2021.</p>
-      <div style="font-family:var(--ff-mono); font-size:11px; color:var(--muted); letter-spacing:0.1em;">Legacy Architecture · Portfolio · For interview and professional reference</div>
-    </div>
-  </div>
-</div>
 
-</div>
-
-<div class="nav" role="navigation" aria-label="Slide navigation">
-  <button type="button" class="nav-btn" id="prevBtn" aria-label="Previous slide">← Prev</button>
-  <div class="pip-row" id="pips" role="tablist" aria-label="Slides"></div>
-  <span class="nav-counter" id="counter" aria-live="polite">1 / 12</span>
-  <button type="button" class="nav-btn" id="nextBtn" aria-label="Next slide">Next →</button>
-</div>
+<footer>
+  <div class="wrap">
+    <div style="margin-bottom:8px; font-size:14px; font-family:var(--ff-display); font-weight:700; letter-spacing:2px;">
+      <span>CVML</span> · Computer Vision Machine Learning · Manufacturing Quality Inspection
+    </div>
+    Legacy Architecture · 2020–2021 · <span>Extensive Report</span> · Detailed reference · For professional reference and portfolio use
+  </div>
+</footer>
 
 <script>
-(function () {
-  const slides = document.querySelectorAll('.deck .slide');
-  const pipsEl = document.getElementById('pips');
-  const counter = document.getElementById('counter');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  let current = 0;
-  const total = slides.length;
-
-  document.querySelectorAll('.sn-total').forEach(function (el) { el.textContent = String(total); });
-
-  slides.forEach(function (_, i) {
-    var pip = document.createElement('button');
-    pip.type = 'button';
-    pip.className = 'pip' + (i === 0 ? ' on' : '');
-    pip.setAttribute('aria-label', 'Go to slide ' + (i + 1));
-    pip.addEventListener('click', function () { goTo(i); });
-    pipsEl.appendChild(pip);
-  });
-
-  function animateLatencyBars(slideEl) {
-    if (!slideEl) return;
-    var table = slideEl.querySelector('.latency-table');
-    if (!table) return;
-    table.querySelectorAll('.latency-bar').forEach(function (bar) {
-      var target = bar.style.width;
-      bar.style.width = '0%';
-      setTimeout(function () { bar.style.width = target; }, 150);
-    });
-  }
-
-  function goTo(idx) {
-    var next = Math.max(0, Math.min(idx, total - 1));
-    slides[current].classList.remove('active');
-    var pips = pipsEl.querySelectorAll('.pip');
-    pips[current].classList.remove('on');
-    current = next;
-    slides[current].classList.add('active');
-    pips[current].classList.add('on');
-    counter.textContent = (current + 1) + ' / ' + total;
-    document.querySelectorAll('.sn-cur').forEach(function (el) { el.textContent = String(current + 1); });
-    prevBtn.disabled = current === 0;
-    nextBtn.disabled = current === total - 1;
-    var activeBody = slides[current].querySelector('.slide-body');
-    if (activeBody) activeBody.scrollTop = 0;
-    if (slides[current].id === 's7') animateLatencyBars(slides[current]);
-  }
-
-  function changeSlide(dir) { goTo(current + dir); }
-
-  prevBtn.addEventListener('click', function () { changeSlide(-1); });
-  nextBtn.addEventListener('click', function () { changeSlide(1); });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
-      e.preventDefault();
-      changeSlide(1);
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 60);
+      observer.unobserve(e.target);
     }
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
-      e.preventDefault();
-      changeSlide(-1);
-    }
-    if (e.key === 'Home') { e.preventDefault(); goTo(0); }
-    if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
   });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
 
-  prevBtn.disabled = true;
-})();
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Animated latency bars on scroll
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.latency-bar').forEach(bar => {
+        const target = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => { bar.style.width = target; }, 200);
+      });
+      barObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.latency-table').forEach(t => barObserver.observe(t));
+
+// KPI counter animation
+const kpiObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.animation = 'none';
+      e.target.offsetHeight; // reflow
+      e.target.style.animation = 'fadeSlideUp .5s ease forwards';
+      kpiObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.kpi-val').forEach(el => kpiObserver.observe(el));
+
+// Active nav link highlight
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.style.color = a.getAttribute('href') === '#' + current ? 'var(--amber)' : '';
+  });
+}, { passive: true });
 </script>
 </body>
 </html>

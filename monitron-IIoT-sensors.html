@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon Monitron TE1A001 — IIoT Sensor Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Orange-wash theme (AWS / industrial accent) */
+  --bg: #fff7ed;
+  --surface: #fffbeb;
+  --surface2: #ffedd5;
+  --border: #fdba74;
+  --aws: #FF9900;
+  --aws-dim: rgba(255,153,0,0.15);
+  --blue: #0284c7;
+  --green: #16a34a;
+  --text: #0f172a;
+  --muted: #64748b;
+  --desc: #475569;
+  --mono: 'IBM Plex Mono', monospace;
+  --head: 'Rajdhani', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: linear-gradient(165deg, #fffbeb 0%, #ffedd5 38%, #fdba74 72%, #ea580c 100%);
+  color: var(--text);
+  font-family: var(--head);
+  overflow: hidden; /* Prevents the whole page from scrolling */
+  height: 100vh;
+  width: 100vw;
+  user-select: none;
+}
+
+/* ── SLIDE SHELL ── */
+.deck { width: 100%; height: 100vh; position: relative; }
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+  overflow: hidden;
+}
+.slide.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── NAV BAR (Fixed Visibility) ── */
+.nav {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 251, 235, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(234, 88, 12, 0.35);
+  border-radius: 40px;
+  padding: 12px 24px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  z-index: 9999; /* Ensure it stays above all content */
+}
+.nav-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+.nav-btn:hover { border-color: var(--aws); color: var(--aws); background: #fff; }
+.nav-counter {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 50px;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+.pip-row { display: flex; gap: 8px; align-items: center; }
+.pip {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+.pip.on { background: var(--aws); }
+
+/* ── SHARED ELEMENTS ── */
+.slide-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 48px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+  z-index: 10;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-icon {
+  width: 32px; height: 32px;
+  background: var(--aws);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 700;
+  font-family: var(--head);
+}
+.brand-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.slide-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+.slide-body {
+  flex: 1;
+  /* Added bottom padding ensures content can scroll past the fixed nav bar */
+  padding: 40px 48px 100px 48px; 
+  display: flex;
+  flex-direction: column;
+  
+  /* THIS ALLOWS VERTICAL SCROLLING */
+  overflow-y: auto; 
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar for the Slide Body */
+.slide-body::-webkit-scrollbar {
+  width: 8px;
+}
+.slide-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.slide-body::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
+.slide-body::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #ea580c;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.slide-title {
+  font-size: clamp(28px, 3vw, 44px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+  color: var(--text);
+  flex-shrink: 0;
+}
+.slide-title .hi { color: #d97706; }
+.slide-desc {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--desc);
+  line-height: 1.65;
+  max-width: 680px;
+  margin-bottom: 32px;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════
+   SLIDE 1 — TITLE
+   ═══════════════════════════════ */
+#s1 {
+  background: radial-gradient(ellipse at 70% 40%, rgba(255,153,0,0.22) 0%, transparent 50%), rgba(255,251,235,0.85);
+}
+#s1 .slide-body {
+  justify-content: center;
+  align-items: flex-start;
+}
+.s1-title {
+  font-size: clamp(38px, 5vw, 68px);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: 0.01em;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+.s1-title .line2 { color: var(--aws); }
+.s1-meta {
+  display: flex;
+  gap: 0;
+  margin-top: 40px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 6px;
+  width: fit-content;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+.s1-cell {
+  padding: 14px 24px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.s1-cell:last-child { border-right: none; }
+.s1-key {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+}
+.s1-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.05em;
+}
+.s1-val.a { color: #d97706; }
+.grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════
+   SLIDE 2 — WHAT IS MONITRON
+   ═══════════════════════════════ */
+#s2 .content-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  flex: 1;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+.info-card-icon { font-size: 26px; }
+.info-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #d97706;
+  text-transform: uppercase;
+}
+.info-card-body {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--desc);
+  line-height: 1.6;
+}
+.info-card-body strong { color: var(--text); font-weight: 700; }
+
+/* ═══════════════════════════════
+   SLIDE 3 — SENSOR SPECS
+   ═══════════════════════════════ */
+#s3 .specs-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 32px;
+  flex: 1;
+  align-items: start;
+}
+.sensor-visual {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  position: sticky;
+  top: 0; /* Keeps the visual sticky while scrolling specs */
+}
+.sensor-body {
+  width: 90px;
+  height: 90px;
+  background: linear-gradient(145deg, #e2e8f0, #cbd5e1);
+  border: 2px solid #94a3b8;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.6);
+}
+.sensor-body::after {
+  content: '';
+  position: absolute;
+  top: 18px; left: 50%;
+  transform: translateX(-50%);
+  width: 14px; height: 14px;
+  background: var(--aws);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--aws);
+  animation: blink 2.5s ease infinite;
+}
+@keyframes blink {
+  0%,100% { opacity: 1; box-shadow: 0 0 8px rgba(255,153,0,0.8); }
+  50% { opacity: 0.4; box-shadow: 0 0 4px rgba(255,153,0,0.3); }
+}
+.sensor-body-inner {
+  font-size: 28px;
+  margin-top: 16px;
+}
+.sensor-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: #d97706;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+.sensor-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  font-weight: 500;
+}
+.spec-table { width: 100%; padding-bottom: 20px;}
+.spec-group { margin-bottom: 24px; }
+.spec-group-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #ea580c;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--border);
+}
+.spec-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+}
+.spec-key {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.spec-val {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+.spec-val .badge {
+  display: inline-block;
+  background: var(--aws-dim);
+  color: #b45309;
+  border: 1px solid rgba(255,153,0,0.3);
+  border-radius: 4px;
+  font-size: 10px;
+  padding: 2px 8px;
+  margin-left: 6px;
+  letter-spacing: 0.06em;
+}
+
+/* ═══════════════════════════════
+   SLIDE 4 — HOW IT WORKS
+   ═══════════════════════════════ */
+#s4 .flow-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  flex: 1;
+}
+.flow-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 12px;
+}
+.flow-icon-wrap {
+  width: 68px; height: 68px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 16px;
+  position: relative;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+.flow-step:hover .flow-icon-wrap { 
+  border-color: var(--aws); 
+  box-shadow: 0 0 0 4px var(--aws-dim); 
+  transform: translateY(-2px);
+}
+.flow-step-num {
+  position: absolute;
+  top: -4px; right: -4px;
+  width: 20px; height: 20px;
+  background: var(--aws);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+}
+.flow-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.flow-desc {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--desc);
+  line-height: 1.5;
+}
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  padding-top: 34px;
+  color: #cbd5e1;
+  font-size: 24px;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+#s4 .protocol-strip {
+  display: flex;
+  gap: 10px;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+  flex-wrap: wrap;
+}
+.proto-chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 500;
+  border-radius: 4px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.proto-chip.lit { 
+  border-color: rgba(255,153,0,0.4); 
+  color: #b45309; 
+  background: var(--aws-dim); 
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════
+   SLIDE 5 — USE CASE
+   ═══════════════════════════════ */
+#s5 .usecase-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  flex: 1;
+}
+.usecase-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.uc-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--aws);
+  border-radius: 4px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+.uc-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+.uc-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #d97706;
+  margin-bottom: 6px;
+}
+.uc-body {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--desc);
+  line-height: 1.6;
+}
+.usecase-right {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+.pipeline-mini-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #ea580c;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 16px;
+}
+.pipeline-mini-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.pipeline-mini-row:last-child { border-bottom: none; }
+.pm-icon { font-size: 20px; width: 32px; text-align: center; flex-shrink: 0; }
+.pm-label {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  flex: 1;
+}
+.pm-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.pm-arrow { color: #cbd5e1; font-weight: 700; font-size: 16px; }
+
+/* ═══════════════════════════════
+   SLIDE 6 — ARCHITECTURE
+   ═══════════════════════════════ */
+#s6 .arch-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  flex: 1;
+}
+.arch-col-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+.arch-col-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border);
+}
+.arch-col-icon { font-size: 26px; }
+.arch-col-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #d97706;
+}
+.arch-col-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.feature-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--desc);
+  line-height: 1.5;
+}
+.feature-item::before {
+  content: '▸';
+  color: var(--aws);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.feature-item strong { color: var(--text); font-weight: 700; }
+
+/* ═══════════════════════════════
+   SLIDE 7 — FUTURE AI/ML
+   ═══════════════════════════════ */
+#s7 .horizon-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  flex: 1;
+}
+.horizon-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px 20px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+.horizon-card.h1 { border-top: 4px solid var(--aws); }
+.horizon-card.h2 { border-top: 4px solid var(--blue); }
+.horizon-card.h3 { border-top: 4px solid var(--green); }
+.horizon-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+.horizon-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.h1 .horizon-title { color: #d97706; }
+.h2 .horizon-title { color: var(--blue); }
+.h3 .horizon-title { color: var(--green); }
+.horizon-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+.horizon-items li {
+  list-style: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--desc);
+  line-height: 1.55;
+  padding-left: 14px;
+  position: relative;
+}
+.horizon-items li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: #94a3b8;
+  font-weight: 700;
+}
+.horizon-items li strong { color: var(--text); font-weight: 700; }
+.horizon-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.htag {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ═══════════════════════════════
+   SLIDE 8 — SUMMARY
+   ═══════════════════════════════ */
+#s8 {
+  background: radial-gradient(ellipse at 30% 60%, rgba(251,146,60,0.2) 0%, transparent 55%), rgba(255,247,237,0.9);
+}
+#s8 .slide-body {
+  justify-content: center;
+}
+#s8 .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 36px;
+}
+.sum-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+.sum-icon { font-size: 24px; }
+.sum-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ea580c;
+}
+.sum-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.closing-line {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--desc);
+  line-height: 1.6;
+  max-width: 760px;
+}
+.closing-line strong { color: var(--text); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <div class="slide active" id="s1">
+    <div class="grid-bg"></div>
+    <div class="slide-header">
+      <div class="brand">
+        <div class="brand-icon">⚙</div>
+        <div class="brand-text">Heavy Machinery OEM · Advanced Manufacturing · IIoT</div>
+      </div>
+      <div class="slide-num">01 / 08</div>
+    </div>
+    <div class="slide-body">
+      <div class="eyebrow">Sensor Deep-Dive · Pilot Program 2022</div>
+      <div class="s1-title">
+        Amazon Monitron<br>
+        <span class="line2">TE1A001 Sensor</span>
+      </div>
+      <div class="slide-desc" style="margin-top:16px">
+        How a wireless vibration & temperature sensor became the edge node
+        for a heavy machinery manufacturer's first real-time IIoT pump condition monitoring pilot at the assembly line fluid fill station.
+      </div>
+      <div class="s1-meta">
+        <div class="s1-cell">
+          <span class="s1-key">Device</span>
+          <span class="s1-val a">TE1A001</span>
+        </div>
+        <div class="s1-cell">
+          <span class="s1-key">Type</span>
+          <span class="s1-val">Wireless IoT Sensor</span>
+        </div>
+        <div class="s1-cell">
+          <span class="s1-key">Manufacturer</span>
+          <span class="s1-val">Amazon Web Services</span>
+        </div>
+        <div class="s1-cell">
+          <span class="s1-key">Deployment</span>
+          <span class="s1-val">Heavy Machinery OEM, 2022</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s2">
+    <div class="slide-header">
+      <div class="brand">
+        <div class="brand-icon">⚙</div>
+        <div class="brand-text">Amazon Monitron — Overview</div>
+      </div>
+      <div class="slide-num">02 / 08</div>
+    </div>
+    <div class="slide-body">
+      <div class="eyebrow">What is Amazon Monitron?</div>
+      <div class="slide-title">End-to-End <span class="hi">Condition Monitoring</span></div>
+      <div class="slide-desc">
+        A purpose-built AWS IIoT solution combining wireless sensors, a gateway, and a managed cloud service — designed to detect abnormal machine behavior without requiring deep ML expertise from the plant team.
+      </div>
+      <div class="content-cols">
+        <div class="info-card">
+          <div class="info-card-icon">📡</div>
+          <div class="info-card-title">The Sensor (TE1A001)</div>
+          <div class="info-card-body">
+            A small <strong>wireless sensor</strong> that attaches magnetically or with adhesive directly to industrial equipment. Continuously measures <strong>vibration and temperature</strong>, transmitting data over Bluetooth Low Energy (BLE) to the Monitron Gateway.
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">🌐</div>
+          <div class="info-card-title">The Gateway (G1A001)</div>
+          <div class="info-card-body">
+            A network hub that collects BLE data from up to <strong>20 sensors</strong> simultaneously and securely forwards telemetry to AWS IoT Core over TLS. Zero-code provisioning via the Monitron mobile app.
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">☁️</div>
+          <div class="info-card-title">The Cloud Service</div>
+          <div class="info-card-body">
+            AWS Monitron service runs <strong>built-in ML models</strong> in the cloud to classify machine health as Normal, Warning, or Alarm — based on ISO 20816 vibration standards. Sends alerts to operators via mobile app or email.
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">🔗</div>
+          <div class="info-card-title">Why It Fit the Pilot</div>
+          <div class="info-card-body">
+            <strong>No embedded firmware required.</strong> The sensor, gateway, and cloud connection are provisioned entirely through the app — letting the data engineering team focus on the AWS pipeline integration, not hardware bring-up.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s3">
+    <div class="slide-header">
+      <div class="brand">
+        <div class="brand-icon">⚙</div>
+        <div class="brand-text">TE1A001 — Technical Specifications</div>
+      </div>
+      <div class="slide-num">03 / 08</div>
+    </div>
+    <div class="slide-body">
+      <div class="eyebrow">Hardware Specifications</div>
+      <div class="slide-title">TE1A001 <span class="hi">Sensor Profile</span></div>
+      <div class="specs-layout" style="margin-top:4px">
+        <div class="sensor-visual">
+          <div class="sensor-body">
+            <div class="sensor-body-inner">📟</div>
+          </div>
+          <div class="sensor-label">TE1A001</div>
+          <div class="sensor-sub">Amazon Monitron Sensor</div>
+          <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px; width:100%">
+            <div style="background:var(--surface2); border:1px solid var(--border); padding:8px 12px; border-radius:4px; text-align:center">
+              <div style="font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; font-weight:600;">Status</div>
+              <div style="font-family:var(--mono); font-size:12px; font-weight:600; color:var(--green); margin-top:4px;">● ACTIVE — PILOT</div>
+            </div>
+            <div style="background:var(--surface2); border:1px solid var(--border); padding:8px 12px; border-radius:4px; text-align:center">
+              <div style="font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; font-weight:600;">Protocol</div>
+              <div style="font-family:var(--mono); font-size:12px; font-weight:600; color:#d97706; margin-top:4px;">BLE 5.0 → MQTT</div>
+            </div>
+          </div>
+        </div>
+        <div class="spec-table">
+          <div class="spec-group">
+            <div class="spec-group-title">Sensing Capabilities</div>
+            <div class="spec-row">
+              <div class="spec-key">Measurement Type</div>
+              <div class="spec-val">Vibration + Temperature <span class="badge">Dual</span></div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-key">Vibration Axes</div>
+              <div class="spec-val">3-axis accelerometer (X, Y, Z)</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-key">Vibration Freq. Range</div>
+              <div class="spec-val">10 Hz – 1,000 Hz</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-key">Temperature Range</div>
+              <div class="spec-val">-10°C to +70°C</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-key">Sampling Rate</div>
+              <div class="spec-val">Every 5 minutes (configurable)</div>
+            </div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-group-title">Connectivity & Power</div>
+            <div class="spec-row">
+              <div class="spec-key">Wireless Protocol</div>
+              <div class="spec-val">Bluetooth Low Energy (BLE 5.0) <span class="badge">AWS</span></div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-key">Range to Gateway</div>
+              <div class="spec-val">Up to 15 m (line of sight)</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-key">Power Source</div>
+              <div class="spec-val">CR2032 coin cell battery</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-key">Battery Life</div>
+              <div class="spec-val">~ 2 years (5-min interval)</div>
+            </div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-group-title">Physical & Installation</div>
+            <div class="spec-row">
+              <div class="spec-key">Mounting</div>
+              <div class="spec-val">Magnetic or adhesive pad</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-key">IP Rating</div>
+              <div class="spec-val">IP67 — dust + water resistant</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-key">Provisioning</div>
+              <div class="spec-val">Amazon Monitron mobile app (NFC)</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-key">Standards Compliance</div>
+              <div class="spec-val">ISO 20816 vibration classification</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s4">
+    <div class="slide-header">
+      <div class="brand">
+        <div class="brand-icon">⚙</div>
+        <div class="brand-text">TE1A001 — Data Flow</div>
+      </div>
+      <div class="slide-num">04 / 08</div>
+    </div>
+    <div class="slide-body">
+      <div class="eyebrow">How the Sensor Works</div>
+      <div class="slide-title">From <span class="hi">Measurement to Cloud</span></div>
+      <div class="flow-row" style="margin-top:24px">
+
+        <div class="flow-step">
+          <div class="flow-icon-wrap">
+            💧
+            <div class="flow-step-num">1</div>
+          </div>
+          <div class="flow-name">Sense</div>
+          <div class="flow-desc">Sensor detects vibration anomalies (e.g., cavitation) on the fill station pump motor every 5 minutes</div>
+        </div>
+
+        <div class="flow-arrow">›</div>
+
+        <div class="flow-step">
+          <div class="flow-icon-wrap">
+            📶
+            <div class="flow-step-num">2</div>
+          </div>
+          <div class="flow-name">Transmit</div>
+          <div class="flow-desc">Raw measurement packet broadcast over BLE 5.0 to the nearest Monitron Gateway within 15m</div>
+        </div>
+
+        <div class="flow-arrow">›</div>
+
+        <div class="flow-step">
+          <div class="flow-icon-wrap">
+            📡
+            <div class="flow-step-num">3</div>
+          </div>
+          <div class="flow-name">Gateway</div>
+          <div class="flow-desc">Gateway aggregates data from up to 20 sensors, serializes to JSON, and forwards to AWS over MQTT/TLS</div>
+        </div>
+
+        <div class="flow-arrow">›</div>
+
+        <div class="flow-step">
+          <div class="flow-icon-wrap">
+            ☁️
+            <div class="flow-step-num">4</div>
+          </div>
+          <div class="flow-name">IoT Core</div>
+          <div class="flow-desc">AWS IoT Core receives authenticated message; Rules Engine routes events to Kinesis stream and S3 archive</div>
+        </div>
+
+        <div class="flow-arrow">›</div>
+
+        <div class="flow-step">
+          <div class="flow-icon-wrap">
+            🔔
+            <div class="flow-step-num">5</div>
+          </div>
+          <div class="flow-name">Alert</div>
+          <div class="flow-desc">Ignition SCADA consumes the stream, evaluates context, and notifies the operator within 60s of receipt</div>
+        </div>
+
+      </div>
+      <div class="protocol-strip">
+        <span class="proto-chip lit">BLE 5.0</span>
+        <span class="proto-chip lit">MQTT 3.1.1</span>
+        <span class="proto-chip lit">TLS 1.2+</span>
+        <span class="proto-chip lit">X.509 Auth</span>
+        <span class="proto-chip">JSON Payload</span>
+        <span class="proto-chip">ISO 20816</span>
+        <span class="proto-chip">5-min Polling Interval</span>
+        <span class="proto-chip">&lt; 60s Trans. Latency</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s5">
+    <div class="slide-header">
+      <div class="brand">
+        <div class="brand-icon">⚙</div>
+        <div class="brand-text">Assembly Line · Deployment Use Case</div>
+      </div>
+      <div class="slide-num">05 / 08</div>
+    </div>
+    <div class="slide-body">
+      <div class="eyebrow">Deployment Scenario — Heavy Equipment Assembly</div>
+      <div class="slide-title">Hydraulic Fluid <span class="hi">Fill Station</span></div>
+      <div class="usecase-layout" style="margin-top:16px">
+        <div class="usecase-left">
+          <div class="uc-card">
+            <div class="uc-icon">🏭</div>
+            <div>
+              <div class="uc-title">The Asset</div>
+              <div class="uc-body">Hydraulic fluid fill station pump supplying heavy equipment units on the assembly line. Pump feeds critical systems — low fluid levels cause cavitation and immediate line stoppage risk.</div>
+            </div>
+          </div>
+          <div class="uc-card">
+            <div class="uc-icon">⚠️</div>
+            <div>
+              <div class="uc-title">The Problem</div>
+              <div class="uc-body">Manual inspection was the only monitoring method — operators physically checked fluid levels on shift rounds, leaving gaps of 30–60 minutes and introducing response latency.</div>
+            </div>
+          </div>
+          <div class="uc-card">
+            <div class="uc-icon">📡</div>
+            <div>
+              <div class="uc-title">Monitron's Role</div>
+              <div class="uc-body">TE1A001 sensor mounted on the fill station pump motor — vibration signature detects pump cavitation as a proxy for low-fluid conditions, supplementing standard level sensors. Gateway forwards telemetry to AWS.</div>
+            </div>
+          </div>
+          <div class="uc-card">
+            <div class="uc-icon">✅</div>
+            <div>
+              <div class="uc-title">Result</div>
+              <div class="uc-body">Real-time automated condition monitoring achieved. A dedicated level sensor triggers the threshold event; Monitron provides the pump health context layer to diagnose the root cause immediately.</div>
+            </div>
+          </div>
+        </div>
+        <div class="usecase-right">
+          <div class="pipeline-mini-title">Live Data Pipeline — Fill Station</div>
+          <div class="pipeline-mini-row">
+            <div class="pm-icon">💧</div>
+            <div>
+              <div class="pm-label">Fluid Level Sensor</div>
+              <div class="pm-sub">Assembly line fill station · physical threshold active</div>
+            </div>
+          </div>
+          <div class="pipeline-mini-row">
+            <div class="pm-icon">📶</div>
+            <div>
+              <div class="pm-label">TE1A001 (Monitron Sensor)</div>
+              <div class="pm-sub">Mounted to pump motor · vibration anomaly · 5-min interval</div>
+            </div>
+            <div class="pm-arrow">↓</div>
+          </div>
+          <div class="pipeline-mini-row">
+            <div class="pm-icon">📡</div>
+            <div>
+              <div class="pm-label">Monitron Gateway (G1A001)</div>
+              <div class="pm-sub">MQTT/TLS · up to 20 sensors · Wi-Fi uplink</div>
+            </div>
+            <div class="pm-arrow">↓</div>
+          </div>
+          <div class="pipeline-mini-row">
+            <div class="pm-icon">☁️</div>
+            <div>
+              <div class="pm-label">AWS IoT Core</div>
+              <div class="pm-sub">Device auth · rules engine · topic routing</div>
+            </div>
+            <div class="pm-arrow">↓</div>
+          </div>
+          <div class="pipeline-mini-row">
+            <div class="pm-icon">🌊</div>
+            <div>
+              <div class="pm-label">AWS Kinesis Data Streams</div>
+              <div class="pm-sub">Ordered stream · shard by asset_id · 24h retention</div>
+            </div>
+            <div class="pm-arrow">↓</div>
+          </div>
+          <div class="pipeline-mini-row">
+            <div class="pm-icon">🔔</div>
+            <div>
+              <div class="pm-label">Ignition SCADA → Operator</div>
+              <div class="pm-sub">Health context layer · &lt; 60s transmission latency</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s6">
+    <div class="slide-header">
+      <div class="brand">
+        <div class="brand-icon">⚙</div>
+        <div class="brand-text">Monitron Gateway + AWS Integration</div>
+      </div>
+      <div class="slide-num">06 / 08</div>
+    </div>
+    <div class="slide-body">
+      <div class="eyebrow">Infrastructure Deep-Dive</div>
+      <div class="slide-title">Gateway <span class="hi">→</span> AWS IoT Core <span class="hi">→</span> Kinesis</div>
+      <div class="arch-cols" style="margin-top:20px">
+        <div class="arch-col-card">
+          <div class="arch-col-header">
+            <div class="arch-col-icon">📡</div>
+            <div>
+              <div class="arch-col-name">Monitron Gateway (G1A001)</div>
+              <div class="arch-col-sub">Edge aggregation layer</div>
+            </div>
+          </div>
+          <div class="feature-list">
+            <div class="feature-item">Collects BLE telemetry from up to <strong>20 TE1A001 sensors</strong> simultaneously per zone. Gateways scale horizontally.</div>
+            <div class="feature-item"><strong>Resilient Backhaul:</strong> Relies on Wi-Fi for the pilot, but future deployments require hardwired Ethernet fallbacks to mitigate plant floor EMI and physical obstructions.</div>
+            <div class="feature-item">Provisioned via Amazon Monitron mobile app using NFC tap — zero manual network configuration required on the edge.</div>
+            <div class="feature-item">Local buffering ensures no data loss during transient cloud connectivity interruptions.</div>
+            <div class="feature-item">All outbound traffic encrypted with <strong>TLS 1.2+</strong>; device identity securely managed via X.509 certificates.</div>
+          </div>
+        </div>
+        <div class="arch-col-card">
+          <div class="arch-col-header">
+            <div class="arch-col-icon">☁️</div>
+            <div>
+              <div class="arch-col-name">AWS IoT Core + Kinesis</div>
+              <div class="arch-col-sub">Cloud ingestion + streaming</div>
+            </div>
+          </div>
+          <div class="feature-list">
+            <div class="feature-item">IoT Core acts as the <strong>authenticated MQTT broker</strong> — evaluating every incoming message via the Rules Engine SQL filter.</div>
+            <div class="feature-item"><strong>Kinesis Data Streams:</strong> Routes threshold-breach events downstream with ordered, durable delivery and a 24h replay window for fault tolerance.</div>
+            <div class="feature-item">Parallel IoT Rule action writes <strong>100% of raw telemetry to S3</strong> — building a Data Lake to preserve full history for analytics and ML training.</div>
+            <div class="feature-item">Shard partitioned by <strong>asset_id</strong> — guarantees ordering of events per individual tank or machine unit across the assembly line.</div>
+            <div class="feature-item">SCADA monitors <strong>Sensor Fleet Health</strong>, tracking battery degradation to group replacements into scheduled maintenance windows.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s7">
+    <div class="slide-header">
+      <div class="brand">
+        <div class="brand-icon">⚙</div>
+        <div class="brand-text">AI / ML Integration Roadmap</div>
+      </div>
+      <div class="slide-num">07 / 08</div>
+    </div>
+    <div class="slide-body">
+      <div class="eyebrow">From Reactive Alerts → Predictive Intelligence</div>
+      <div class="slide-title">Sensor Data as <span class="hi">AI Foundation</span></div>
+      <div class="slide-desc">The S3 telemetry archive built during the pilot serves as the labeled training dataset for the next three horizons of integrated capability.</div>
+      <div class="horizon-row">
+        <div class="horizon-card h1">
+          <div class="horizon-num">Horizon 1 — Near Term</div>
+          <div class="horizon-title">Anomaly Detection</div>
+          <ul class="horizon-items">
+            <li><strong>Data Quality Gate:</strong> Implement strict data cleaning/imputation pipeline to filter network dropouts before ML training.</li>
+            <li>Train unsupervised model (Isolation Forest / Autoencoder) on cleaned S3 historical sensor telemetry.</li>
+            <li>Deploy as a secondary Kinesis consumer to surface anomaly scores in SCADA before alarms fire.</li>
+          </ul>
+          <div class="horizon-tags">
+            <span class="htag">SageMaker</span>
+            <span class="htag">Data Cleaning</span>
+            <span class="htag">Isolation Forest</span>
+          </div>
+        </div>
+        <div class="horizon-card h2">
+          <div class="horizon-num">Horizon 2 — Medium Term</div>
+          <div class="horizon-title">Predictive Maintenance</div>
+          <ul class="horizon-items">
+            <li>Supervised model predicts failure probability N hours ahead using vibration decay rate.</li>
+            <li><strong>Human-in-the-Loop Integration:</strong> Model suggests condition-based maintenance triggers to a supervisor before automating ERP (SAP PM) work orders.</li>
+            <li>MTTR reduction: proactive dispatch vs. reactive repair.</li>
+          </ul>
+          <div class="horizon-tags">
+            <span class="htag">SageMaker MLOps</span>
+            <span class="htag">SAP PM CBM</span>
+            <span class="htag">Human-in-Loop</span>
+          </div>
+        </div>
+        <div class="horizon-card h3">
+          <div class="horizon-num">Horizon 3 — Long Term</div>
+          <div class="horizon-title">Digital Twin Simulation</div>
+          <ul class="horizon-items">
+            <li>Ingest real-time telemetry into AWS IoT TwinMaker to construct a 3D visual replica of the fill station.</li>
+            <li>Physics-based simulation models fluid consumption behavior under varying assembly line speeds.</li>
+            <li>Provides operators with spatial context and a single pane of glass for all overlapping asset telemetry.</li>
+          </ul>
+          <div class="horizon-tags">
+            <span class="htag">IoT TwinMaker</span>
+            <span class="htag">3D Visualization</span>
+            <span class="htag">Physics Model</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s8">
+    <div class="slide-header">
+      <div class="brand">
+        <div class="brand-icon">⚙</div>
+        <div class="brand-text">Summary & Key Takeaways</div>
+      </div>
+      <div class="slide-num">08 / 08</div>
+    </div>
+    <div class="slide-body">
+      <div class="eyebrow">Key Takeaways</div>
+      <div class="slide-title">What the <span class="hi">TE1A001</span> Enabled</div>
+      <div class="summary-grid" style="margin-top:24px">
+        <div class="sum-card">
+          <div class="sum-icon">📡</div>
+          <div class="sum-label">Sensor</div>
+          <div class="sum-value">TE1A001 — wireless, battery-powered, IP67, magnetic mount. No wiring, no custom firmware.</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-icon">⚡</div>
+          <div class="sum-label">Latency</div>
+          <div class="sum-value">Under 60 seconds from sensor transmission to operator alarm notification (5-min polling interval).</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-icon">🏭</div>
+          <div class="sum-label">Context</div>
+          <div class="sum-value">Heavy Machinery OEM's first IIoT pilot — assembly line fill station pump, 2022.</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-icon">☁️</div>
+          <div class="sum-label">Pipeline</div>
+          <div class="sum-value">BLE → Gateway → IoT Core → Kinesis → SCADA. S3 for raw data archival.</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-icon">🛡️</div>
+          <div class="sum-label">Resiliency</div>
+          <div class="sum-value">SCADA monitors sensor battery fleet health; planning Ethernet fallbacks for future gateways.</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-icon">🔮</div>
+          <div class="sum-label">Roadmap</div>
+          <div class="sum-value">Governed AI path: Data Quality → Human-in-Loop Predictive Maintenance → IoT TwinMaker.</div>
+        </div>
+      </div>
+      <div class="closing-line">
+        One small sensor on a pump motor — the <strong>first node in the Smart Manufacturing network</strong>, establishing the resilient edge-to-cloud architecture that scales to every asset on the plant floor.
+      </div>
+    </div>
+  </div>
+
+</div><div class="nav">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Prev</button>
+  <div class="pip-row" id="pips"></div>
+  <span class="nav-counter" id="counter">1 / 8</span>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const pipsEl = document.getElementById('pips');
+  const counter = document.getElementById('counter');
+  let current = 0;
+
+  // Build pips
+  slides.forEach((_, i) => {
+    const pip = document.createElement('div');
+    pip.className = 'pip' + (i === 0 ? ' on' : '');
+    pip.onclick = () => goTo(i);
+    pipsEl.appendChild(pip);
+  });
+
+  function goTo(idx) {
+    slides[current].classList.remove('active');
+    document.querySelectorAll('.pip')[current].classList.remove('on');
+    current = Math.max(0, Math.min(idx, slides.length - 1));
+    slides[current].classList.add('active');
+    document.querySelectorAll('.pip')[current].classList.add('on');
+    counter.textContent = (current + 1) + ' / ' + slides.length;
+    
+    // Auto-scroll back to the top when switching slides
+    const activeBody = slides[current].querySelector('.slide-body');
+    if(activeBody) {
+        activeBody.scrollTop = 0;
+    }
+  }
+
+  function changeSlide(dir) { goTo(current + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changeSlide(-1);
+  });
+</script>
+</body>
+</html>
