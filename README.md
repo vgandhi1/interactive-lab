@@ -6,6 +6,8 @@ A curated collection of interactive single-page applications (SPAs), financial t
 You can access the main interactive hub here:
 **[Main Hub Landing Page](https://vgandhi1.github.io/web-interactive-collection/)**
 
+The **portfolio root** (all GitHub / live-app links, theory, programming, mirrored `interactive/` tools) lives at **[vgandhi1.github.io](https://vgandhi1.github.io/)**. This repository powers the **static-only** Tailwind index (local HTML decks, EV reference pages, DSA, glossaries, simulators) deployed as the `web-interactive-collection` GitHub Pages project site.
+
 ---
 
 ## 📂 Projects Included
