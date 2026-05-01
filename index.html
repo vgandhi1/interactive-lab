@@ -3,14 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vinay Gandhi | Static HTML hub (decks &amp; tools)</title>
+    <meta name="description" content="Interactive lab: slide decks, EV reference pages, and browser learning tools. Repos and career narrative live on the main portfolio site.">
+    <meta name="color-scheme" content="light">
+    <meta property="og:title" content="Vinay Gandhi | Interactive lab (decks &amp; tools)">
+    <meta property="og:description" content="Decks, EV references, and interactive learning tools. Evidence and story on vgandhi1.github.io.">
+    <meta property="og:url" content="https://vgandhi1.github.io/web-interactive-collection/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Vinay Gandhi | Interactive lab">
+    <meta name="twitter:description" content="Decks, EV references, and browser learning tools linked from the main portfolio.">
+    <title>Vinay Gandhi | Interactive lab (decks &amp; tools)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        html { scroll-behavior: smooth; }
+
         * {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
         
         @keyframes fadeInUp {
@@ -93,9 +115,11 @@
             backdrop-filter: blur(10px);
         }
         
-        .card-hover:hover {
-            transform: translateY(-12px) scale(1.03);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        @media (min-width: 768px) and (hover: hover) {
+            .card-hover:hover {
+                transform: translateY(-12px) scale(1.03);
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            }
         }
 
         .glass-card {
@@ -193,12 +217,53 @@
             text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
         }
 
-        .hub-mini-card:focus-visible {
-            outline: 2px solid rgb(99 102 241);
+        .hub-mini-card:focus-visible,
+        .project-card:focus-visible {
+            outline: 3px solid rgb(99 102 241);
             outline-offset: 2px;
         }
 
-        #portfolio,
+        .section-badge {
+            display: inline-block;
+            margin-top: 0.35rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: rgba(99, 102, 234, 0.12);
+            color: rgb(67 56 202);
+        }
+
+        .lab-footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+            gap: 1.25rem;
+            text-align: left;
+        }
+        .lab-footer-grid h3 {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgb(71 85 105);
+            margin-bottom: 0.5rem;
+        }
+        .lab-footer-grid ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .lab-footer-grid a {
+            color: rgb(79 70 229);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .lab-footer-grid a:hover {
+            text-decoration: underline;
+        }
+
+        #repos,
+        #decks,
         #tools {
             scroll-margin-top: 5.5rem;
         }
@@ -207,27 +272,29 @@
 </head>
 <body class="min-h-screen">
 
-    <div class="content-wrapper max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+    <main id="main-content" class="content-wrapper max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
 
-        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 text-sm sm:text-base animate-fade-in-up">
-            <a href="https://vgandhi1.github.io/" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-slate-200 text-slate-700 font-semibold shadow-sm hover:shadow-md hover:border-indigo-300 hover:text-indigo-700 transition-all">← Portfolio home</a>
-            <a href="#portfolio" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-slate-200 text-slate-700 font-semibold shadow-sm hover:shadow-md hover:border-indigo-300 hover:text-indigo-700 transition-all">Repos &amp; demos</a>
+        <nav class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 text-sm sm:text-base animate-fade-in-up" aria-label="Site and in-page navigation">
+            <a href="https://vgandhi1.github.io/" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-slate-200 text-slate-700 font-semibold shadow-sm hover:shadow-md hover:border-indigo-300 hover:text-indigo-700 transition-all">← Back to portfolio home</a>
+            <a href="#repos" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-slate-200 text-slate-700 font-semibold shadow-sm hover:shadow-md hover:border-indigo-300 hover:text-indigo-700 transition-all">Repositories</a>
+            <a href="#decks" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-slate-200 text-slate-700 font-semibold shadow-sm hover:shadow-md hover:border-indigo-300 hover:text-indigo-700 transition-all">Decks &amp; EV</a>
+            <a href="#tools" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-slate-200 text-slate-700 font-semibold shadow-sm hover:shadow-md hover:border-indigo-300 hover:text-indigo-700 transition-all">Tools</a>
             <span class="hidden sm:inline text-slate-400" aria-hidden="true">·</span>
-            <span class="text-slate-500 font-medium text-center">Portfolio: vgandhi1.github.io · Here: static HTML hub</span>
-        </div>
+            <span class="text-slate-500 font-medium text-center">Story on vgandhi1.github.io · demos and tools here</span>
+        </nav>
         
         <header class="text-center mb-12 sm:mb-16 lg:mb-20 animate-fade-in-up">
             <div class="inline-block mb-4">
                 <div class="badge px-4 py-2 rounded-full text-xs font-semibold text-indigo-600 uppercase tracking-wider">
-                    Static HTML hub
+                    Interactive lab
                 </div>
             </div>
             <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-4 text-slate-900 header-glow">
                 Vinay Gandhi
             </h1>
             <div class="flex flex-wrap items-center justify-center gap-3 mb-6">
-                <a href="https://vgandhi1.github.io/" target="_blank" rel="noopener" class="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg ripple">
-                    <span>Portfolio &amp; all repositories</span>
+                <a href="https://vgandhi1.github.io/" target="_blank" rel="noopener" class="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                    <span>Main portfolio</span>
                     <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
@@ -236,221 +303,89 @@
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482C19.138 20.197 22 16.425 22 12.017 22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
                     GitHub
                 </a>
-                <a href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-300 text-slate-800 text-sm font-semibold hover:border-violet-400 hover:text-violet-700 transition-all" title="Notion portfolio — link updates when workspace is published">
-                    <span class="w-5 h-5 inline-flex items-center justify-center bg-slate-900 text-white rounded text-xs font-black leading-none">N</span>
-                    Notion
-                </a>
             </div>
-            <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+            <p class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
                 <span class="gradient-text">Decks, EV references &amp; tools</span>
-            </h2>
+            </p>
             <p class="text-slate-600 text-base sm:text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
-                This hub hosts <strong>static decks and tools</strong> below. Repositories and hosted demos are mapped in the next section — the canonical portfolio (Motel GIF, theory links) is <a href="https://vgandhi1.github.io/" class="text-indigo-600 font-semibold hover:underline" target="_blank" rel="noopener">vgandhi1.github.io</a>.
+                <strong>Interactive lab</strong> — decks, EV references, and browser tools hosted here. <strong>Repositories and narrative</strong> live on the <a href="https://vgandhi1.github.io/" class="text-indigo-600 font-semibold hover:underline" target="_blank" rel="noopener">main portfolio</a> (no duplicate repo grid on this site).
             </p>
         </header>
 
-        <!-- Portfolio: repos & live demos (full-width grouped grid) -->
-        <section class="mb-8 lg:mb-12 animate-fade-in-up animate-delay-100" id="portfolio" aria-labelledby="portfolio-heading">
+        <section id="repos" class="mb-8 lg:mb-12 animate-fade-in-up animate-delay-100" aria-labelledby="repos-heading">
             <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover">
-                <div class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-6 mb-8 pb-6 border-b border-slate-200/80">
-                    <div class="min-w-0">
-                        <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100/80">Portfolio</span>
-                        <h2 id="portfolio-heading" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-3 tracking-tight">Repositories &amp; live demos</h2>
-                        <p class="text-slate-600 text-sm sm:text-base mt-2 max-w-2xl leading-relaxed">
-                            Aligned with the user-site portfolio. <span class="text-slate-500">GitHub</span> = source; <span class="text-emerald-700 font-medium">Live</span> = public Pages or app; <span class="text-indigo-700 font-medium">This hub</span> = static HTML in this repo.
-                        </p>
-                    </div>
-                    <div class="flex flex-wrap gap-2 sm:gap-3 shrink-0">
-                        <a href="https://vgandhi1.github.io/" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold shadow-md hover:bg-slate-800 transition-colors ripple">Portfolio index →</a>
-                        <a href="https://github.com/vgandhi1" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-800 text-sm font-semibold hover:border-indigo-400 hover:text-indigo-700 transition-colors">All GitHub repos</a>
-                    </div>
-                </div>
-
-                <div class="space-y-8">
-                    <div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-violet-500" aria-hidden="true"></span> Manufacturing &amp; IIoT</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                            <a href="https://github.com/vgandhi1/aegis" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-violet-400 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-violet-700 transition-colors">AEGIS</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">PLC telemetry, MES, streaming ML inference.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/SentinelFlow" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-violet-400 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-violet-700 transition-colors">SentinelFlow</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">IIoT — PLCs, OPC UA, Kafka, GraphQL.</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-rose-500" aria-hidden="true"></span> ML, vision &amp; research</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                            <a href="https://github.com/vgandhi1/automotive-visual-qa-engine" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-rose-400 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-rose-700 transition-colors">Automotive visual QA</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">Edge CLIP, AWS serverless, FastAPI.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/CLaimLens" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-rose-400 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-rose-700 transition-colors">CLaimLens</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">VLM vehicle damage — Glue, SageMaker.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/Big-Data-Analytics-in-Healthcare/tree/main" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-rose-400 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-rose-700 transition-colors">Healthcare analytics</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">ETL and deep learning at scale.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/LLSPIN-Project" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-rose-400 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-rose-700 transition-colors">LLSPIN</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">Interpretable nets — feature selection.</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-500" aria-hidden="true"></span> Data engineering &amp; ETL</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                            <a href="https://github.com/vgandhi1/MARKET_MOOD_RING" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-amber-500 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-amber-800 transition-colors">Market Mood Ring</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">Kafka, Flink, Postgres, Ollama analyst.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/Crypto-Data-ETL" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-amber-500 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-amber-800 transition-colors">Crypto data ETL</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">Market data extraction and pipelines.</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-500" aria-hidden="true"></span> EV, OTA &amp; security</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                            <a href="https://github.com/vgandhi1/Overdrive-OTA-Manager" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-indigo-400 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-indigo-700 transition-colors">Overdrive OTA Manager</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">OTA campaigns and firmware delivery.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/automotive-key-provission" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-indigo-400 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-indigo-700 transition-colors">Key provisioning</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">Automotive key lifecycle utilities.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/OTA-firmware-verifier" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-indigo-400 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-indigo-700 transition-colors">OTA firmware verifier</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">Package verification for OTA payloads.</span>
-                            </a>
-                            <a href="ev_protocols.html" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-indigo-400 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">This hub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-indigo-700 transition-colors">EV protocols</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">CAN, LIN, FlexRay, DoIP reference.</span>
-                            </a>
-                            <a href="ev-cybersecurity.html" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-indigo-400 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">This hub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-indigo-700 transition-colors">EV cybersecurity</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">SecOC, R155/R156, ISO 21434, OTA.</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-teal-500" aria-hidden="true"></span> Agents, apps &amp; product</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                            <a href="https://github.com/vgandhi1/rag-qa-system" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-teal-500 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-teal-800 transition-colors">RAG QA system</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">Retrieval-augmented assistant patterns.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/ToDoApp" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-teal-500 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-teal-800 transition-colors">ToDoApp (FARM)</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">FastAPI, React, MongoDB.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/data-analytics-ai-agents" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-teal-500 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-teal-800 transition-colors">Data analytics AI agents</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">Multi-agent flows for files and charts.</span>
-                            </a>
-                            <a href="https://vgandhi1.github.io/weather-WebApp/" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-teal-500 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Live</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-teal-800 transition-colors">Weather WebApp</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">GitHub Pages — forecast demo.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/Job-board-projects/tree/main/SmartFound" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-teal-500 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-teal-800 transition-colors">SmartFound</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">Job-board / discovery experiment.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/HabitArc" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-teal-500 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-teal-800 transition-colors">HabitArc</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">Habit tracking product experiment.</span>
-                            </a>
-                            <a href="https://github.com/vgandhi1/Motel-web-portal" target="_blank" rel="noopener" class="hub-mini-card group rounded-xl border border-slate-200/90 bg-white/90 p-4 shadow-sm hover:border-teal-500 hover:shadow-md transition-all ripple flex flex-col h-full">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">GitHub</span>
-                                <span class="font-bold text-slate-900 mt-0.5 group-hover:text-teal-800 transition-colors">Motel Web Portal</span>
-                                <span class="text-xs text-slate-600 mt-1.5 leading-snug flex-1">Full-stack demo; walkthrough on portfolio.</span>
-                            </a>
-                        </div>
-                    </div>
+                <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 bg-slate-100/90">Repositories</span>
+                <h2 id="repos-heading" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-3 tracking-tight">Evidence on GitHub</h2>
+                <span class="section-badge">Code &amp; README case studies</span>
+                <p class="text-slate-600 text-sm sm:text-base mt-3 max-w-2xl leading-relaxed">
+                    Flagship systems and the full project list are curated on the main portfolio. Open it for story plus repo links, or browse all code on GitHub.
+                </p>
+                <div class="flex flex-wrap gap-2 sm:gap-3 mt-6">
+                    <a href="https://vgandhi1.github.io/#work" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold shadow-md hover:bg-slate-800 transition-colors">Portfolio — flagship &amp; more</a>
+                    <a href="https://github.com/vgandhi1?tab=repositories" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-800 text-sm font-semibold hover:border-indigo-400 hover:text-indigo-700 transition-colors">All repositories</a>
                 </div>
             </div>
         </section>
+
+        <section id="decks" class="mb-8 lg:mb-12 animate-fade-in-up animate-delay-150" aria-labelledby="decks-heading">
+            <div class="text-center mb-8 lg:mb-10 max-w-3xl mx-auto">
+                <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100/80">Interactive lab</span>
+                <h2 id="decks-heading" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-3 tracking-tight">Decks &amp; EV references</h2>
+                <span class="section-badge">Deep reference material</span>
+                <p class="text-slate-600 text-sm sm:text-base mt-2 leading-relaxed">Slide-style pages and SDV references served from this collection.</p>
+            </div>
 
         <!-- Decks hosted in this repo -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch mb-8 lg:mb-12">
             <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover animate-fade-in-up animate-delay-250 flex-none">
                 <div class="flex items-center gap-3 mb-6 lg:mb-8">
-                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100/80">This hub</span>
+                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100/80">Interactive lab</span>
                     <h3 class="text-xl sm:text-2xl font-bold text-slate-800">Homelab</h3>
                 </div>
 
-                    <a href="Homelab/HomelabPortal.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-purple-500 hover:to-pink-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 ripple group block">
+                    <a href="Homelab/HomelabPortal.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-purple-500 hover:to-pink-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 group block">
                         <div class="flex items-center gap-4 lg:gap-6">
-                            <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float">🏠</div>
+                            <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-purple-100 to-purple-200 text-purple-800 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">🏠</div>
                             <div class="flex-1 min-w-0">
                                 <h4 class="font-bold text-lg lg:text-xl text-slate-900 group-hover:text-white transition-colors mb-2">HomeLab Setup</h4>
                                 <p class="text-slate-600 text-sm lg:text-base leading-relaxed group-hover:text-purple-50 transition-colors">
                                     Raspberry Pi 4B (8GB) setup guide for self-hosting enthusiasts. Complete architecture with Cloudflare Tunnel, Tailscale VPN, and self-hosted services.
                                 </p>
                             </div>
-                            <div class="ml-auto text-purple-500 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl lg:text-3xl font-bold">→</div>
+                            <div class="ml-auto text-purple-500 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl lg:text-3xl font-bold" aria-hidden="true">→</div>
                         </div>
                     </a>
-                </div>
+            </div>
 
                 <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover animate-fade-in-up animate-delay-200 flex-none">
                     <div class="flex items-center gap-3 mb-6 lg:mb-8">
-                        <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100/80">This hub</span>
+                        <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100/80">Interactive lab</span>
                         <h3 class="text-xl sm:text-2xl font-bold text-slate-800">CVML &amp; IIoT decks</h3>
                     </div>
 
                     <div class="flex flex-col gap-4 lg:gap-5">
-                        <a href="CVML_Project_Overview.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-rose-500 hover:to-rose-700 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 ripple group block">
+                        <a href="CVML_Project_Overview.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-rose-500 hover:to-rose-700 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 group block">
                             <div class="flex items-center gap-4 lg:gap-6">
-                                <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-rose-100 to-rose-300 text-rose-700 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float">👁️</div>
+                                <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-rose-100 to-rose-300 text-rose-800 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">👁️</div>
                                 <div class="flex-1 min-w-0">
                                     <h4 class="font-bold text-lg lg:text-xl text-slate-900 group-hover:text-white transition-colors mb-2">CVML — manufacturing QA</h4>
                                     <p class="text-slate-600 text-sm lg:text-base leading-relaxed group-hover:text-rose-50 transition-colors">
                                         Slide deck: edge CV, MQTT, AWS ML, MES/SCADA.
                                     </p>
                                 </div>
-                                <div class="ml-auto text-rose-500 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl lg:text-3xl font-bold">→</div>
+                                <div class="ml-auto text-rose-500 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl lg:text-3xl font-bold" aria-hidden="true">→</div>
                             </div>
                         </a>
-                        <a href="monitron-IIoT-sensors.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-orange-500 hover:to-amber-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 ripple group block">
+                        <a href="monitron-IIoT-sensors.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-orange-500 hover:to-amber-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 group block">
                             <div class="flex items-center gap-4 lg:gap-6">
-                                <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-orange-100 to-amber-200 text-orange-600 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float">📡</div>
+                                <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-orange-100 to-amber-200 text-orange-900 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">📡</div>
                                 <div class="flex-1 min-w-0">
                                     <h4 class="font-bold text-lg lg:text-xl text-slate-900 group-hover:text-white transition-colors mb-2">Amazon Monitron TE1A001 — IIoT Sensor Demo</h4>
                                     <p class="text-slate-600 text-sm lg:text-base leading-relaxed group-hover:text-orange-50 transition-colors">
                                         Interactive slide deck: vibration sensing, gateway, AWS Monitron, IIoT workflow.
                                     </p>
                                 </div>
-                                <div class="ml-auto text-orange-500 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl lg:text-3xl font-bold">→</div>
+                                <div class="ml-auto text-orange-500 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl lg:text-3xl font-bold" aria-hidden="true">→</div>
                             </div>
                         </a>
                     </div>
@@ -458,209 +393,144 @@
 
         </div>
 
-        <!-- EV protocol + cybersecurity pages: linked from #portfolio only (no second hero row) -->
-
-        <!-- Tools & Simulators (bottom) -->
-        <div id="tools" class="mt-8 lg:mt-12 animate-fade-in-up animate-delay-300">
-            <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover">
-                <div class="flex items-center gap-3 mb-6 lg:mb-8">
-                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-orange-700 bg-orange-100/80">Interactive Tools</span>
-                    <h3 class="text-xl sm:text-2xl font-bold text-slate-800">Tools &amp; Simulators</h3>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-                    <a href="AI-buzzwords.html" class="project-card glass-card hover:bg-white hover:border-orange-200 hover:shadow-xl rounded-2xl p-5 lg:p-6 shadow-md transition-all duration-300 ripple group flex flex-col h-full">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 text-orange-600 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-12 transition-all icon-float">🤖</div>
-                            <h4 class="font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">AI Buzzwords</h4>
-                        </div>
-                        <p class="text-slate-600 text-sm leading-relaxed flex-1">Interactive visualizations of AI concepts: Transformers, Temperature, Zero/Few-shot, Tokens, RAG, and AI Agents.</p>
-                    </a>
-
-                    <a href="DSA.html" class="project-card glass-card hover:bg-white hover:border-orange-200 hover:shadow-xl rounded-2xl p-5 lg:p-6 shadow-md transition-all duration-300 ripple group flex flex-col h-full">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 text-orange-600 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-12 transition-all icon-float" style="animation-delay: 0.3s;">📚</div>
-                            <h4 class="font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">DSA Architect</h4>
-                        </div>
-                        <p class="text-slate-600 text-sm leading-relaxed flex-1">Complete Data Structures & Algorithms reference guide with 16 essential topics, code examples, and complexity analysis.</p>
-                    </a>
-
-                    <a href="AI-terminology.html" class="project-card glass-card hover:bg-white hover:border-orange-200 hover:shadow-xl rounded-2xl p-5 lg:p-6 shadow-md transition-all duration-300 ripple group flex flex-col h-full">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 text-orange-600 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-12 transition-all icon-float" style="animation-delay: 0.4s;">📖</div>
-                            <h4 class="font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">AI Glossary</h4>
-                        </div>
-                        <p class="text-slate-600 text-sm leading-relaxed flex-1">Comprehensive interactive glossary of LLM terminology with search and category filters.</p>
-                    </a>
-
-                    <a href="uv-guide.html" class="project-card glass-card hover:bg-white hover:border-orange-200 hover:shadow-xl rounded-2xl p-5 lg:p-6 shadow-md transition-all duration-300 ripple group flex flex-col h-full">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 text-orange-600 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-12 transition-all icon-float">🚀</div>
-                            <h4 class="font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">Mastering uv</h4>
-                        </div>
-                        <p class="text-slate-600 text-sm leading-relaxed flex-1">Interactive terminal-based guide for the modern Python package manager.</p>
-                    </a>
-
-                    <a href="hedging_simulator.html" class="project-card glass-card hover:bg-white hover:border-orange-200 hover:shadow-xl rounded-2xl p-5 lg:p-6 shadow-md transition-all duration-300 ripple group flex flex-col h-full">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 text-orange-600 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-12 transition-all icon-float" style="animation-delay: 0.5s;">📈</div>
-                            <h4 class="font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">Hedging Simulator</h4>
-                        </div>
-                        <p class="text-slate-600 text-sm leading-relaxed flex-1">Visualize Profit/Loss scenarios using Stock and Put Options.</p>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notion portfolio CTA — update href when workspace is published -->
-        <div class="mt-8 lg:mt-12 animate-fade-in-up animate-delay-400">
-            <div class="section-card rounded-3xl p-8 sm:p-10 lg:p-12 text-center">
-                <div class="inline-block mb-4">
-                    <div class="badge px-4 py-2 rounded-full text-xs font-semibold text-violet-600 uppercase tracking-wider bg-violet-100/80">
-                        Career Narrative
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mt-8 lg:mt-10">
+                <a href="ev_protocols.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-indigo-500 hover:to-violet-700 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 group flex items-center gap-4">
+                    <div class="w-14 h-14 bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-800 rounded-2xl flex items-center justify-center text-2xl shrink-0 group-hover:from-white/20 group-hover:text-white group-hover:scale-110 transition-all" aria-hidden="true">🚗</div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-lg text-slate-900 group-hover:text-white transition-colors">Vehicle protocol architecture</h3>
+                        <p class="text-sm text-slate-600 group-hover:text-indigo-100 transition-colors mt-0.5">CAN, LIN, FlexRay, DoIP — ev_protocols.html</p>
                     </div>
-                </div>
-                <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Full Portfolio on Notion</h3>
-                <p class="text-slate-600 text-base max-w-xl mx-auto mb-8 leading-relaxed">
-                    Complete career arc, problem statements, architecture deep-dives for Factory AI Platform, learning tracks, and project context — all in one living document.
-                </p>
-                <a href="#" class="inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-slate-900 hover:bg-slate-700 text-white text-sm font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl ripple">
-                    <span class="w-6 h-6 inline-flex items-center justify-center bg-white text-slate-900 rounded text-sm font-black leading-none">N</span>
-                    Open Notion portfolio →
+                    <span class="text-indigo-500 group-hover:text-white text-2xl font-bold" aria-hidden="true">→</span>
                 </a>
-                <p class="text-slate-400 text-xs mt-5">Link activates when Notion workspace is published (Month 4–5)</p>
+                <a href="ev-cybersecurity.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-emerald-500 hover:to-teal-700 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 group flex items-center gap-4">
+                    <div class="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-200 text-emerald-900 rounded-2xl flex items-center justify-center text-2xl shrink-0 group-hover:from-white/20 group-hover:text-white group-hover:scale-110 transition-all" aria-hidden="true">🔐</div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-lg text-slate-900 group-hover:text-white transition-colors">EV cybersecurity</h3>
+                        <p class="text-sm text-slate-600 group-hover:text-emerald-100 transition-colors mt-0.5">SecOC, R155/R156, ISO 21434 — ev-cybersecurity.html</p>
+                    </div>
+                    <span class="text-emerald-500 group-hover:text-white text-2xl font-bold" aria-hidden="true">→</span>
+                </a>
             </div>
-        </div>
+        </section>
 
-        <footer class="mt-16 lg:mt-20 pt-8 lg:pt-10 border-t border-slate-300/50 text-center animate-fade-in-up animate-delay-400">
-            <div class="glass-card rounded-2xl p-6 max-w-2xl mx-auto">
-                <p class="text-slate-600 text-sm sm:text-base font-medium">
+        <section id="tools" class="mt-8 lg:mt-12 animate-fade-in-up animate-delay-300" aria-labelledby="tools-heading">
+            <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover">
+                <div class="mb-6 lg:mb-8">
+                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-orange-900 bg-orange-100/90">Tools</span>
+                    <h2 id="tools-heading" class="text-xl sm:text-2xl font-bold text-slate-800 mt-3">Tools &amp; simulators</h2>
+                    <span class="section-badge">Interactive learning</span>
+                    <p class="text-slate-600 text-sm sm:text-base mt-2 max-w-3xl">Browser guides and simulators for concepts and interview prep.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5" role="list">
+                    <article class="h-full flex flex-col" role="listitem">
+                        <a href="AI-buzzwords.html" class="project-card glass-card hover:bg-white hover:border-orange-200 hover:shadow-xl rounded-2xl p-5 lg:p-6 shadow-md transition-all duration-300 group flex flex-col h-full">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 text-orange-900 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-12 transition-all icon-float" aria-hidden="true">🤖</div>
+                                <h3 class="font-bold text-base md:text-lg text-slate-900 group-hover:text-orange-800 transition-colors">AI Buzzwords</h3>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed flex-1">Interactive visualizations of AI concepts: Transformers, Temperature, Zero/Few-shot, Tokens, RAG, and AI Agents.</p>
+                        </a>
+                    </article>
+
+                    <article class="h-full flex flex-col" role="listitem">
+                        <a href="DSA.html" class="project-card glass-card hover:bg-white hover:border-orange-200 hover:shadow-xl rounded-2xl p-5 lg:p-6 shadow-md transition-all duration-300 group flex flex-col h-full">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 text-orange-900 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-12 transition-all icon-float" style="animation-delay: 0.3s;" aria-hidden="true">📚</div>
+                                <h3 class="font-bold text-base md:text-lg text-slate-900 group-hover:text-orange-800 transition-colors">DSA Architect</h3>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed flex-1">Complete Data Structures &amp; Algorithms reference guide with 16 essential topics, code examples, and complexity analysis.</p>
+                        </a>
+                    </article>
+
+                    <article class="h-full flex flex-col" role="listitem">
+                        <a href="AI-terminology.html" class="project-card glass-card hover:bg-white hover:border-orange-200 hover:shadow-xl rounded-2xl p-5 lg:p-6 shadow-md transition-all duration-300 group flex flex-col h-full">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 text-orange-900 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-12 transition-all icon-float" style="animation-delay: 0.4s;" aria-hidden="true">📖</div>
+                                <h3 class="font-bold text-base md:text-lg text-slate-900 group-hover:text-orange-800 transition-colors">AI Glossary</h3>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed flex-1">Comprehensive interactive glossary of LLM terminology with search and category filters.</p>
+                        </a>
+                    </article>
+
+                    <article class="h-full flex flex-col" role="listitem">
+                        <a href="uv-guide.html" class="project-card glass-card hover:bg-white hover:border-orange-200 hover:shadow-xl rounded-2xl p-5 lg:p-6 shadow-md transition-all duration-300 group flex flex-col h-full">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 text-orange-900 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-12 transition-all icon-float" aria-hidden="true">🚀</div>
+                                <h3 class="font-bold text-base md:text-lg text-slate-900 group-hover:text-orange-800 transition-colors">Mastering uv</h3>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed flex-1">Interactive terminal-based guide for the modern Python package manager.</p>
+                        </a>
+                    </article>
+
+                    <article class="h-full flex flex-col" role="listitem">
+                        <a href="hedging_simulator.html" class="project-card glass-card hover:bg-white hover:border-orange-200 hover:shadow-xl rounded-2xl p-5 lg:p-6 shadow-md transition-all duration-300 group flex flex-col h-full">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 text-orange-900 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-12 transition-all icon-float" style="animation-delay: 0.5s;" aria-hidden="true">📈</div>
+                                <h3 class="font-bold text-base md:text-lg text-slate-900 group-hover:text-orange-800 transition-colors">Hedging Simulator</h3>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed flex-1">Visualize Profit/Loss scenarios using Stock and Put Options.</p>
+                        </a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-16 lg:mt-20 pt-8 lg:pt-10 border-t border-slate-300/50 animate-fade-in-up animate-delay-400">
+            <div class="glass-card rounded-2xl p-6 sm:p-8 max-w-4xl mx-auto">
+                <p class="text-slate-600 text-sm sm:text-base font-medium text-center">
                     &copy; 2026 <span class="font-semibold text-slate-800">Vinay A Gandhi (VAG)</span>
                 </p>
-                <p class="text-slate-500 text-xs sm:text-sm mt-2">
-                    Hosted on GitHub Pages • Portfolio root: <a href="https://vgandhi1.github.io/" class="text-indigo-600 font-medium hover:underline" target="_blank" rel="noopener">vgandhi1.github.io</a>
-                </p>
+                <nav class="lab-footer-grid mt-6 pt-6 border-t border-slate-200/80" aria-label="Footer links">
+                    <div>
+                        <h3>Explore</h3>
+                        <ul>
+                            <li><a href="https://vgandhi1.github.io/#work" target="_blank" rel="noopener">Portfolio — flagship systems</a></li>
+                            <li><a href="https://vgandhi1.github.io/#learn" target="_blank" rel="noopener">Learning paths (theory &amp; code)</a></li>
+                            <li><a href="#decks">Decks &amp; EV (this page)</a></li>
+                            <li><a href="#tools">Tools &amp; simulators</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Repositories</h3>
+                        <ul>
+                            <li><a href="https://github.com/vgandhi1/vgandhi1.github.io" target="_blank" rel="noopener">Portfolio site repo</a></li>
+                            <li><a href="https://github.com/vgandhi1/web-interactive-collection" target="_blank" rel="noopener">This collection (source)</a></li>
+                            <li><a href="https://github.com/vgandhi1?tab=repositories" target="_blank" rel="noopener">All GitHub repositories</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Quick links</h3>
+                        <ul>
+                            <li><a href="https://vgandhi1.github.io/" target="_blank" rel="noopener">Portfolio home</a></li>
+                            <li><a href="https://github.com/vgandhi1" target="_blank" rel="noopener">GitHub profile</a></li>
+                        </ul>
+                    </div>
+                </nav>
             </div>
         </footer>
-    </div>
+    </main>
 
     <script>
-        // Enhanced smooth scroll behavior
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+        (function () {
+            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reduceMotion) return;
+
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        entry.target.classList.add('animate-fade-in-up');
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -100px 0px' });
+
+            document.querySelectorAll('.animate-fade-in-up').forEach(function (el) {
+                observer.observe(el);
             });
-        });
-
-        // Enhanced intersection observer for scroll animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                    entry.target.classList.add('animate-fade-in-up');
-                }
-            });
-        }, observerOptions);
-
-        // Observe all animated elements
-        document.querySelectorAll('.animate-fade-in-up').forEach(el => {
-            observer.observe(el);
-        });
-
-        // Enhanced click animations with ripple effect
-        document.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                // Create ripple effect
-                const ripple = document.createElement('span');
-                const rect = this.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                const x = e.clientX - rect.left - size / 2;
-                const y = e.clientY - rect.top - size / 2;
-                
-                ripple.style.width = ripple.style.height = size + 'px';
-                ripple.style.left = x + 'px';
-                ripple.style.top = y + 'px';
-                ripple.classList.add('ripple-effect');
-                
-                this.appendChild(ripple);
-                
-                setTimeout(() => {
-                    ripple.remove();
-                }, 600);
-                
-                // Scale animation
-                this.style.transform = 'scale(0.97)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 150);
-            });
-        });
-
-        // Add parallax effect to background on scroll
-        let lastScroll = 0;
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            const scrollDiff = currentScroll - lastScroll;
-            
-            if (Math.abs(scrollDiff) > 1) {
-                document.body.style.backgroundPositionY = `${currentScroll * 0.5}px`;
-            }
-            
-            lastScroll = currentScroll;
-        });
-
-        // Add mouse move parallax effect to cards
-        document.querySelectorAll('.card-hover').forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = (y - centerY) / 20;
-                const rotateY = (centerX - x) / 20;
-                
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-12px) scale(1.03)`;
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = '';
-            });
-        });
+        })();
     </script>
-
-    <style>
-        .ripple-effect {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.6);
-            transform: scale(0);
-            animation: ripple-animation 0.6s ease-out;
-            pointer-events: none;
-        }
-        
-        @keyframes ripple-animation {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-    </style>
 
 </body>
 </html>
