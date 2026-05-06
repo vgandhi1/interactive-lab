@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git 101 — Guide & Interactive Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes pulse-border {
+            0% { border-color: rgba(59, 130, 246, 0.5); }
+            50% { border-color: rgba(59, 130, 246, 1); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+            100% { border-color: rgba(59, 130, 246, 0.5); }
+        }
+        
+        .active-zone { animation: pulse-border 2s infinite; }
+
+        .file-token {
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Specific transition for stash popping to make it look like it's jumping out */
+        .file-token.popping {
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .stash-box {
+            background-image: repeating-linear-gradient(45deg, #f8fafc 25%, transparent 25%, transparent 75%, #f8fafc 75%, #f8fafc), repeating-linear-gradient(45deg, #f8fafc 25%, #f1f5f9 25%, #f1f5f9 75%, #f8fafc 75%, #f8fafc);
+            background-position: 0 0, 10px 10px;
+            background-size: 20px 20px;
+        }
+        
+        /* Custom scrollbar for terminal */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-800 font-sans min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white py-10 px-4 shadow-lg relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+        <div class="max-w-7xl mx-auto relative z-10 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-extrabold mb-2"><i class="fa-brands fa-git-alt text-orange-500 mr-3"></i>Git 101 — Guide & Interactive Lab</h1>
+                <p class="text-lg text-slate-300 max-w-2xl">Use the Reference tab for setup and workflows from the guide. Use the Lab tab to rehearse how files move through Git’s areas.</p>
+            </div>
+            <div class="hidden md:flex bg-slate-800 rounded-lg p-3 border border-slate-700 items-center">
+                <i class="fa-solid fa-code-branch text-emerald-400 mr-3 text-2xl"></i>
+                <div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wide">Current Branch</div>
+                    <div class="font-mono font-bold text-emerald-300" id="current-branch-label">main</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto p-4 md:p-6 -mt-6 relative z-20">
+
+        <!-- View switcher -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4" role="tablist" aria-label="Choose view">
+            <div class="inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+                <button type="button" id="tab-reference" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50" role="tab" aria-selected="false" aria-controls="panel-reference">Reference</button>
+                <button type="button" id="tab-lab" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white shadow" role="tab" aria-selected="true" aria-controls="panel-lab">Interactive lab</button>
+            </div>
+            <p class="text-xs text-slate-500 max-w-xl">Reference mirrors <span class="font-mono">GIT_AND_GITHUB_GUIDE.md</span>; the lab is a simplified single-file simulator.</p>
+        </div>
+
+        <!-- Reference (from guide) -->
+        <div id="panel-reference" class="hidden mb-8 space-y-4" role="tabpanel" aria-labelledby="tab-reference">
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-lg p-6">
+                <h2 class="text-xl font-bold text-slate-800 mb-4"><i class="fa-solid fa-book text-sky-600 mr-2"></i>What Git and GitHub are</h2>
+                <ul class="list-disc pl-6 text-slate-700 space-y-1 text-sm">
+                    <li><strong>Git</strong> tracks versions of your project on your machine.</li>
+                    <li><strong>GitHub</strong> hosts Git repositories online for collaboration.</li>
+                </ul>
+            </div>
+
+            <details class="bg-white rounded-2xl border border-slate-200 shadow-lg open:shadow-xl group">
+                <summary class="cursor-pointer list-none px-6 py-4 font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-gears text-slate-500"></i> Prerequisites &amp; identity <span class="ml-auto text-xs font-normal text-slate-400 group-open:hidden">Expand</span><span class="ml-auto text-xs font-normal text-slate-400 hidden group-open:inline">Collapse</span></summary>
+                <div class="px-6 pb-6 pt-0 text-sm text-slate-700 space-y-3 border-t border-slate-100">
+                    <p>Install Git from <a href="https://git-scm.com/downloads" class="text-blue-600 underline" target="_blank" rel="noopener noreferrer">git-scm.com/downloads</a>. Create a GitHub account at <a href="https://github.com" class="text-blue-600 underline" target="_blank" rel="noopener noreferrer">github.com</a>.</p>
+                    <div class="relative">
+                        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg font-mono text-xs overflow-x-auto pr-14" id="block-config">git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"</pre>
+                        <button type="button" class="copy-btn absolute top-2 right-2 text-xs bg-slate-700 hover:bg-slate-600 text-white px-2 py-1 rounded" data-copy="block-config" title="Copy">Copy</button>
+                    </div>
+                </div>
+            </details>
+
+            <details class="bg-white rounded-2xl border border-slate-200 shadow-lg">
+                <summary class="cursor-pointer list-none px-6 py-4 font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-key text-amber-600"></i> Authentication (PAT, SSH, CLI, credential manager)</summary>
+                <div class="px-6 pb-6 text-sm text-slate-700 space-y-3 border-t border-slate-100">
+                    <p>GitHub does not accept account passwords for Git over HTTPS. Use a <strong>Personal Access Token</strong>, <strong>SSH keys</strong>, <strong>GitHub CLI</strong> (<code class="bg-slate-100 px-1 rounded">gh auth login</code>), or the OS <strong>Git Credential Manager</strong>.</p>
+                    <p class="text-xs text-slate-500">See the full guide for token scopes, <code class="bg-slate-100 px-1 rounded">ssh-keygen -t ed25519</code>, and testing with <code class="bg-slate-100 px-1 rounded">ssh -T git@github.com</code>.</p>
+                </div>
+            </details>
+
+            <details class="bg-white rounded-2xl border border-slate-200 shadow-lg" open>
+                <summary class="cursor-pointer list-none px-6 py-4 font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-rocket text-green-600"></i> Happy path (clone, daily cycle)</summary>
+                <div class="px-6 pb-6 space-y-3 border-t border-slate-100">
+                    <div class="relative">
+                        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg font-mono text-xs overflow-x-auto pr-14" id="block-init">git init
+git remote add origin https://github.com/USER/REPO.git
+
+# OR
+git clone https://github.com/USER/REPO.git</pre>
+                        <button type="button" class="copy-btn absolute top-2 right-2 text-xs bg-slate-700 hover:bg-slate-600 text-white px-2 py-1 rounded" data-copy="block-init">Copy</button>
+                    </div>
+                    <div class="relative">
+                        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg font-mono text-xs overflow-x-auto pr-14" id="block-daily">git add .
+git commit -m "Your message"
+git push origin main
+git pull</pre>
+                        <button type="button" class="copy-btn absolute top-2 right-2 text-xs bg-slate-700 hover:bg-slate-600 text-white px-2 py-1 rounded" data-copy="block-daily">Copy</button>
+                    </div>
+                </div>
+            </details>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <details class="bg-white rounded-2xl border border-slate-200 shadow-lg">
+                    <summary class="cursor-pointer list-none px-5 py-3 font-bold text-slate-800"><i class="fa-solid fa-code-branch text-emerald-600 mr-2"></i> Branching &amp; merge</summary>
+                    <div class="px-5 pb-4 pt-0 text-sm text-slate-700 border-t border-slate-100 space-y-2">
+                        <pre class="bg-slate-100 p-3 rounded font-mono text-xs overflow-x-auto">git checkout -b feature-login
+# ... commits ...
+git checkout main
+git pull origin main
+git merge feature-login
+git push origin main</pre>
+                    </div>
+                </details>
+                <details class="bg-white rounded-2xl border border-slate-200 shadow-lg">
+                    <summary class="cursor-pointer list-none px-5 py-3 font-bold text-slate-800"><i class="fa-solid fa-arrows-spin text-purple-600 mr-2"></i> Merge vs rebase</summary>
+                    <div class="px-5 pb-4 pt-0 text-sm text-slate-700 border-t border-slate-100 space-y-2">
+                        <p><strong>Merge</strong> preserves full history; adds a merge commit.</p>
+                        <p><strong>Rebase</strong> replays your commits on top of main for a linear history — avoid on shared branches you do not own.</p>
+                        <pre class="bg-slate-100 p-3 rounded font-mono text-xs">git checkout feature-branch
+git pull origin main --rebase</pre>
+                    </div>
+                </details>
+            </div>
+
+            <details class="bg-white rounded-2xl border border-slate-200 shadow-lg">
+                <summary class="cursor-pointer list-none px-6 py-4 font-bold text-slate-800"><i class="fa-solid fa-cloud-arrow-down text-indigo-600 mr-2"></i> Fetch vs pull &amp; safe update</summary>
+                <div class="px-6 pb-6 text-sm text-slate-700 border-t border-slate-100 space-y-2">
+                    <p><code class="bg-slate-100 px-1 rounded">git pull</code> fetches and merges. <code class="bg-slate-100 px-1 rounded">git fetch</code> only downloads — inspect before merging.</p>
+                    <div class="relative">
+                        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg font-mono text-xs overflow-x-auto pr-14" id="block-fetch">git fetch origin
+git log main..origin/main
+git merge origin/main</pre>
+                        <button type="button" class="copy-btn absolute top-2 right-2 text-xs bg-slate-700 hover:bg-slate-600 text-white px-2 py-1 rounded" data-copy="block-fetch">Copy</button>
+                    </div>
+                </div>
+            </details>
+
+            <details class="bg-white rounded-2xl border border-slate-200 shadow-lg">
+                <summary class="cursor-pointer list-none px-6 py-4 font-bold text-slate-800"><i class="fa-solid fa-clipboard-question text-slate-600 mr-2"></i> Quick check (interactive)</summary>
+                <div class="px-6 pb-6 border-t border-slate-100 space-y-4 text-sm">
+                    <p class="text-slate-600">Flip each card — term on the front, answer on the back.</p>
+                    <div class="grid sm:grid-cols-3 gap-3">
+                        <button type="button" class="flip-card relative h-28 text-left rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors overflow-hidden" aria-pressed="false">
+                            <span class="flip-front block absolute inset-0 p-3 font-semibold text-slate-800">Staging area</span>
+                            <span class="flip-back hidden absolute inset-0 p-3 text-slate-600 text-xs leading-snug bg-sky-50">Where <code class="bg-white px-1 rounded">git add</code> puts snapshots before <code class="bg-white px-1 rounded">commit</code>.</span>
+                        </button>
+                        <button type="button" class="flip-card relative h-28 text-left rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors overflow-hidden" aria-pressed="false">
+                            <span class="flip-front block absolute inset-0 p-3 font-semibold text-slate-800"><code class="text-xs bg-white px-1 rounded">git stash</code></span>
+                            <span class="flip-back hidden absolute inset-0 p-3 text-slate-600 text-xs leading-snug bg-amber-50">Shelves uncommitted work so you can switch context; restore with <code class="bg-white px-1 rounded">git stash pop</code>.</span>
+                        </button>
+                        <button type="button" class="flip-card relative h-28 text-left rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors overflow-hidden" aria-pressed="false">
+                            <span class="flip-front block absolute inset-0 p-3 font-semibold text-slate-800"><code class="text-xs bg-white px-1 rounded">git fetch</code></span>
+                            <span class="flip-back hidden absolute inset-0 p-3 text-slate-600 text-xs leading-snug bg-indigo-50">Downloads remote updates without merging your branch.</span>
+                        </button>
+                    </div>
+                </div>
+            </details>
+
+            <details class="bg-white rounded-2xl border border-slate-200 shadow-lg">
+                <summary class="cursor-pointer list-none px-6 py-4 font-bold text-slate-800"><i class="fa-solid fa-table text-slate-600 mr-2"></i> Cheat sheet</summary>
+                <div class="px-6 pb-6 overflow-x-auto border-t border-slate-100">
+                    <table class="w-full text-sm text-left border-collapse">
+                        <thead><tr class="border-b border-slate-200"><th class="py-2 pr-4 font-mono text-xs">Command</th><th class="py-2 font-sans text-slate-700">Description</th></tr></thead>
+                        <tbody class="text-slate-700">
+                            <tr class="border-b border-slate-100"><td class="py-2 pr-4 font-mono text-xs whitespace-nowrap">git status</td><td>Check file status</td></tr>
+                            <tr class="border-b border-slate-100"><td class="py-2 pr-4 font-mono text-xs whitespace-nowrap">git log --oneline --graph</td><td>Visual commit history</td></tr>
+                            <tr class="border-b border-slate-100"><td class="py-2 pr-4 font-mono text-xs whitespace-nowrap">git diff</td><td>Unstaged changes</td></tr>
+                            <tr class="border-b border-slate-100"><td class="py-2 pr-4 font-mono text-xs whitespace-nowrap">git branch -a</td><td>List local and remote branches</td></tr>
+                            <tr class="border-b border-slate-100"><td class="py-2 pr-4 font-mono text-xs whitespace-nowrap">git remote -v</td><td>Show remote URLs</td></tr>
+                            <tr class="border-b border-slate-100"><td class="py-2 pr-4 font-mono text-xs whitespace-nowrap">git commit --amend</td><td>Fix the last commit message</td></tr>
+                            <tr class="border-0"><td class="py-2 pr-4 font-mono text-xs whitespace-nowrap">git pull --rebase</td><td>Pull with rebase</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        </div>
+        
+        <!-- Interactive Workspace -->
+        <div id="panel-lab" class="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden mb-8" role="tabpanel" aria-labelledby="tab-lab">
+            <div class="flex flex-col lg:flex-row h-auto lg:h-[650px]">
+                
+                <!-- Left Panel: Advanced Controls -->
+                <div class="w-full lg:w-1/3 bg-slate-50 border-r border-slate-200 flex flex-col">
+                    <div class="p-5 border-b border-slate-200 bg-white flex flex-wrap items-start justify-between gap-3">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-terminal text-slate-500 mr-2"></i> Command Center
+                        </h2>
+                        <button type="button" id="btn-reset-lab" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700" title="Restore the simulator to a clean slate">Reset simulation</button>
+                    </div>
+                    
+                    <div class="p-5 flex-grow overflow-y-auto custom-scroll space-y-6">
+                        
+                        <!-- Group 1: The Core Flow -->
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">1. Standard Workflow</h3>
+                            <div class="space-y-2">
+                                <button type="button" data-lab-cmd="modify" class="lab-cmd-btn w-full text-left px-3 py-2 bg-white border border-slate-300 rounded shadow-sm hover:bg-slate-100 font-mono text-xs text-slate-600 transition-colors disabled:opacity-45 disabled:pointer-events-none disabled:cursor-not-allowed">
+                                    <i class="fa-solid fa-pen text-slate-400 w-5"></i> (edit files)
+                                </button>
+                                <button type="button" data-lab-cmd="add" class="lab-cmd-btn w-full text-left px-3 py-2 bg-blue-50 border border-blue-200 rounded shadow-sm hover:bg-blue-100 font-mono text-xs text-blue-800 transition-colors disabled:opacity-45 disabled:pointer-events-none">
+                                    <i class="fa-solid fa-plus text-blue-500 w-5"></i> git add .
+                                </button>
+                                <button type="button" data-lab-cmd="commit" class="lab-cmd-btn w-full text-left px-3 py-2 bg-green-50 border border-green-200 rounded shadow-sm hover:bg-green-100 font-mono text-xs text-green-800 transition-colors disabled:opacity-45 disabled:pointer-events-none">
+                                    <i class="fa-solid fa-check text-green-500 w-5"></i> git commit -m "msg"
+                                </button>
+                                <div class="flex gap-2">
+                                    <button type="button" data-lab-cmd="push" class="lab-cmd-btn w-1/2 text-left px-3 py-2 bg-purple-50 border border-purple-200 rounded shadow-sm hover:bg-purple-100 font-mono text-xs text-purple-800 transition-colors disabled:opacity-45 disabled:pointer-events-none">
+                                        <i class="fa-solid fa-arrow-up text-purple-500 w-4"></i> push
+                                    </button>
+                                    <button type="button" data-lab-cmd="pull" class="lab-cmd-btn w-1/2 text-left px-3 py-2 bg-indigo-50 border border-indigo-200 rounded shadow-sm hover:bg-indigo-100 font-mono text-xs text-indigo-800 transition-colors disabled:opacity-45 disabled:pointer-events-none">
+                                        <i class="fa-solid fa-arrow-down text-indigo-500 w-4"></i> pull
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 2: Stashing (Advanced) -->
+                        <div>
+                            <h3 class="text-xs font-bold text-amber-500 uppercase tracking-wider mb-3 flex items-center">
+                                <i class="fa-solid fa-box-archive mr-1"></i> 2. Shelf Work (Stash)
+                            </h3>
+                            <div class="space-y-2">
+                                <button type="button" data-lab-cmd="stash" class="lab-cmd-btn w-full text-left px-3 py-2 bg-amber-50 border border-amber-200 rounded shadow-sm hover:bg-amber-100 font-mono text-xs text-amber-800 transition-colors relative overflow-hidden group disabled:opacity-45 disabled:pointer-events-none">
+                                    <i class="fa-solid fa-box text-amber-600 w-5"></i> git stash
+                                </button>
+                                <button type="button" data-lab-cmd="stashPop" class="lab-cmd-btn w-full text-left px-3 py-2 bg-yellow-50 border border-yellow-200 rounded shadow-sm hover:bg-yellow-100 font-mono text-xs text-yellow-800 transition-colors disabled:opacity-45 disabled:pointer-events-none">
+                                    <i class="fa-solid fa-box-open text-yellow-600 w-5"></i> git stash pop
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Group 3: Time Travel & Undo (Advanced) -->
+                        <div>
+                            <h3 class="text-xs font-bold text-red-500 uppercase tracking-wider mb-3 flex items-center">
+                                <i class="fa-solid fa-rotate-left mr-1"></i> 3. Undo Mistakes
+                            </h3>
+                            <div class="space-y-2">
+                                <button type="button" data-lab-cmd="restore" class="lab-cmd-btn w-full text-left px-3 py-2 bg-rose-50 border border-rose-200 rounded shadow-sm hover:bg-rose-100 font-mono text-xs text-rose-800 transition-colors disabled:opacity-45 disabled:pointer-events-none" title="Unstage a file">
+                                    <i class="fa-solid fa-minus text-rose-500 w-5"></i> git restore --staged
+                                </button>
+                                <button type="button" data-lab-cmd="resetSoft" class="lab-cmd-btn w-full text-left px-3 py-2 bg-red-50 border border-red-200 rounded shadow-sm hover:bg-red-100 font-mono text-xs text-red-800 transition-colors disabled:opacity-45 disabled:pointer-events-none" title="Undo last commit but keep files staged">
+                                    <i class="fa-solid fa-clock-rotate-left text-red-500 w-5"></i> git reset --soft HEAD~1
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Group 4: Context Switching -->
+                        <div>
+                            <h3 class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-3 flex items-center">
+                                <i class="fa-solid fa-code-branch mr-1"></i> 4. Branching
+                            </h3>
+                            <button type="button" data-lab-cmd="switch" class="lab-cmd-btn w-full text-left px-3 py-2 bg-emerald-50 border border-emerald-200 rounded shadow-sm hover:bg-emerald-100 font-mono text-xs text-emerald-800 transition-colors disabled:opacity-45 disabled:pointer-events-none">
+                                <i class="fa-solid fa-shuffle text-emerald-600 w-5"></i> git switch -c feature
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <!-- Information Console -->
+                    <div class="bg-slate-900 text-slate-300 p-4 border-t border-slate-700 min-h-[160px] flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-mono text-emerald-400 mb-1" id="info-cmd">$ status</div>
+                            <p class="text-sm font-sans" id="info-desc">Working tree clean. Edit a file to start.</p>
+                            <p class="text-xs text-slate-500 mt-2 border-t border-slate-700/80 pt-2" id="info-hint" aria-live="polite"><span class="text-slate-400">Next:</span> <span id="info-hint-text">Use <strong class="text-slate-300">(edit files)</strong> to create a change.</span></p>
+                        </div>
+                        <div id="error-msg" class="text-red-400 text-xs font-bold font-mono hidden mt-2">
+                            <i class="fa-solid fa-xmark mr-1"></i> <span id="error-text">Fatal error</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Advanced Visualization Arena -->
+                <div class="w-full lg:w-2/3 p-4 md:p-6 relative bg-slate-100 flex flex-col">
+                    
+                    <!-- Top Notification Area -->
+                    <div class="h-8 mb-2 flex justify-end">
+                        <div id="branch-toast" class="bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-full border border-emerald-300 shadow-sm opacity-0 transition-opacity flex items-center">
+                            <i class="fa-solid fa-check mr-2"></i> Switched to new branch 'feature'
+                        </div>
+                    </div>
+
+                    <!-- Zone Headers -->
+                    <div class="flex justify-between mb-4 relative z-10 text-sm md:text-base">
+                        <div class="w-1/4 text-center font-bold text-blue-800"><i class="fa-regular fa-folder-open block text-xl mb-1"></i>Working<br>Dir</div>
+                        <div class="w-1/4 text-center font-bold text-green-800"><i class="fa-solid fa-clipboard-list block text-xl mb-1"></i>Staging<br>Index</div>
+                        <div class="w-1/4 text-center font-bold text-orange-800"><i class="fa-solid fa-server block text-xl mb-1"></i>Local<br>Repo</div>
+                        <div class="w-1/4 text-center font-bold text-purple-800"><i class="fa-brands fa-github block text-xl mb-1"></i>Remote<br>Repo</div>
+                    </div>
+
+                    <!-- Visual Arena -->
+                    <div class="flex-grow flex relative border border-slate-300 rounded-xl bg-white overflow-hidden shadow-inner min-h-[400px]" id="arena">
+                        
+                        <!-- Zone Columns -->
+                        <div class="w-1/4 border-r border-slate-100 bg-blue-50/20 transition-colors" id="zone-working"></div>
+                        <div class="w-1/4 border-r border-slate-100 bg-green-50/20 transition-colors" id="zone-staging"></div>
+                        <div class="w-1/4 border-r border-slate-300 border-r-4 bg-orange-50/20 transition-colors" id="zone-local"></div>
+                        <div class="w-1/4 bg-purple-50/20 transition-colors" id="zone-remote"></div>
+
+                        <!-- Stash Area (The Advanced Addition) -->
+                        <div id="zone-stash" class="absolute bottom-4 left-[12.5%] transform -translate-x-1/2 w-20 md:w-24 h-24 stash-box border-2 border-dashed border-amber-400 rounded-lg shadow-sm flex flex-col items-center justify-end pb-2 opacity-80 transition-all">
+                            <i class="fa-solid fa-box-archive text-amber-300 text-4xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50"></i>
+                            <span class="text-xs font-bold text-amber-700 bg-white/80 px-2 rounded-full relative z-10 text-center">Stash</span>
+                        </div>
+
+                        <!-- Animated File Token -->
+                        <div id="file-token" class="file-token absolute top-1/2 left-[12.5%] w-14 h-16 md:w-16 md:h-20 bg-white border-2 border-slate-400 rounded shadow-lg flex flex-col items-center justify-center z-20 hidden">
+                            <i class="fa-regular fa-file-code text-2xl md:text-3xl text-slate-600" id="file-icon"></i>
+                            <div class="w-8 md:w-10 h-1.5 md:h-2 bg-slate-200 mt-2 rounded-full overflow-hidden">
+                                <div class="w-0 h-full bg-blue-500 transition-all duration-300" id="file-progress"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // State Machine
+        let currentState = 'empty';
+        let currentBranch = 'main';
+
+        // DOM Elements
+        const fileToken = document.getElementById('file-token');
+        const fileIcon = document.getElementById('file-icon');
+        const fileProgress = document.getElementById('file-progress');
+        const infoCmd = document.getElementById('info-cmd');
+        const infoDesc = document.getElementById('info-desc');
+        const infoHintText = document.getElementById('info-hint-text');
+        const errorMsg = document.getElementById('error-msg');
+        const errorText = document.getElementById('error-text');
+        const branchLabel = document.getElementById('current-branch-label');
+        const branchToast = document.getElementById('branch-toast');
+        const stashZone = document.getElementById('zone-stash');
+        const panelLab = document.getElementById('panel-lab');
+        const panelReference = document.getElementById('panel-reference');
+        const tabReference = document.getElementById('tab-reference');
+        const tabLab = document.getElementById('tab-lab');
+
+        // Layout mapping (percentages for absolute positioning)
+        // Adjusting Y position based on state to visually represent stashing
+        const getPosition = (target) => {
+            const positions = {
+                'working': { x: '12.5%', y: '50%', scale: 1 },
+                'staging': { x: '37.5%', y: '50%', scale: 1 },
+                'local':   { x: '62.5%', y: '50%', scale: 1 },
+                'remote':  { x: '87.5%', y: '50%', scale: 1 },
+                'stash':   { x: '12.5%', y: 'calc(100% - 4rem)', scale: 0.7 } // Bottom left, perfectly centered in the stash box
+            };
+            return positions[target];
+        };
+
+        // Command Dictionary with Advanced Rules
+        const commands = {
+            // Core
+            'modify': {
+                allowedFrom: ['empty', 'committed', 'remote', 'working'],
+                targetState: 'modified', targetPos: 'working',
+                cmd: '$ (edit file)', desc: 'File modified locally. It is currently untracked/unstaged.',
+                iconClass: 'fa-file-code', colorClass: 'text-blue-500', borderClass: 'border-blue-400', progWidth: '25%', progColor: 'bg-blue-500'
+            },
+            'add': {
+                allowedFrom: ['modified'],
+                targetState: 'staged', targetPos: 'staging',
+                cmd: '$ git add .', desc: 'Snapshot taken. File moved to Staging Area index, ready for commit.',
+                iconClass: 'fa-file-code', colorClass: 'text-green-500', borderClass: 'border-green-400', progWidth: '50%', progColor: 'bg-green-500'
+            },
+            'commit': {
+                allowedFrom: ['staged'],
+                targetState: 'committed', targetPos: 'local',
+                cmd: '$ git commit -m "update"', desc: 'Changes permanently recorded in local repository history.',
+                iconClass: 'fa-file-code', colorClass: 'text-orange-500', borderClass: 'border-orange-400', progWidth: '75%', progColor: 'bg-orange-500'
+            },
+            'push': {
+                allowedFrom: ['committed'],
+                targetState: 'remote', targetPos: 'remote',
+                cmd: '$ git push', desc: 'Local commits uploaded to the remote server.',
+                iconClass: 'fa-check-circle', colorClass: 'text-purple-500', borderClass: 'border-purple-400', progWidth: '100%', progColor: 'bg-purple-500'
+            },
+            'pull': {
+                allowedFrom: ['remote', 'empty', 'working', 'modified', 'staged', 'committed'],
+                targetState: 'working', targetPos: 'working',
+                cmd: '$ git pull', desc: 'Fetched remote changes and merged directly into working directory.',
+                iconClass: 'fa-file-arrow-down', colorClass: 'text-indigo-500', borderClass: 'border-indigo-400', progWidth: '25%', progColor: 'bg-blue-500'
+            },
+            // Advanced: Stash
+            'stash': {
+                allowedFrom: ['modified', 'staged'],
+                targetState: 'stashed', targetPos: 'stash',
+                cmd: '$ git stash', desc: 'WIP saved to a temporary shelf. Working directory is now clean.',
+                iconClass: 'fa-box-archive', colorClass: 'text-amber-600', borderClass: 'border-amber-500', progWidth: '0%', progColor: 'bg-slate-300'
+            },
+            'stashPop': {
+                allowedFrom: ['stashed'],
+                targetState: 'modified', targetPos: 'working',
+                cmd: '$ git stash pop', desc: 'Restored WIP from shelf back into the working directory.',
+                iconClass: 'fa-file-code', colorClass: 'text-blue-500', borderClass: 'border-blue-400', progWidth: '25%', progColor: 'bg-blue-500'
+            },
+            // Advanced: Undo
+            'restore': {
+                allowedFrom: ['staged'],
+                targetState: 'modified', targetPos: 'working',
+                cmd: '$ git restore --staged <file>', desc: 'Unstaged the file. Changes are preserved in the working directory.',
+                iconClass: 'fa-file-code', colorClass: 'text-rose-500', borderClass: 'border-rose-400', progWidth: '25%', progColor: 'bg-rose-500'
+            },
+            'resetSoft': {
+                allowedFrom: ['committed', 'remote'],
+                targetState: 'staged', targetPos: 'staging',
+                cmd: '$ git reset --soft HEAD~1', desc: 'Undid the last commit. Changes remain in the staging area.',
+                iconClass: 'fa-file-code', colorClass: 'text-red-500', borderClass: 'border-red-400', progWidth: '50%', progColor: 'bg-red-500'
+            },
+            // Advanced: Branch
+            'switch': {
+                allowedFrom: ['empty', 'working', 'modified', 'staged', 'committed', 'remote', 'stashed'],
+                targetState: null, targetPos: null,
+                cmd: '$ git switch -c feature', desc: 'Created and switched to a new branch. Context updated.',
+                iconClass: null
+            }
+        };
+
+        function showError(message) {
+            errorText.textContent = message;
+            errorMsg.classList.remove('hidden');
+            setTimeout(() => errorMsg.classList.add('hidden'), 3500);
+        }
+
+        function clearZoneHighlights() {
+            ['working', 'staging', 'local', 'remote'].forEach(z => {
+                document.getElementById(`zone-${z}`).classList.remove('bg-blue-100', 'bg-green-100', 'bg-orange-100', 'bg-purple-100');
+            });
+            stashZone.classList.remove('border-amber-600', 'bg-amber-50');
+        }
+
+        function highlightZone(targetPos) {
+            clearZoneHighlights();
+            if (targetPos === 'working') document.getElementById('zone-working').classList.add('bg-blue-100');
+            if (targetPos === 'staging') document.getElementById('zone-staging').classList.add('bg-green-100');
+            if (targetPos === 'local') document.getElementById('zone-local').classList.add('bg-orange-100');
+            if (targetPos === 'remote') document.getElementById('zone-remote').classList.add('bg-purple-100');
+            if (targetPos === 'stash') stashZone.classList.add('border-amber-600', 'bg-amber-50');
+        }
+
+        function updateNextHint() {
+            const hintByState = {
+                empty: 'Use <strong class="text-slate-300">(edit files)</strong> to create a change, or <strong class="text-slate-300">pull</strong> after you have pushed to remote in this demo.',
+                working: 'Make edits in the working tree, then try <strong class="text-slate-300">(edit files)</strong> or <strong class="text-slate-300">pull</strong>.',
+                modified: 'Stage with <strong class="text-slate-300">git add</strong>, stash with <strong class="text-slate-300">git stash</strong>, or switch branches.',
+                staged: 'Commit with <strong class="text-slate-300">git commit</strong>, unstage with <strong class="text-slate-300">git restore --staged</strong>, or stash.',
+                committed: 'Push with <strong class="text-slate-300">push</strong> or adjust history with <strong class="text-slate-300">reset --soft</strong>.',
+                remote: 'Bring work back locally with <strong class="text-slate-300">pull</strong>, or continue editing from <strong class="text-slate-300">(edit files)</strong>.',
+                stashed: 'Restore your shelf with <strong class="text-slate-300">git stash pop</strong>.'
+            };
+            infoHintText.innerHTML = hintByState[currentState] || 'Try the next valid command in the list above.';
+        }
+
+        function refreshLabCommandButtons() {
+            document.querySelectorAll('.lab-cmd-btn').forEach(btn => {
+                const cmdId = btn.getAttribute('data-lab-cmd');
+                const cfg = commands[cmdId];
+                if (!cfg) return;
+                const ok = cfg.allowedFrom.includes(currentState);
+                btn.disabled = !ok;
+                const label = cmdId === 'modify' ? '(edit files)' : (cmdId === 'stashPop' ? 'git stash pop' : cmdId);
+                btn.title = ok ? '' : `Not available now — ${label} needs a different state.`;
+            });
+        }
+
+        function refreshLabUI() {
+            updateNextHint();
+            refreshLabCommandButtons();
+        }
+
+        function resetLabSimulation() {
+            currentState = 'empty';
+            currentBranch = 'main';
+            branchLabel.textContent = currentBranch;
+            fileToken.classList.add('hidden');
+            fileProgress.style.width = '0';
+            fileIcon.className = 'fa-regular fa-file-code text-2xl md:text-3xl text-slate-600';
+            clearZoneHighlights();
+            errorMsg.classList.add('hidden');
+            infoCmd.textContent = '$ status';
+            infoDesc.textContent = 'Working tree clean. Edit a file to start.';
+            refreshLabUI();
+        }
+
+        function updateTokenVisuals(cmdConfig) {
+            fileIcon.className = `fa-solid ${cmdConfig.iconClass} text-3xl ${cmdConfig.colorClass}`;
+            fileToken.className = `file-token absolute w-14 h-16 md:w-16 md:h-20 bg-white border-2 rounded shadow-lg flex flex-col items-center justify-center z-20 ${cmdConfig.borderClass}`;
+            
+            // Manage progress bar classes completely replacing previous background colors
+            fileProgress.className = `w-0 h-full transition-all duration-500 ${cmdConfig.progColor}`;
+            setTimeout(() => { fileProgress.style.width = cmdConfig.progWidth; }, 50);
+            
+            // Special animation handling for Stash
+            if (cmdConfig.targetPos === 'stash') {
+                fileToken.style.opacity = '0.7';
+            } else {
+                fileToken.style.opacity = '1';
+            }
+        }
+
+        function moveToken(posId, isPopping = false) {
+            const coords = getPosition(posId);
+            if (isPopping) fileToken.classList.add('popping');
+            else fileToken.classList.remove('popping');
+
+            fileToken.style.left = coords.x;
+            fileToken.style.top = coords.y;
+            fileToken.style.transform = `translate(-50%, -50%) scale(${coords.scale})`;
+        }
+
+        function executeCommand(cmdId) {
+            const config = commands[cmdId];
+            
+            // 1. Validation
+            if (!config.allowedFrom.includes(currentState)) {
+                let err = "Command not valid in current state.";
+                if (cmdId === 'add') err = "Nothing to add. Modify a file first.";
+                if (cmdId === 'commit') err = "Nothing staged to commit. Use git add.";
+                if (cmdId === 'push') err = "Nothing to push. Commit changes first.";
+                if (cmdId === 'stash') err = "Working directory is clean. Nothing to stash.";
+                if (cmdId === 'stashPop') err = "Stash is empty.";
+                if (cmdId === 'restore') err = "File is not staged. Cannot unstage.";
+                if (cmdId === 'resetSoft') err = "No recent local commit to reset.";
+                
+                showError(err);
+                return;
+            }
+
+            // 2. UI Updates (Console)
+            infoCmd.textContent = config.cmd;
+            infoDesc.textContent = config.desc;
+            errorMsg.classList.add('hidden');
+
+            // 3. Handle Branch Switch Special Case
+            if (cmdId === 'switch') {
+                currentBranch = currentBranch === 'main' ? 'feature-ui' : 'main';
+                branchLabel.textContent = currentBranch;
+
+                branchToast.innerHTML = `<i class="fa-solid fa-code-branch mr-2"></i> Switched to '${currentBranch}'`;
+                branchToast.classList.remove('opacity-0');
+                setTimeout(() => branchToast.classList.add('opacity-0'), 3000);
+
+                refreshLabUI();
+                return;
+            }
+
+            // 4. Handle Visual Token
+            fileToken.classList.remove('hidden');
+
+            // Special Pull Animation (Remote -> Working)
+            if (cmdId === 'pull') {
+                moveToken('remote');
+                setTimeout(() => {
+                    currentState = config.targetState;
+                    updateTokenVisuals(config);
+                    moveToken(config.targetPos);
+                    highlightZone(config.targetPos);
+                    refreshLabUI();
+                }, 300);
+                return;
+            }
+
+            // Stash Pop Animation flag
+            const isPopping = (cmdId === 'stashPop');
+
+            // Standard Flow Movement
+            currentState = config.targetState;
+            updateTokenVisuals(config);
+            moveToken(config.targetPos, isPopping);
+            highlightZone(config.targetPos);
+            refreshLabUI();
+        }
+
+        // Reference tab: copy to clipboard (no sensitive content in snippets)
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-copy');
+                const pre = id ? document.getElementById(id) : null;
+                const text = pre ? pre.textContent.trim() : '';
+                if (!text) return;
+                try {
+                    await navigator.clipboard.writeText(text);
+                    const prev = btn.textContent;
+                    btn.textContent = 'Copied';
+                    setTimeout(() => { btn.textContent = prev; }, 1600);
+                } catch {
+                    btn.textContent = 'Select & copy';
+                    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+                }
+            });
+        });
+
+        document.querySelectorAll('.flip-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const front = card.querySelector('.flip-front');
+                const back = card.querySelector('.flip-back');
+                if (!front || !back) return;
+                const open = !card.classList.contains('is-open');
+                card.classList.toggle('is-open', open);
+                front.classList.toggle('hidden', open);
+                back.classList.toggle('hidden', !open);
+                card.setAttribute('aria-pressed', open ? 'true' : 'false');
+            });
+        });
+
+        function setActiveTab(which) {
+            const ref = which === 'reference';
+            panelReference.classList.toggle('hidden', !ref);
+            panelLab.classList.toggle('hidden', ref);
+            tabReference.setAttribute('aria-selected', ref ? 'true' : 'false');
+            tabLab.setAttribute('aria-selected', ref ? 'false' : 'true');
+            tabReference.className = ref
+                ? 'tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white shadow'
+                : 'tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50';
+            tabLab.className = !ref
+                ? 'tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white shadow'
+                : 'tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50';
+        }
+
+        tabReference.addEventListener('click', () => setActiveTab('reference'));
+        tabLab.addEventListener('click', () => setActiveTab('lab'));
+
+        document.getElementById('btn-reset-lab').addEventListener('click', resetLabSimulation);
+
+        panelLab.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-lab-cmd]');
+            if (!btn || btn.disabled) return;
+            executeCommand(btn.getAttribute('data-lab-cmd'));
+        });
+
+        refreshLabUI();
+    </script>
+</body>
+</html>
