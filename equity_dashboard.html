@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equity Compensation Dashboard — ISO &amp; RSU</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ══════════════════════════════════════════
+           SHARED DESIGN TOKENS
+        ══════════════════════════════════════════ */
+        :root {
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --green: #10b981;
+            --red: #ef4444;
+            --amber: #f59e0b;
+            --purple: #8b5cf6;
+            --slate: #64748b;
+            --radius: 10px;
+            /* ISO blues (default) */
+            --primary: #1e3a8a;
+            --accent:  #3b82f6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        /* ── App Shell ── */
+        .app-shell { max-width: 1360px; margin: 0 auto; padding: 1.25rem; }
+
+        .app-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 1rem 1.75rem;
+            border-radius: var(--radius) var(--radius) 0 0;
+            gap: 1rem;
+        }
+        .app-topbar h1 { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.01em; }
+        .app-topbar p  { font-size: 0.8rem; color: #93c5fd; margin-top: 0.15rem; }
+
+        /* ── Top-Level Tabs ── */
+        .top-tabs {
+            display: flex;
+            background: rgba(0,0,0,0.25);
+            border-radius: 8px;
+            padding: 4px;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .toptab {
+            padding: 0.5rem 1.25rem;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: #bfdbfe;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s;
+            white-space: nowrap;
+        }
+        .toptab:hover { background: rgba(255,255,255,0.12); color: white; }
+        .toptab.iso-active { background: #2563eb; color: white; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
+        .toptab.rsu-active { background: #4f46e5; color: white; box-shadow: 0 2px 8px rgba(79,70,229,0.4); }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── Panel Headers ── */
+        .panel-header {
+            color: white;
+            padding: 1.1rem 1.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .panel-header.iso-hdr { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); }
+        .panel-header.rsu-hdr { background: linear-gradient(135deg, #312e81 0%, #4f46e5 100%); }
+
+        .panel-header h2  { font-size: 1.25rem; margin-bottom: 0.15rem; }
+        .panel-header p   { color: rgba(255,255,255,0.75); font-size: 0.82rem; }
+
+        .hstats { display: flex; gap: 0.65rem; flex-shrink: 0; }
+        .hstat  {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 0.5rem 0.9rem;
+            text-align: center;
+            min-width: 100px;
+        }
+        .hstat-lbl { font-size: 0.65rem; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.06em; }
+        .hstat-val { font-size: 1.1rem; font-weight: 700; margin-top: 0.1rem; }
+        .hstat-val.pos { color: #6ee7b7; }
+        .hstat-val.neg { color: #fca5a5; }
+
+        /* ── Dashboard Grid ── */
+        .dash {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 var(--radius) var(--radius);
+            padding: 1.25rem;
+            display: grid;
+            grid-template-columns: 310px 1fr;
+            gap: 1.1rem;
+        }
+        .sidebar { grid-column: 1; display: flex; flex-direction: column; gap: 1.1rem; }
+        .main    { grid-column: 2; display: flex; flex-direction: column; gap: 1.1rem; }
+        .full-row { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .card-head {
+            padding: 0.8rem 1.2rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.77rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .card-head.iso { color: #1e3a8a; }
+        .card-head.rsu { color: #312e81; }
+        .card-body { padding: 1.1rem 1.2rem; }
+
+        /* ── Inputs ── */
+        .sect-sep {
+            font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--muted);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.3rem; margin: 1rem 0 0.75rem;
+        }
+        .sect-sep:first-child { margin-top: 0; }
+
+        .irow { display: flex; flex-direction: column; margin-bottom: 0.7rem; }
+        .ilabel-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.28rem; }
+        .ilabel { font-size: 0.81rem; font-weight: 600; }
+
+        .tip {
+            width: 14px; height: 14px; background: var(--muted); color: white;
+            border-radius: 50%; font-size: 0.58rem; font-weight: 700;
+            display: inline-flex; align-items: center; justify-content: center;
+            cursor: help; position: relative; flex-shrink: 0;
+        }
+        .tip::after {
+            content: attr(data-tip);
+            position: absolute; bottom: calc(100% + 6px); right: 0;
+            background: #111827; color: white;
+            font-size: 0.71rem; padding: 0.5rem 0.7rem; border-radius: 6px;
+            width: 225px; line-height: 1.45; font-weight: normal;
+            display: none; z-index: 300; pointer-events: none; white-space: normal;
+        }
+        .tip:hover::after { display: block; }
+
+        input, select {
+            width: 100%; padding: 0.42rem 0.65rem;
+            border: 1px solid var(--border); border-radius: 6px;
+            font-size: 0.9rem; background: white; color: var(--text);
+            transition: border-color 0.18s, box-shadow 0.18s;
+        }
+        input:focus, select:focus {
+            outline: none; border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        }
+
+        /* ── Banners ── */
+        .banner {
+            display: flex; align-items: flex-start; gap: 0.7rem;
+            padding: 0.75rem 0.9rem; border-radius: 8px;
+            font-size: 0.83rem; margin-bottom: 0.9rem;
+        }
+        .banner.met     { background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; }
+        .banner.not-met { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; }
+        .banner.unknown { background: #f3f4f6; border: 1px solid var(--border); color: var(--muted); }
+        .b-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 0.25rem; }
+        .met .b-dot     { background: var(--green); }
+        .not-met .b-dot { background: var(--amber); }
+        .unknown .b-dot { background: var(--muted); }
+
+        /* ── Disposition / Hold Tabs ── */
+        .tab-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .dtab {
+            flex: 1; padding: 0.6rem 0.4rem; border: 2px solid var(--border);
+            border-radius: 8px; background: white; cursor: pointer;
+            font-size: 0.78rem; font-weight: 600; color: var(--muted);
+            text-align: center; line-height: 1.3; transition: all 0.18s;
+        }
+        .dtab.qual-on   { border-color: var(--green); background: #ecfdf5; color: #065f46; }
+        .dtab.disq-on   { border-color: var(--red);   background: #fef2f2; color: #7f1d1d; }
+
+        /* ── Metrics Grid ── */
+        .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 1rem; }
+        .mbox {
+            background: #f9fafb; border-radius: 8px;
+            border-left: 4px solid var(--slate); padding: 0.85rem 0.9rem;
+        }
+        .mbox.red    { border-left-color: var(--red); }
+        .mbox.green  { border-left-color: var(--green); }
+        .mbox.amber  { border-left-color: var(--amber); }
+        .mbox.purple { border-left-color: var(--purple); }
+        .mbox.blue   { border-left-color: #3b82f6; }
+        .mbox.indigo { border-left-color: #6366f1; }
+
+        .mtitle { font-size: 0.71rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 0.3rem; }
+        .mval   { font-size: 1.2rem; font-weight: 700; }
+        .mval.pos { color: var(--green); }
+        .mval.neg { color: var(--red); }
+        .msub   { font-size: 0.7rem; color: var(--muted); margin-top: 0.12rem; line-height: 1.3; }
+
+        /* ── Chart ── */
+        .chart-wrap { position: relative; height: 295px; }
+
+        /* ── Tables ── */
+        .tbl { width: 100%; border-collapse: collapse; font-size: 0.835rem; }
+        .tbl th { padding: 0.5rem 0.85rem; text-align: left; font-weight: 700; font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .tbl th:first-child { background: #f3f4f6; color: var(--text); }
+        .tbl th.iso-q { background: #ecfdf5; color: #065f46; }
+        .tbl th.iso-d { background: #fef2f2; color: #7f1d1d; }
+        .tbl th.rsu-a { background: #ecfdf5; color: #065f46; }
+        .tbl th.rsu-b { background: #eff6ff; color: #1e40af; }
+        .tbl th.rsu-c { background: #f5f3ff; color: #4338ca; }
+        .tbl td { padding: 0.5rem 0.85rem; border-top: 1px solid var(--border); }
+        .tbl tr:hover td { background: #f9fafb; }
+        .tbl .rl  { color: var(--muted); font-weight: 600; font-size: 0.81rem; }
+        .tbl .bld { font-weight: 700; }
+        .tbl .pos { color: var(--green); font-weight: 700; }
+        .tbl .neg { color: var(--red); font-weight: 700; }
+        .tbl .hi  { background: #f0fdf4 !important; }
+
+        /* ── Notes ── */
+        .notes { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+        .note  { display: flex; gap: 0.65rem; font-size: 0.79rem; color: var(--muted); line-height: 1.5; }
+        .nico  { flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; margin-top: 0.1rem; }
+        .n-info { background: #dbeafe; color: #1d4ed8; }
+        .n-tip  { background: #d1fae5; color: #065f46; }
+        .n-warn { background: #fef3c7; color: #b45309; }
+
+        /* ── Warning badge ── */
+        .warn-badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: #fef3c7; border: 1px solid #fcd34d; color: #92400e;
+            border-radius: 6px; padding: 0.35rem 0.65rem;
+            font-size: 0.75rem; font-weight: 600; margin-top: 0.5rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 960px) {
+            .dash { grid-template-columns: 1fr; }
+            .sidebar, .main { grid-column: 1; }
+            .full-row { grid-template-columns: 1fr; }
+            .metrics { grid-template-columns: repeat(2, 1fr); }
+            .app-topbar { flex-direction: column; align-items: flex-start; }
+            .hstats { flex-wrap: wrap; }
+            .panel-header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- ════════════════════════════════════════
+         GLOBAL TOP BAR + TABS
+    ════════════════════════════════════════ -->
+    <div class="app-topbar">
+        <div>
+            <h1>Equity Compensation Dashboard</h1>
+            <p>Real-world 2026 tax simulation — ISO Options &amp; RSU Grants · AMT · LTCG · NIIT · FICA</p>
+        </div>
+        <div class="top-tabs">
+            <button class="toptab iso-active" data-tab="iso" onclick="switchTab('iso')">🏛 ISO Options</button>
+            <button class="toptab"            data-tab="rsu" onclick="switchTab('rsu')">📋 RSU Grants</button>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         ISO PANEL
+    ════════════════════════════════════════ -->
+    <div id="iso-panel" class="tab-panel active">
+
+        <div class="panel-header iso-hdr">
+            <div>
+                <h2>ISO Strategy &amp; Profit Simulator</h2>
+                <p>Model exercise costs, AMT (2026 tiers), qualifying vs. disqualifying dispositions, NIIT &amp; AMT credit recovery</p>
+            </div>
+            <div class="hstats">
+                <div class="hstat"><div class="hstat-lbl">Net Profit</div><div class="hstat-val pos" id="iso-h-profit">—</div></div>
+                <div class="hstat"><div class="hstat-lbl">ROI</div><div class="hstat-val" id="iso-h-roi">—</div></div>
+                <div class="hstat"><div class="hstat-lbl">Eff. Tax Rate</div><div class="hstat-val" id="iso-h-eff">—</div></div>
+            </div>
+        </div>
+
+        <div class="dash">
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-head iso">⚙ Input Variables</div>
+                    <div class="card-body">
+                        <div class="sect-sep">Grant &amp; Share Details</div>
+
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Options Exercised</span>
+                                <span class="tip" data-tip="Number of ISO shares to exercise. Only $100K FMV-at-grant per calendar year can qualify as ISO; excess auto-converts to NSO.">?</span></div>
+                            <input type="number" id="iso-options" value="10000" min="1" oninput="isoCalc()">
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Strike Price ($ / share)</span>
+                                <span class="tip" data-tip="Exercise price per share. For ISO qualification, must equal FMV on grant date.">?</span></div>
+                            <input type="number" id="iso-strike" value="5.00" step="0.10" min="0" oninput="isoCalc()">
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">FMV at Exercise ($ / share)</span>
+                                <span class="tip" data-tip="Fair Market Value per share on exercise date. Spread = (FMV − Strike) × Shares becomes an AMT preference item — NOT regular income tax, but triggers AMT.">?</span></div>
+                            <input type="number" id="iso-fmvEx" value="20.00" step="0.50" min="0" oninput="isoCalc()">
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Sale Price ($ / share)</span>
+                                <span class="tip" data-tip="Projected sale price. Qualifying: all gain = LTCG. Disqualifying: spread = ordinary income, further growth = LTCG.">?</span></div>
+                            <input type="number" id="iso-salePrice" value="35.00" step="1.00" min="0" oninput="isoCalc()">
+                        </div>
+
+                        <div class="sect-sep">Tax Profile (2026)</div>
+
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Filing Status</span></div>
+                            <select id="iso-filing" onchange="isoCalc()">
+                                <option value="single">Single</option>
+                                <option value="mfj">Married Filing Jointly</option>
+                            </select>
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Other Ordinary Income ($)</span>
+                                <span class="tip" data-tip="Your W-2 salary or other income. Sets your tax bracket, AMT exemption phaseout, and LTCG rate.">?</span></div>
+                            <input type="number" id="iso-otherInc" value="150000" step="5000" min="0" oninput="isoCalc()">
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">State Tax Rate (%)</span>
+                                <span class="tip" data-tip="CA: up to 13.3%. WA/TX/FL: 0%. Most states tax capital gains at ordinary income rates.">?</span></div>
+                            <input type="number" id="iso-stateRate" value="5.00" step="0.25" min="0" max="15" oninput="isoCalc()">
+                        </div>
+
+                        <div class="sect-sep">Holding Period Tracker</div>
+
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Grant Date</span>
+                                <span class="tip" data-tip="Rule 1: Sale must be ≥ 2 years after grant date for qualifying disposition.">?</span></div>
+                            <input type="date" id="iso-grantDate" oninput="isoCalc()">
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Exercise Date</span>
+                                <span class="tip" data-tip="Rule 2: Sale must be ≥ 1 year after exercise date. AMT is assessed in the exercise tax year.">?</span></div>
+                            <input type="date" id="iso-exerciseDate" oninput="isoCalc()">
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Planned Sale Date</span></div>
+                            <input type="date" id="iso-saleDate" oninput="isoCalc()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main -->
+            <div class="main">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="iso-hp-banner" class="banner unknown">
+                            <span class="b-dot"></span>
+                            <div><strong>Holding Period:</strong> Enter grant, exercise &amp; sale dates to check qualifying disposition eligibility.</div>
+                        </div>
+
+                        <div class="tab-row">
+                            <button class="dtab qual-on" id="iso-tab-q" onclick="isoSetDisp('qualifying')">
+                                ✅ Qualifying Disposition<br>
+                                <span style="font-weight:400;font-size:0.72rem;">2yr from grant + 1yr from exercise → all gain = LTCG</span>
+                            </button>
+                            <button class="dtab" id="iso-tab-d" onclick="isoSetDisp('disqualifying')">
+                                ⚠️ Disqualifying Disposition<br>
+                                <span style="font-weight:400;font-size:0.72rem;">Sell early → spread = ordinary income, extra growth = LTCG</span>
+                            </button>
+                        </div>
+
+                        <div class="metrics">
+                            <div class="mbox red">  <div class="mtitle">Cost to Exercise</div><div class="mval" id="iso-m-exCost">$0</div><div class="msub">Cash to buy shares</div></div>
+                            <div class="mbox amber"> <div class="mtitle">AMT Spread</div><div class="mval" id="iso-m-spread">$0</div><div class="msub" id="iso-m-spread-s">AMT preference item</div></div>
+                            <div class="mbox red">  <div class="mtitle">Tax at Exercise</div><div class="mval" id="iso-m-exTax">$0</div><div class="msub" id="iso-m-exTax-s">Federal AMT</div></div>
+                            <div class="mbox purple"><div class="mtitle">AMT Credit Carried Fwd</div><div class="mval" id="iso-m-credit">$0</div><div class="msub">Recoverable (Form 8801)</div></div>
+                            <div class="mbox red">  <div class="mtitle">Tax at Sale</div><div class="mval" id="iso-m-saleTax">$0</div><div class="msub" id="iso-m-saleTax-s">LTCG + NIIT + State</div></div>
+                            <div class="mbox purple"><div class="mtitle">NIIT (3.8%)</div><div class="mval" id="iso-m-niit">$0</div><div class="msub" id="iso-m-niit-s">Investment surtax</div></div>
+                            <div class="mbox green"> <div class="mtitle">Gross Sale Proceeds</div><div class="mval" id="iso-m-proceeds">$0</div><div class="msub">Before all taxes</div></div>
+                            <div class="mbox"       ><div class="mtitle">Breakeven / Share</div><div class="mval" id="iso-m-be">$—</div><div class="msub">Min price to break even</div></div>
+                            <div class="mbox green" id="iso-mbox-profit"><div class="mtitle">Net Cash Profit</div><div class="mval" id="iso-m-profit">$0</div><div class="msub" id="iso-m-profit-s">After all costs &amp; taxes</div></div>
+                        </div>
+
+                        <div class="chart-wrap"><canvas id="isoChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row -->
+            <div class="full-row">
+                <div class="card">
+                    <div class="card-head iso">⚖ Qualifying vs. Disqualifying</div>
+                    <div class="card-body" style="padding:0;">
+                        <table class="tbl">
+                            <thead><tr>
+                                <th>Component</th>
+                                <th class="iso-q">✅ Qualifying</th>
+                                <th class="iso-d">⚠️ Disqualifying</th>
+                            </tr></thead>
+                            <tbody>
+                                <tr><td class="rl">Spread Treatment</td><td>LTCG</td><td>Ordinary Income (W-2)</td></tr>
+                                <tr><td class="rl">AMT at Exercise</td><td id="ict-amt-q">—</td><td>$0 (eliminated)</td></tr>
+                                <tr><td class="rl">Fed Ordinary Tax on Spread</td><td>$0</td><td id="ict-ord-d">—</td></tr>
+                                <tr><td class="rl">Federal LTCG Tax</td><td id="ict-ltcg-q">—</td><td id="ict-ltcg-d">—</td></tr>
+                                <tr><td class="rl">NIIT (3.8%)</td><td id="ict-niit-q">—</td><td id="ict-niit-d">—</td></tr>
+                                <tr><td class="rl">State Tax</td><td id="ict-state-q">—</td><td id="ict-state-d">—</td></tr>
+                                <tr><td class="rl">Total Tax Burden</td><td id="ict-total-q" class="bld">—</td><td id="ict-total-d" class="bld">—</td></tr>
+                                <tr><td class="rl">FICA Savings vs NSO</td><td id="ict-fica-q">—</td><td id="ict-fica-d">—</td></tr>
+                                <tr><td class="rl bld">Net Cash Profit</td><td id="ict-profit-q" class="bld">—</td><td id="ict-profit-d" class="bld">—</td></tr>
+                                <tr><td class="rl bld">Eff. Tax Rate on Gain</td><td id="ict-eff-q">—</td><td id="ict-eff-d">—</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head iso">📋 2026 ISO Rules &amp; Key Facts</div>
+                    <div class="card-body">
+                        <ul class="notes">
+                            <li class="note"><span class="nico n-info">ℹ</span><span><strong>AMT (2026):</strong> 26% on AMTI up to $244,500 above exemption; 28% above. Exemption: <strong>$90,100 single / $140,200 MFJ</strong>. Phaseout: 25¢ per $1 above $500K (S) / $1M (MFJ).</span></li>
+                            <li class="note"><span class="nico n-tip">✓</span><span><strong>Qualifying:</strong> Hold <strong>2+ yrs from grant</strong> &amp; <strong>1+ yr from exercise</strong>. All profit = LTCG at 0%, 15%, or 20%.</span></li>
+                            <li class="note"><span class="nico n-warn">!</span><span><strong>Disqualifying:</strong> Selling early reclassifies the spread as W-2 ordinary income in the year of sale. AMT is eliminated on those shares.</span></li>
+                            <li class="note"><span class="nico n-info">ℹ</span><span><strong>NIIT (3.8%):</strong> Applies to investment gains when MAGI exceeds <strong>$200K (S) / $250K (MFJ)</strong>. Makes effective max rate 23.8% + state.</span></li>
+                            <li class="note"><span class="nico n-tip">✓</span><span><strong>AMT Credit:</strong> Every dollar of AMT paid at exercise carries forward as a credit (Form 8801) — offsetting regular tax in years where regular tax &gt; tentative min. <strong>Never expires.</strong></span></li>
+                            <li class="note"><span class="nico n-warn">!</span><span><strong>$100K Cap:</strong> Only $100K FMV-at-grant per year can be ISOs; excess auto-converts to NSOs (which owe FICA on the spread).</span></li>
+                            <li class="note"><span class="nico n-warn">!</span><span><strong>90-Day Window:</strong> ISOs must be exercised within 90 days of leaving your employer or they expire. Risky at private companies without liquidity.</span></li>
+                            <li class="note"><span class="nico n-tip">✓</span><span><strong>FICA Exempt:</strong> ISO spreads are exempt from Social Security &amp; Medicare taxes — even in disqualifying dispositions. Key advantage over NSOs.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /dash -->
+    </div><!-- /iso-panel -->
+
+
+    <!-- ════════════════════════════════════════
+         RSU PANEL
+    ════════════════════════════════════════ -->
+    <div id="rsu-panel" class="tab-panel">
+
+        <div class="panel-header rsu-hdr">
+            <div>
+                <h2>RSU Tax &amp; Profit Simulator</h2>
+                <p>Model vesting income, real FICA, withholding gap, sell-to-cover, STCG vs LTCG &amp; NIIT (2026)</p>
+            </div>
+            <div class="hstats">
+                <div class="hstat"><div class="hstat-lbl">Net Take-Home</div><div class="hstat-val pos" id="rsu-h-profit">—</div></div>
+                <div class="hstat"><div class="hstat-lbl">Effective Tax</div><div class="hstat-val" id="rsu-h-eff">—</div></div>
+                <div class="hstat"><div class="hstat-lbl">Holding Benefit</div><div class="hstat-val pos" id="rsu-h-benefit">—</div></div>
+            </div>
+        </div>
+
+        <div class="dash">
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-head rsu">⚙ Input Variables</div>
+                    <div class="card-body">
+                        <div class="sect-sep">Grant &amp; Share Details</div>
+
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">RSUs Vesting</span>
+                                <span class="tip" data-tip="Number of shares vesting in this event. FMV at vest is reported as W-2 income — taxable as ordinary income the moment they vest.">?</span></div>
+                            <input type="number" id="rsu-shares" value="5000" min="1" oninput="rsuCalc()">
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">FMV at Vest ($ / share)</span>
+                                <span class="tip" data-tip="Fair Market Value per share on the vest date. This becomes your W-2 income AND your cost basis for future capital gains calculations.">?</span></div>
+                            <input type="number" id="rsu-vestFMV" value="25.00" step="0.50" min="0" oninput="rsuCalc()">
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Projected Sale Price ($ / share)</span>
+                                <span class="tip" data-tip="Price at which you plan to sell retained shares. If you sell immediately at vest, this equals FMV at vest (no capital gain). Holding creates STCG or LTCG.">?</span></div>
+                            <input type="number" id="rsu-salePrice" value="38.00" step="1.00" min="0" oninput="rsuCalc()">
+                        </div>
+
+                        <div class="sect-sep">Tax Profile (2026)</div>
+
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Filing Status</span></div>
+                            <select id="rsu-filing" onchange="rsuCalc()">
+                                <option value="single">Single</option>
+                                <option value="mfj">Married Filing Jointly</option>
+                            </select>
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Other W-2 Income ($)</span>
+                                <span class="tip" data-tip="Your base salary and other ordinary income this year (before RSU vesting). Used to place the vest income in the correct bracket and determine Social Security wage base remaining.">?</span></div>
+                            <input type="number" id="rsu-otherInc" value="120000" step="5000" min="0" oninput="rsuCalc()">
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">State Tax Rate (%)</span>
+                                <span class="tip" data-tip="State taxes apply to RSU vest income as ordinary income. Most states have no LTCG preference — capital gains also taxed at ordinary state rates.">?</span></div>
+                            <input type="number" id="rsu-stateRate" value="5.00" step="0.25" min="0" max="15" oninput="rsuCalc()">
+                        </div>
+
+                        <div class="sect-sep">Holding Period Tracker</div>
+
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Vest Date</span>
+                                <span class="tip" data-tip="Your cost basis and holding period clock start on the vest date. You need to hold more than 1 year from vest to qualify for LTCG rates.">?</span></div>
+                            <input type="date" id="rsu-vestDate" oninput="rsuCalc()">
+                        </div>
+                        <div class="irow">
+                            <div class="ilabel-row"><span class="ilabel">Planned Sale Date</span></div>
+                            <input type="date" id="rsu-saleDate" oninput="rsuCalc()">
+                        </div>
+
+                        <div id="rsu-withhold-warn" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main -->
+            <div class="main">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="rsu-hp-banner" class="banner unknown">
+                            <span class="b-dot"></span>
+                            <div><strong>Hold Period:</strong> Enter vest &amp; sale dates. Holding &gt;1 year from vest qualifies gains for LTCG rates (0/15/20%) instead of ordinary rates.</div>
+                        </div>
+
+                        <div class="metrics">
+                            <div class="mbox indigo"><div class="mtitle">Gross Vest Value (W-2)</div><div class="mval" id="rsu-m-gross">$0</div><div class="msub">Taxable as ordinary income at vest</div></div>
+                            <div class="mbox red">   <div class="mtitle">Federal Income Tax at Vest</div><div class="mval" id="rsu-m-fedTax">$0</div><div class="msub" id="rsu-m-fedTax-s">Marginal rate on vest income</div></div>
+                            <div class="mbox red">   <div class="mtitle">FICA + Medicare at Vest</div><div class="mval" id="rsu-m-fica">$0</div><div class="msub" id="rsu-m-fica-s">SS 6.2% + Medicare 1.45%+</div></div>
+                            <div class="mbox amber">  <div class="mtitle">Employer Withholding (22%)</div><div class="mval" id="rsu-m-withheld">$0</div><div class="msub" id="rsu-m-withheld-s">Shares auto-sold by employer</div></div>
+                            <div class="mbox amber">  <div class="mtitle">Withholding Gap</div><div class="mval" id="rsu-m-gap">$0</div><div class="msub" id="rsu-m-gap-s">Owe more / get refund at filing</div></div>
+                            <div class="mbox blue">   <div class="mtitle">Shares Retained</div><div class="mval" id="rsu-m-retained">0</div><div class="msub" id="rsu-m-retained-s">After covering actual tax</div></div>
+                            <div class="mbox amber">  <div class="mtitle">Capital Gain / Loss</div><div class="mval" id="rsu-m-cg">$0</div><div class="msub" id="rsu-m-cg-s">Gain on retained shares</div></div>
+                            <div class="mbox red">    <div class="mtitle">Cap Gains Tax + NIIT</div><div class="mval" id="rsu-m-cgTax">$0</div><div class="msub" id="rsu-m-cgTax-s">LTCG or STCG + 3.8%</div></div>
+                            <div class="mbox green" id="rsu-mbox-profit"><div class="mtitle">Net Cash Take-Home</div><div class="mval" id="rsu-m-profit">$0</div><div class="msub" id="rsu-m-profit-s">After all taxes &amp; costs</div></div>
+                        </div>
+
+                        <div class="chart-wrap"><canvas id="rsuChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row -->
+            <div class="full-row">
+                <div class="card">
+                    <div class="card-head rsu">📊 Strategy Comparison: Same-Day vs STCG vs LTCG</div>
+                    <div class="card-body" style="padding:0;">
+                        <table class="tbl">
+                            <thead><tr>
+                                <th>Component</th>
+                                <th class="rsu-a">⚡ Same-Day Sale</th>
+                                <th class="rsu-b">📅 &lt; 1yr (STCG)</th>
+                                <th class="rsu-c">🏆 &gt; 1yr (LTCG)</th>
+                            </tr></thead>
+                            <tbody>
+                                <tr><td class="rl">Cap Gains Type</td><td>None</td><td>STCG (ordinary)</td><td>LTCG (0/15/20%)</td></tr>
+                                <tr><td class="rl">Vest Tax (Fed + FICA)</td><td id="rct-vest-a">—</td><td id="rct-vest-b">—</td><td id="rct-vest-c">—</td></tr>
+                                <tr><td class="rl">State Tax at Vest</td><td id="rct-state-a">—</td><td id="rct-state-b">—</td><td id="rct-state-c">—</td></tr>
+                                <tr><td class="rl">Capital Gain</td><td>$0</td><td id="rct-gain-b">—</td><td id="rct-gain-c">—</td></tr>
+                                <tr><td class="rl">Fed Cap Gains Tax</td><td>$0</td><td id="rct-cgt-b">—</td><td id="rct-cgt-c">—</td></tr>
+                                <tr><td class="rl">NIIT (3.8%)</td><td>$0</td><td id="rct-niit-b">—</td><td id="rct-niit-c">—</td></tr>
+                                <tr><td class="rl">State Tax at Sale</td><td>$0</td><td id="rct-states-b">—</td><td id="rct-states-c">—</td></tr>
+                                <tr><td class="rl bld">Net Take-Home</td><td id="rct-net-a" class="bld">—</td><td id="rct-net-b" class="bld">—</td><td id="rct-net-c" class="bld">—</td></tr>
+                                <tr><td class="rl bld">Eff. Tax on Total Value</td><td id="rct-eff-a">—</td><td id="rct-eff-b">—</td><td id="rct-eff-c">—</td></tr>
+                                <tr><td class="rl bld">Benefit of Holding (vs Same-Day)</td><td>—</td><td id="rct-benefit-b">—</td><td id="rct-benefit-c">—</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head rsu">📋 2026 RSU Rules &amp; Key Facts</div>
+                    <div class="card-body">
+                        <ul class="notes">
+                            <li class="note"><span class="nico n-info">ℹ</span><span><strong>Vest = W-2 Income:</strong> FMV at vest is ordinary income reported on your W-2 (Box 1). Employer withholds at a <strong>flat 22% supplemental rate</strong> for federal tax — may not match your marginal rate.</span></li>
+                            <li class="note"><span class="nico n-warn">!</span><span><strong>Withholding Gap Risk:</strong> If your marginal rate is 24–37%, the 22% flat withholding leaves you under-withheld. You may owe thousands at tax filing. Make quarterly estimates (Form 1040-ES) if needed.</span></li>
+                            <li class="note"><span class="nico n-info">ℹ</span><span><strong>FICA at Vest:</strong> RSU vesting income is subject to Social Security (6.2%, up to $176,100 wage base) and Medicare (1.45%) taxes. Additional 0.9% Medicare if income &gt; $200K (S) / $250K (MFJ).</span></li>
+                            <li class="note"><span class="nico n-tip">✓</span><span><strong>Cost Basis = Vest FMV:</strong> Your cost basis for capital gains is the FMV on vest date (same amount that was taxed as W-2). Future gain/loss is measured from this price, not $0.</span></li>
+                            <li class="note"><span class="nico n-tip">✓</span><span><strong>LTCG Benefit:</strong> Sell &gt;1 year after vest for LTCG rates (0/15/20%) instead of ordinary income rates on the gain. The longer you hold (if the stock rises), the bigger the tax savings.</span></li>
+                            <li class="note"><span class="nico n-info">ℹ</span><span><strong>NIIT (3.8%):</strong> Applies to investment income (capital gains) if MAGI &gt; <strong>$200K (S) / $250K (MFJ)</strong>. Applies to both STCG and LTCG. Stacks on top of cap gains rate.</span></li>
+                            <li class="note"><span class="nico n-warn">!</span><span><strong>Selling at a Loss:</strong> If the stock drops below vest FMV, you have a capital loss deductible against other capital gains. Only $3,000/year of net capital loss can offset ordinary income. Excess carries forward.</span></li>
+                            <li class="note"><span class="nico n-tip">✓</span><span><strong>Basis Error Risk:</strong> The #1 RSU mistake is double-counting the vest income on your tax return. Your 1099-B may show $0 basis — enter your correct basis (vest FMV × shares sold) on Schedule D.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /dash -->
+    </div><!-- /rsu-panel -->
+
+</div><!-- /app-shell -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  SHARED: 2026 TAX CONSTANTS  (IRS Rev Proc 2025-32)
+// ═══════════════════════════════════════════════════════════
+const TAX = {
+    single: {
+        amtExemption: 90100, amtPhaseout: 500000, amtBreakpoint: 244500,
+        niitThreshold: 200000, stdDeduction: 15000,
+        ltcg:     [{ rate: 0,    top: 49450  }, { rate: 0.15, top: 545500 }, { rate: 0.20, top: Infinity }],
+        ordinary: [{ rate: 0.10, top: 11925  }, { rate: 0.12, top: 48475  }, { rate: 0.22, top: 103350  },
+                   { rate: 0.24, top: 197300 }, { rate: 0.32, top: 250525 }, { rate: 0.35, top: 626350  },
+                   { rate: 0.37, top: Infinity }]
+    },
+    mfj: {
+        amtExemption: 140200, amtPhaseout: 1000000, amtBreakpoint: 244500,
+        niitThreshold: 250000, stdDeduction: 30000,
+        ltcg:     [{ rate: 0,    top: 98900  }, { rate: 0.15, top: 613700 }, { rate: 0.20, top: Infinity }],
+        ordinary: [{ rate: 0.10, top: 23850  }, { rate: 0.12, top: 96950  }, { rate: 0.22, top: 206700  },
+                   { rate: 0.24, top: 394600 }, { rate: 0.32, top: 501050 }, { rate: 0.35, top: 751600  },
+                   { rate: 0.37, top: Infinity }]
+    }
+};
+
+const SS_WAGE_BASE = 176100;   // 2026 estimate
+
+// ═══════════════════════════════════════════════════════════
+//  SHARED UTILITY FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+const fmt    = n  => new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(n);
+const fmtPct = n  => (n * 100).toFixed(1) + '%';
+const fmtShr = n  => Math.round(n).toLocaleString();
+
+function progressiveTax(income, brackets) {
+    if (income <= 0) return 0;
+    let tax = 0, prev = 0;
+    for (const b of brackets) {
+        if (income <= prev) break;
+        tax += (Math.min(income, b.top) - prev) * b.rate;
+        prev = b.top;
+    }
+    return tax;
+}
+
+// LTCG stacked on top of ordinary income
+function ltcgTax(ordInc, ltcgAmt, brackets) {
+    if (ltcgAmt <= 0) return 0;
+    return Math.max(0, progressiveTax(ordInc + ltcgAmt, brackets) - progressiveTax(ordInc, brackets));
+}
+
+// Incremental ordinary tax on an addition to income
+function incrOrdTax(baseInc, addition, P) {
+    const base = progressiveTax(Math.max(0, baseInc - P.stdDeduction), P.ordinary);
+    const top  = progressiveTax(Math.max(0, baseInc + addition - P.stdDeduction), P.ordinary);
+    return Math.max(0, top - base);
+}
+
+// AMT with 2026 tiered rates + exemption phaseout
+function calcAMT(otherInc, amtAdj, P) {
+    const amti    = otherInc + amtAdj;
+    const phaseOut = Math.max(0, (amti - P.amtPhaseout) * 0.25);
+    const exemption = Math.max(0, P.amtExemption - phaseOut);
+    const taxableAMTI = Math.max(0, amti - exemption);
+    const tentative   = taxableAMTI <= P.amtBreakpoint
+        ? taxableAMTI * 0.26
+        : P.amtBreakpoint * 0.26 + (taxableAMTI - P.amtBreakpoint) * 0.28;
+    const regularTax = progressiveTax(Math.max(0, otherInc - P.stdDeduction), P.ordinary);
+    return { amtOwed: Math.max(0, tentative - regularTax), exemption };
+}
+
+// FICA for RSU vest (employee share)
+function calcFICA(vestIncome, otherInc, P) {
+    const ssBase     = Math.max(0, SS_WAGE_BASE - otherInc);
+    const ssOnRSU    = Math.min(vestIncome, ssBase) * 0.062;
+    const medicare   = vestIncome * 0.0145;
+    // Additional 0.9% Medicare on earned income > threshold
+    const addlMcBase = Math.max(0, otherInc + vestIncome - P.niitThreshold)
+                     - Math.max(0, otherInc - P.niitThreshold);
+    const addlMc     = addlMcBase * 0.009;
+    return { ssOnRSU, medicare, addlMc, total: ssOnRSU + medicare + addlMc };
+}
+
+// NIIT on investment income (capital gains)
+function calcNIIT(otherInc, earnedVestInc, cgAmt, P) {
+    if (cgAmt <= 0) return 0;
+    const magi = otherInc + earnedVestInc + cgAmt;
+    const base = Math.min(cgAmt, Math.max(0, magi - P.niitThreshold));
+    return base * 0.038;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ISO MODULE
+// ═══════════════════════════════════════════════════════════
+let isoChart = null;
+let isoDisp  = 'qualifying';
+
+function isoSetDisp(type) {
+    isoDisp = type;
+    document.getElementById('iso-tab-q').className = `dtab ${type === 'qualifying'    ? 'qual-on' : ''}`;
+    document.getElementById('iso-tab-d').className = `dtab ${type === 'disqualifying' ? 'disq-on' : ''}`;
+    isoCalc();
+}
+
+function isoCheckHP() {
+    const g = document.getElementById('iso-grantDate').value;
+    const e = document.getElementById('iso-exerciseDate').value;
+    const s = document.getElementById('iso-saleDate').value;
+    const el = document.getElementById('iso-hp-banner');
+    if (!g || !e || !s) {
+        el.className = 'banner unknown';
+        el.innerHTML = '<span class="b-dot"></span><div><strong>Holding Period:</strong> Enter grant, exercise &amp; sale dates to check qualifying disposition eligibility.</div>';
+        return null;
+    }
+    const gD = new Date(g), eD = new Date(e), sD = new Date(s);
+    const r2yr = new Date(gD); r2yr.setFullYear(r2yr.getFullYear() + 2);
+    const r1yr = new Date(eD); r1yr.setFullYear(r1yr.getFullYear() + 1);
+    const r1 = sD >= r2yr, r2 = sD >= r1yr;
+    if (r1 && r2) {
+        el.className = 'banner met';
+        el.innerHTML = '<span class="b-dot"></span><div><strong>✅ Qualifying Disposition</strong> — Both holding periods met. All gain eligible for LTCG rates.</div>';
+    } else {
+        const miss = [];
+        if (!r1) miss.push(`2yr from grant (earliest: ${r2yr.toLocaleDateString()})`);
+        if (!r2) miss.push(`1yr from exercise (earliest: ${r1yr.toLocaleDateString()})`);
+        el.className = 'banner not-met';
+        el.innerHTML = `<span class="b-dot"></span><div><strong>⚠️ Disqualifying Disposition</strong> — Not met: ${miss.join('; ')}.</div>`;
+    }
+    return r1 && r2;
+}
+
+function isoCalc() {
+    isoCheckHP();
+
+    const shares    = parseFloat(document.getElementById('iso-options').value)    || 0;
+    const strike    = parseFloat(document.getElementById('iso-strike').value)     || 0;
+    const fmvEx     = parseFloat(document.getElementById('iso-fmvEx').value)      || 0;
+    const salePrice = parseFloat(document.getElementById('iso-salePrice').value)  || 0;
+    const status    = document.getElementById('iso-filing').value;
+    const otherInc  = parseFloat(document.getElementById('iso-otherInc').value)   || 0;
+    const stateRate = (parseFloat(document.getElementById('iso-stateRate').value) || 0) / 100;
+    const P = TAX[status];
+
+    const exerciseCost = shares * strike;
+    const spread       = Math.max(0, shares * (fmvEx - strike));
+    const saleProceeds = shares * salePrice;
+
+    // ── Qualifying ────────────────────────────────────────
+    const { amtOwed, exemption } = calcAMT(otherInc, spread, P);
+    const gainQ    = Math.max(0, shares * (salePrice - strike));
+    const ltcgFedQ = ltcgTax(otherInc, gainQ, P.ltcg);
+    const niitQ    = calcNIIT(otherInc, 0, gainQ, P);
+    const stateQ   = gainQ * stateRate;
+    const saleTaxQ = ltcgFedQ + niitQ + stateQ;
+    const netProfQ = saleProceeds - exerciseCost - saleTaxQ;   // AMT credit fully recovered
+    const effRateQ = gainQ > 0 ? saleTaxQ / gainQ : 0;
+
+    // ── Disqualifying ─────────────────────────────────────
+    const spreadInc = spread;
+    const addlGainD = Math.max(0, shares * (salePrice - fmvEx));
+    const ordFedD   = incrOrdTax(otherInc, spreadInc, P);
+    const stateOrdD = spreadInc * stateRate;
+    const ltcgFedD  = ltcgTax(otherInc + spreadInc, addlGainD, P.ltcg);
+    const niitD     = calcNIIT(otherInc, spreadInc, addlGainD, P);
+    const stateLTCGD= addlGainD * stateRate;
+    const totalTaxD = ordFedD + stateOrdD + ltcgFedD + niitD + stateLTCGD;
+    const netProfD  = saleProceeds - exerciseCost - totalTaxD;
+    const totalGainD= Math.max(0, saleProceeds - exerciseCost);
+    const effRateD  = totalGainD > 0 ? totalTaxD / totalGainD : 0;
+
+    // ── FICA savings vs NSO ──────────────────────────────
+    const ssBase = Math.max(0, SS_WAGE_BASE - otherInc);
+    const ficaSav = Math.min(spread, ssBase) * 0.062 + Math.max(0, spread - ssBase) * 0.0145;
+
+    // ── Breakeven ────────────────────────────────────────
+    const saleTaxRateQ = gainQ > 0 ? saleTaxQ / gainQ   : (0.15 + stateRate + 0.038);
+    const saleTaxRateD = totalGainD > 0 ? totalTaxD / totalGainD : (0.22 + stateRate);
+    const beQ = (exerciseCost) / (shares * (1 - saleTaxRateQ));
+    const beD = (exerciseCost) / (shares * (1 - saleTaxRateD));
+
+    // ── Active display ───────────────────────────────────
+    const isQ = isoDisp === 'qualifying';
+    const dispTax  = isQ ? saleTaxQ    : totalTaxD;
+    const dispNIIT = isQ ? niitQ       : niitD;
+    const dispProf = isQ ? netProfQ    : netProfD;
+    const dispBE   = isQ ? beQ         : beD;
+    const dispAMT  = isQ ? amtOwed     : 0;
+    const dispCred = isQ ? amtOwed     : 0;
+    const dispROI  = exerciseCost > 0 ? dispProf / exerciseCost : 0;
+    const dispEff  = isQ ? effRateQ    : effRateD;
+
+    // Update metrics
+    setText('iso-m-exCost',   fmt(exerciseCost));
+    setText('iso-m-spread',   fmt(spread));
+    setText('iso-m-spread-s', isQ ? 'AMT preference item at exercise' : 'Ordinary income at sale');
+    setText('iso-m-exTax',    fmt(dispAMT));
+    setText('iso-m-exTax-s',  isQ ? `AMT owed (exemption: ${fmt(exemption)})` : 'No AMT on disqualifying');
+    setText('iso-m-credit',   fmt(dispCred));
+    setText('iso-m-saleTax',  fmt(dispTax));
+    setText('iso-m-saleTax-s',isQ
+        ? `LTCG ${fmt(ltcgFedQ)} · NIIT ${fmt(niitQ)} · State ${fmt(stateQ)}`
+        : `Ord ${fmt(ordFedD+stateOrdD)} · LTCG ${fmt(ltcgFedD)} · NIIT ${fmt(niitD)}`);
+    setText('iso-m-niit',     fmt(dispNIIT));
+    setText('iso-m-niit-s',   `MAGI: ${fmt(otherInc + (isQ ? gainQ : spreadInc + addlGainD))}`);
+    setText('iso-m-proceeds', fmt(saleProceeds));
+    setText('iso-m-be',       dispBE > 0 ? `$${dispBE.toFixed(2)}` : '—');
+
+    const profEl  = document.getElementById('iso-m-profit');
+    const profBox = document.getElementById('iso-mbox-profit');
+    profEl.textContent = fmt(dispProf);
+    profEl.className   = `mval ${dispProf >= 0 ? 'pos' : 'neg'}`;
+    profBox.className  = `mbox ${dispProf >= 0 ? 'green' : 'red'}`;
+    setText('iso-m-profit-s', `ROI: ${dispROI >= 0 ? '+' : ''}${(dispROI*100).toFixed(1)}%`);
+
+    // Header badges
+    setValClass('iso-h-profit', fmt(dispProf),      dispProf >= 0 ? 'pos' : 'neg');
+    setText('iso-h-roi',  `${dispROI >= 0 ? '+' : ''}${(dispROI*100).toFixed(1)}%`);
+    setText('iso-h-eff',  fmtPct(dispEff));
+
+    // Comparison table
+    setText('ict-amt-q',    fmt(amtOwed));
+    setText('ict-ord-d',    fmt(ordFedD + stateOrdD));
+    setText('ict-ltcg-q',   fmt(ltcgFedQ));
+    setText('ict-ltcg-d',   fmt(ltcgFedD));
+    setText('ict-niit-q',   fmt(niitQ));
+    setText('ict-niit-d',   fmt(niitD));
+    setText('ict-state-q',  fmt(stateQ));
+    setText('ict-state-d',  fmt(stateOrdD + stateLTCGD));
+    setText('ict-total-q',  fmt(saleTaxQ));
+    setText('ict-total-d',  fmt(totalTaxD));
+    setText('ict-fica-q',   fmt(ficaSav) + ' saved vs NSO');
+    setText('ict-fica-d',   fmt(ficaSav) + ' saved vs NSO');
+    setClassText('ict-profit-q', fmt(netProfQ), 'bld ' + (netProfQ >= 0 ? 'pos' : 'neg'));
+    setClassText('ict-profit-d', fmt(netProfD), 'bld ' + (netProfD >= 0 ? 'pos' : 'neg'));
+    setText('ict-eff-q',    fmtPct(effRateQ) + ' of gain');
+    setText('ict-eff-d',    fmtPct(effRateD) + ' of gain');
+
+    // Highlight better profit
+    document.getElementById('ict-profit-q').classList.remove('hi');
+    document.getElementById('ict-profit-d').classList.remove('hi');
+    if (netProfQ > netProfD) document.getElementById('ict-profit-q').classList.add('hi');
+    else if (netProfD > netProfQ) document.getElementById('ict-profit-d').classList.add('hi');
+
+    isoRenderChart({ exerciseCost, amtOwed, ltcgFedQ, niitQ, stateQ, netProfQ,
+                     ordFedD, stateOrdD, ltcgFedD, niitD, stateLTCGD, netProfD });
+}
+
+function isoRenderChart(d) {
+    const ctx = document.getElementById('isoChart').getContext('2d');
+    if (isoChart) isoChart.destroy();
+    isoChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['✅ Qualifying', '⚠️ Disqualifying'],
+            datasets: [
+                { label: 'Exercise Cost',            data: [d.exerciseCost, d.exerciseCost], backgroundColor: '#60a5fa', stack: 's' },
+                { label: 'AMT at Exercise (Qual)',   data: [d.amtOwed,      0],              backgroundColor: '#f87171', stack: 's' },
+                { label: 'Fed Ordinary Tax (Disq)',  data: [0,              d.ordFedD],      backgroundColor: '#fb923c', stack: 's' },
+                { label: 'Federal LTCG Tax',         data: [d.ltcgFedQ,    d.ltcgFedD],    backgroundColor: '#fbbf24', stack: 's' },
+                { label: 'NIIT (3.8%)',              data: [d.niitQ,        d.niitD],        backgroundColor: '#c084fc', stack: 's' },
+                { label: 'State Tax',                data: [d.stateQ,       d.stateOrdD + d.stateLTCGD], backgroundColor: '#94a3b8', stack: 's' },
+                { label: 'Net Profit (Qualifying)',  data: [Math.max(0, d.netProfQ), 0],     backgroundColor: '#34d399', stack: 's' },
+                { label: 'Net Profit (Disqual)',     data: [0, Math.max(0, d.netProfD)],     backgroundColor: '#059669', stack: 's' },
+                { label: 'Net Loss',                 data: [Math.abs(Math.min(0,d.netProfQ)), Math.abs(Math.min(0,d.netProfD))], backgroundColor: '#dc2626', stack: 's' }
+            ]
+        },
+        options: sharedChartOpts('ISO Scenario Comparison')
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RSU MODULE
+// ═══════════════════════════════════════════════════════════
+let rsuChart = null;
+
+function rsuCheckHP() {
+    const v = document.getElementById('rsu-vestDate').value;
+    const s = document.getElementById('rsu-saleDate').value;
+    const el = document.getElementById('rsu-hp-banner');
+    if (!v || !s) {
+        el.className = 'banner unknown';
+        el.innerHTML = '<span class="b-dot"></span><div><strong>Hold Period:</strong> Enter vest &amp; sale dates. Holding &gt;1 year from vest qualifies gains for LTCG rates instead of ordinary rates.</div>';
+        return null;
+    }
+    const vD = new Date(v), sD = new Date(s);
+    const r1yr = new Date(vD); r1yr.setFullYear(r1yr.getFullYear() + 1);
+    const isLTCG = sD > r1yr;
+    if (isLTCG) {
+        el.className = 'banner met';
+        el.innerHTML = `<span class="b-dot"></span><div><strong>🏆 LTCG Eligible</strong> — Held more than 1 year from vest. Capital gains will be taxed at preferential LTCG rates (0/15/20%).</div>`;
+    } else {
+        el.className = 'banner not-met';
+        el.innerHTML = `<span class="b-dot"></span><div><strong>📅 STCG (Short-Term)</strong> — Held ≤1 year from vest (${vD.toLocaleDateString()}). Gains taxed at ordinary income rates. LTCG eligible after ${r1yr.toLocaleDateString()}.</div>`;
+    }
+    return isLTCG;
+}
+
+function rsuCalc() {
+    const isLTCG   = rsuCheckHP();
+    const shares   = parseFloat(document.getElementById('rsu-shares').value)    || 0;
+    const vestFMV  = parseFloat(document.getElementById('rsu-vestFMV').value)   || 0;
+    const salePrice= parseFloat(document.getElementById('rsu-salePrice').value) || 0;
+    const status   = document.getElementById('rsu-filing').value;
+    const otherInc = parseFloat(document.getElementById('rsu-otherInc').value)  || 0;
+    const stateRate= (parseFloat(document.getElementById('rsu-stateRate').value)|| 0) / 100;
+    const P = TAX[status];
+
+    const grossVest = shares * vestFMV;
+
+    // ── At Vest: Actual Tax ───────────────────────────────
+    const fedIncomeTax = incrOrdTax(otherInc, grossVest, P);
+    const fica         = calcFICA(grossVest, otherInc, P);
+    const stateVest    = grossVest * stateRate;
+    const totalVestTax = fedIncomeTax + fica.total + stateVest;
+
+    // ── Employer Withholding (22% flat + FICA + state) ───
+    const federalWithheld = grossVest * 0.22;
+    const totalWithheld   = federalWithheld + fica.ssOnRSU + fica.medicare + stateVest;
+    // Gap = additional you owe (positive = underpaid, negative = overpaid)
+    const withholdingGap  = (fedIncomeTax + fica.addlMc) - (federalWithheld);
+
+    // ── Shares Retained (after covering actual tax) ───────
+    const sharesSoldForTax = totalVestTax / vestFMV;
+    const sharesRetained   = Math.max(0, shares - sharesSoldForTax);
+    const costBasis        = sharesRetained * vestFMV;
+
+    // ── Auto-sold by employer (withholding estimate) ──────
+    const autoSoldShares   = totalWithheld / vestFMV;
+
+    // ── Capital Gain on Retained Shares ──────────────────
+    const saleProceeds = sharesRetained * salePrice;
+    const capitalGain  = saleProceeds - costBasis;  // can be negative
+
+    // ── Cap Gains Tax (using detected hold type) ──────────
+    let cgTaxFed = 0;
+    if (capitalGain > 0) {
+        if (isLTCG === true) {
+            cgTaxFed = ltcgTax(otherInc + grossVest, capitalGain, P.ltcg);
+        } else {
+            // STCG: ordinary income rate stacked on top of other income + vest
+            cgTaxFed = incrOrdTax(otherInc + grossVest, capitalGain, P);
+        }
+    }
+    const niit         = capitalGain > 0 ? calcNIIT(otherInc, grossVest, capitalGain, P) : 0;
+    const stateSaleTax = Math.max(0, capitalGain) * stateRate;
+    const totalCGTax   = cgTaxFed + niit + stateSaleTax;
+
+    // ── Net Take-Home ────────────────────────────────────
+    // Retained shares sold at salePrice, minus CG tax, minus withholding gap owed
+    const netCash      = saleProceeds - totalCGTax - Math.max(0, withholdingGap);
+    const totalValue   = grossVest + Math.max(0, capitalGain);
+    const totalTaxAll  = totalVestTax + totalCGTax + Math.max(0, withholdingGap);
+    const effRate      = totalValue > 0 ? totalTaxAll / totalValue : 0;
+    const roi          = grossVest > 0 ? netCash / grossVest : 0;
+
+    // ── Strategy Comparison: Same-Day, STCG, LTCG ────────
+    // All 3 use the same vest tax; only capital gains treatment differs
+    // Same-Day: sell at vestFMV (no gain)
+    const net_sameDay  = costBasis; // sharesRetained * vestFMV (CG = $0)
+    const eff_sameDay  = grossVest > 0 ? totalVestTax / grossVest : 0;
+
+    // STCG scenario (if salePrice given)
+    const cg_stcg      = capitalGain;
+    const cgFed_stcg   = cg_stcg > 0 ? incrOrdTax(otherInc + grossVest, cg_stcg, P) : 0;
+    const niit_stcg    = cg_stcg > 0 ? calcNIIT(otherInc, grossVest, cg_stcg, P) : 0;
+    const state_stcg   = Math.max(0, cg_stcg) * stateRate;
+    const net_stcg     = saleProceeds - cgFed_stcg - niit_stcg - state_stcg - Math.max(0, withholdingGap);
+    const eff_stcg     = (grossVest + Math.max(0, cg_stcg)) > 0
+        ? (totalVestTax + cgFed_stcg + niit_stcg + state_stcg) / (grossVest + Math.max(0, cg_stcg)) : 0;
+
+    // LTCG scenario (same salePrice, but LTCG rates)
+    const cgFed_ltcg   = cg_stcg > 0 ? ltcgTax(otherInc + grossVest, cg_stcg, P.ltcg) : 0;
+    const niit_ltcg    = niit_stcg; // NIIT is same regardless of hold period
+    const state_ltcg   = state_stcg;
+    const net_ltcg     = saleProceeds - cgFed_ltcg - niit_ltcg - state_ltcg - Math.max(0, withholdingGap);
+    const eff_ltcg     = (grossVest + Math.max(0, cg_stcg)) > 0
+        ? (totalVestTax + cgFed_ltcg + niit_ltcg + state_ltcg) / (grossVest + Math.max(0, cg_stcg)) : 0;
+
+    const holdingBenefit = net_ltcg - net_sameDay;
+
+    // ── Update DOM ────────────────────────────────────────
+    setText('rsu-m-gross',    fmt(grossVest));
+    setText('rsu-m-fedTax',   fmt(fedIncomeTax));
+    setText('rsu-m-fedTax-s', `Marginal rate on ${fmt(grossVest)} vest income`);
+    setText('rsu-m-fica',     fmt(fica.total));
+    setText('rsu-m-fica-s',   `SS ${fmt(fica.ssOnRSU)} + Medicare ${fmt(fica.medicare)} + Addt'l ${fmt(fica.addlMc)}`);
+    setText('rsu-m-withheld', fmt(totalWithheld));
+    setText('rsu-m-withheld-s', `${fmtShr(autoSoldShares)} shares auto-sold by employer`);
+
+    const gapEl  = document.getElementById('rsu-m-gap');
+    const gapBox = gapEl.closest('.mbox');
+    gapEl.textContent = fmt(Math.abs(withholdingGap));
+    gapEl.className   = `mval ${withholdingGap > 0 ? 'neg' : 'pos'}`;
+    gapBox.className  = `mbox ${withholdingGap > 0 ? 'red' : 'green'}`;
+    setText('rsu-m-gap-s', withholdingGap > 0
+        ? `⚠️ Owe extra ${fmt(withholdingGap)} at filing (marginal > 22%)`
+        : `✅ Overpaid by ${fmt(Math.abs(withholdingGap))} — expect refund`);
+
+    setText('rsu-m-retained',   fmtShr(sharesRetained) + ' shares');
+    setText('rsu-m-retained-s', `Cost basis: ${fmt(vestFMV)}/sh · Total: ${fmt(costBasis)}`);
+
+    const cgDisplay = capitalGain >= 0 ? fmt(capitalGain) : `-${fmt(Math.abs(capitalGain))}`;
+    setText('rsu-m-cg',   cgDisplay);
+    setText('rsu-m-cg-s', `${isLTCG === true ? '🏆 LTCG' : isLTCG === false ? '📅 STCG' : '❓ Hold period unknown'} · Sale ${fmt(saleProceeds)}`);
+    setText('rsu-m-cgTax', fmt(totalCGTax));
+    setText('rsu-m-cgTax-s', `Fed ${fmt(cgTaxFed)} · NIIT ${fmt(niit)} · State ${fmt(stateSaleTax)}`);
+
+    const pEl  = document.getElementById('rsu-m-profit');
+    const pBox = document.getElementById('rsu-mbox-profit');
+    pEl.textContent = fmt(netCash);
+    pEl.className   = `mval ${netCash >= 0 ? 'pos' : 'neg'}`;
+    pBox.className  = `mbox ${netCash >= 0 ? 'green' : 'red'}`;
+    setText('rsu-m-profit-s', `Eff. tax: ${fmtPct(effRate)} · ROI vs vest: ${roi >= 0 ? '+' : ''}${(roi*100).toFixed(1)}%`);
+
+    // Header badges
+    setValClass('rsu-h-profit',  fmt(netCash), netCash >= 0 ? 'pos' : 'neg');
+    setText('rsu-h-eff',     fmtPct(effRate));
+    setValClass('rsu-h-benefit', holdingBenefit >= 0 ? `+${fmt(holdingBenefit)}` : fmt(holdingBenefit),
+                holdingBenefit >= 0 ? 'pos' : 'neg');
+
+    // Strategy comparison table (all rows same for vest)
+    const vestTaxDisplay = fmt(fedIncomeTax + fica.total);
+    ['a','b','c'].forEach(x => {
+        setText(`rct-vest-${x}`, vestTaxDisplay);
+        setText(`rct-state-${x}`, fmt(stateVest));
+    });
+    setText('rct-gain-b',    fmt(Math.max(0, cg_stcg)));
+    setText('rct-gain-c',    fmt(Math.max(0, cg_stcg)));
+    setText('rct-cgt-b',     fmt(cgFed_stcg));
+    setText('rct-cgt-c',     fmt(cgFed_ltcg));
+    setText('rct-niit-b',    fmt(niit_stcg));
+    setText('rct-niit-c',    fmt(niit_ltcg));
+    setText('rct-states-b',  fmt(state_stcg));
+    setText('rct-states-c',  fmt(state_ltcg));
+    setClassText('rct-net-a', fmt(net_sameDay), `bld ${net_sameDay >= 0 ? 'pos' : 'neg'}`);
+    setClassText('rct-net-b', fmt(net_stcg),    `bld ${net_stcg    >= 0 ? 'pos' : 'neg'}`);
+    setClassText('rct-net-c', fmt(net_ltcg),    `bld ${net_ltcg    >= 0 ? 'pos' : 'neg'}`);
+    setText('rct-eff-a', fmtPct(eff_sameDay));
+    setText('rct-eff-b', fmtPct(eff_stcg));
+    setText('rct-eff-c', fmtPct(eff_ltcg));
+    setText('rct-benefit-b', `${net_stcg - net_sameDay >= 0 ? '+' : ''}${fmt(net_stcg - net_sameDay)}`);
+    const bcEl = document.getElementById('rct-benefit-c');
+    bcEl.textContent = `${net_ltcg - net_sameDay >= 0 ? '+' : ''}${fmt(net_ltcg - net_sameDay)}`;
+    bcEl.className   = `bld ${net_ltcg >= net_sameDay ? 'pos' : 'neg'}`;
+
+    // Highlight best net
+    ['rct-net-a','rct-net-b','rct-net-c'].forEach(id => document.getElementById(id).classList.remove('hi'));
+    const best = Math.max(net_sameDay, net_stcg, net_ltcg);
+    if (best === net_ltcg)    document.getElementById('rct-net-c').classList.add('hi');
+    else if (best === net_stcg) document.getElementById('rct-net-b').classList.add('hi');
+    else document.getElementById('rct-net-a').classList.add('hi');
+
+    // Compute chart-specific net values (without withholding gap timing — shown separately)
+    const chartNet_a = Math.max(0, grossVest - totalVestTax);                                              // same-day
+    const chartNet_b = Math.max(0, saleProceeds - totalVestTax - cgFed_stcg - niit_stcg - state_stcg);   // STCG
+    const chartNet_c = Math.max(0, saleProceeds - totalVestTax - cgFed_ltcg - niit_ltcg - state_ltcg);   // LTCG
+
+    rsuRenderChart({ grossVest, totalVestTax, stateVest, cgFed_stcg, niit_stcg, state_stcg,
+                     cgFed_ltcg, niit_ltcg, state_ltcg, capitalGain, saleProceeds,
+                     chartNet_a, chartNet_b, chartNet_c });
+}
+
+function rsuRenderChart(d) {
+    const ctx = document.getElementById('rsuChart').getContext('2d');
+    if (rsuChart) rsuChart.destroy();
+
+    // Each bar components add up to the gross value received in that scenario:
+    //   Same-Day: grossVest   (no capital gain)
+    //   STCG/LTCG: saleProceeds (retained shares sold at projected price)
+    const vestFedFICA = d.totalVestTax - d.stateVest;  // Fed income tax + FICA portion
+
+    rsuChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['⚡ Same-Day Sale', '📅 Short-Term (STCG)', '🏆 Long-Term (LTCG)'],
+            datasets: [
+                { label: 'Fed Income Tax + FICA at Vest', data: [vestFedFICA, vestFedFICA, vestFedFICA],     backgroundColor: '#f87171', stack: 's' },
+                { label: 'State Tax at Vest',             data: [d.stateVest, d.stateVest, d.stateVest],     backgroundColor: '#fca5a5', stack: 's' },
+                { label: 'Fed STCG Tax (Ordinary Rate)',  data: [0, d.cgFed_stcg, 0],                        backgroundColor: '#fb923c', stack: 's' },
+                { label: 'Fed LTCG Tax (Pref. Rate)',     data: [0, 0, d.cgFed_ltcg],                        backgroundColor: '#fbbf24', stack: 's' },
+                { label: 'NIIT (3.8%)',                   data: [0, d.niit_stcg, d.niit_ltcg],               backgroundColor: '#c084fc', stack: 's' },
+                { label: 'State Tax at Sale',             data: [0, d.state_stcg, d.state_ltcg],             backgroundColor: '#94a3b8', stack: 's' },
+                { label: 'Net Take-Home',                 data: [d.chartNet_a, d.chartNet_b, d.chartNet_c],  backgroundColor: ['#34d399','#10b981','#059669'], stack: 's' }
+            ]
+        },
+        options: sharedChartOpts('RSU Strategy Comparison')
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SHARED CHART OPTIONS
+// ═══════════════════════════════════════════════════════════
+function sharedChartOpts(title) {
+    return {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+            x: { stacked: true, grid: { display: false } },
+            y: {
+                stacked: true,
+                ticks: { callback: v => Math.abs(v) >= 1e6 ? '$' + (v/1e6).toFixed(1)+'M' : '$' + (v/1000).toFixed(0)+'K' }
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: ctx => {
+                        const v = ctx.parsed.y;
+                        return (v === 0 || v == null) ? null : `${ctx.dataset.label}: ${fmt(v)}`;
+                    }
+                }
+            },
+            legend: { position: 'bottom', labels: { boxWidth: 11, padding: 9, font: { size: 10 } } }
+        }
+    };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TAB NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function switchTab(tab) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(`${tab}-panel`).classList.add('active');
+
+    document.querySelectorAll('.toptab').forEach(b => {
+        b.className = 'toptab' + (b.dataset.tab === tab ? ` ${tab}-active` : '');
+    });
+
+    // Re-render the chart for the newly visible panel
+    if (tab === 'iso') isoCalc();
+    else rsuCalc();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DOM HELPERS
+// ═══════════════════════════════════════════════════════════
+function setText(id, val)       { const el = document.getElementById(id); if (el) el.textContent = val; }
+function setClassText(id, val, cls) { const el = document.getElementById(id); if (el) { el.textContent = val; el.className = cls; } }
+function setValClass(id, val, cls)  { const el = document.getElementById(id); if (el) { el.textContent = val; el.className = `hstat-val ${cls}`; } }
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+window.onload = function() {
+    isoCalc();
+    // RSU calc deferred until tab switch to avoid chart rendering in hidden div
+};
+</script>
+</body>
+</html>

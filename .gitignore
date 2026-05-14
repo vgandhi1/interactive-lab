@@ -1,0 +1,4 @@
+# Windows Zone.Identifier sidecar files (WSL artifact)
+*:Zone.Identifier
+Thumbs.db
+.DS_Store
