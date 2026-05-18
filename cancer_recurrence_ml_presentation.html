@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cancer Recurrence Prediction — ML Study</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1c2333;
+    --surface: #f7f9fc;
+    --surface2: #edf0f7;
+    --border: #d4daea;
+    --accent: #00c9a0;
+    --accent2: #4a8fff;
+    --accent3: #ff6b6b;
+    --accent4: #f5a623;
+    --text: #1a2035;
+    --muted: #556070;
+    --dim: #8898aa;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Instrument Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ── Ambient background ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 55% at 10% 5%,  rgba(0,201,160,.12) 0%, transparent 55%),
+      radial-gradient(ellipse 55% 45% at 92% 85%, rgba(74,143,255,.13) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 35% at 55% 50%, rgba(255,255,255,.04) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 0 3rem;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(28,35,51,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: .75rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 500;
+  }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    font-size: .78rem; color: rgba(255,255,255,.55); text-decoration: none;
+    letter-spacing: .05em; text-transform: uppercase;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: #fff; }
+
+  /* ── Slide wrapper ── */
+  .slide {
+    min-height: 100vh; padding: 7rem 6rem 5rem;
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; justify-content: center;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    opacity: 0; transform: translateY(30px);
+    transition: opacity .7s ease, transform .7s ease;
+    background: var(--surface);
+  }
+  .slide.visible { opacity: 1; transform: translateY(0); }
+  /* every other slide gets a slightly off-white tint for rhythm */
+  .slide:nth-child(even) { background: var(--surface2); }
+
+  /* ── Hero ── */
+  #slide-hero {
+    min-height: 100vh;
+    align-items: center; text-align: center;
+    background: var(--bg) !important;
+    color: #e8edf5;
+  }
+  #slide-hero .hero-title { color: #e8edf5; }
+  #slide-hero .hero-subtitle { color: rgba(232,237,245,.65); }
+  #slide-hero .hero-author { color: rgba(232,237,245,.35); }
+  #slide-hero .hero-stat .label { color: rgba(232,237,245,.45); }
+  #slide-hero .hero-tag { color: var(--accent); border-color: rgba(0,201,160,.35); }
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: .7rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid rgba(0,200,160,.3);
+    padding: .3rem 1rem; border-radius: 20px; display: inline-block;
+    margin-bottom: 2rem;
+    animation: fadeUp .8s .1s both;
+  }
+  h1.hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.8rem, 5vw, 5.5rem);
+    line-height: 1.1; font-weight: 400; font-style: italic;
+    color: var(--text);
+    max-width: 900px; margin: 0 auto 1.5rem;
+    animation: fadeUp .9s .2s both;
+  }
+  h1.hero-title span { color: var(--accent); font-style: normal; }
+  .hero-subtitle {
+    font-size: 1.05rem; color: var(--muted); max-width: 580px; margin: 0 auto 3rem;
+    animation: fadeUp .9s .35s both;
+  }
+  .hero-author {
+    font-family: 'DM Mono', monospace; font-size: .8rem;
+    color: var(--dim); letter-spacing: .08em;
+    animation: fadeUp .9s .5s both;
+  }
+  .hero-stats {
+    display: flex; gap: 3rem; justify-content: center; margin-top: 4rem;
+    animation: fadeUp .9s .65s both;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.4rem; color: var(--accent); display: block; line-height: 1;
+  }
+  .hero-stat .label {
+    font-size: .72rem; color: var(--muted); letter-spacing: .08em;
+    text-transform: uppercase; margin-top: .3rem;
+  }
+
+  /* ── Section headers ── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: .68rem; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1rem;
+  }
+  h2.section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 400; line-height: 1.15;
+    margin-bottom: 1.5rem;
+  }
+  h2.section-title em { color: var(--accent); font-style: italic; }
+
+  /* ── Cards ── */
+  .card-grid {
+    display: grid; gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+  .card-grid.cols-2 { grid-template-columns: repeat(2,1fr); }
+  .card-grid.cols-3 { grid-template-columns: repeat(3,1fr); }
+  .card-grid.cols-4 { grid-template-columns: repeat(4,1fr); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.8rem;
+    position: relative; overflow: hidden;
+    transition: border-color .25s, transform .25s;
+  }
+  .card:hover { border-color: var(--accent2); transform: translateY(-3px); }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0; transition: opacity .25s;
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin-bottom: 1rem;
+    background: rgba(0,200,160,.1);
+  }
+  .card h3 {
+    font-size: 1rem; font-weight: 600; margin-bottom: .5rem;
+    color: var(--text);
+  }
+  .card p { font-size: .88rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── Pill/tag ── */
+  .pill {
+    display: inline-block;
+    font-family: 'DM Mono', monospace; font-size: .68rem;
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: .2rem .7rem; border-radius: 20px;
+    border: 1px solid; margin: .2rem;
+  }
+  .pill-green  { color: var(--accent);  border-color: rgba(0,200,160,.3);  background: rgba(0,200,160,.07); }
+  .pill-blue   { color: var(--accent2); border-color: rgba(61,139,255,.3); background: rgba(61,139,255,.07); }
+  .pill-red    { color: var(--accent3); border-color: rgba(255,107,107,.3);background: rgba(255,107,107,.07); }
+  .pill-yellow { color: var(--accent4); border-color: rgba(247,193,94,.3); background: rgba(247,193,94,.07); }
+
+  /* ── Dataset table ── */
+  .data-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: .88rem; }
+  .data-table th {
+    font-family: 'DM Mono', monospace; font-size: .68rem;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); padding: .75rem 1rem;
+    border-bottom: 1px solid var(--border); text-align: left;
+  }
+  .data-table td {
+    padding: .75rem 1rem; border-bottom: 1px solid rgba(31,45,69,.5);
+    color: var(--text); vertical-align: top;
+  }
+  .data-table tr:hover td { background: rgba(0,0,0,.02); }
+
+  /* ── Pipeline steps ── */
+  .pipeline {
+    display: flex; gap: 0; margin-top: 2rem; align-items: stretch;
+  }
+  .pipeline-step {
+    flex: 1; position: relative;
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 1.5rem 1.2rem; text-align: center;
+  }
+  .pipeline-step:first-child { border-radius: 12px 0 0 12px; }
+  .pipeline-step:last-child  { border-radius: 0 12px 12px 0; }
+  .pipeline-step:not(:last-child)::after {
+    content: '→';
+    position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+    color: var(--accent); font-size: 1.2rem; z-index: 2;
+    background: var(--surface2); padding: 0 4px;
+  }
+  .pipeline-step .step-num {
+    font-family: 'DM Mono', monospace; font-size: .65rem;
+    color: var(--accent); letter-spacing: .1em; margin-bottom: .5rem;
+  }
+  .pipeline-step .step-name { font-size: .85rem; font-weight: 600; margin-bottom: .4rem; }
+  .pipeline-step .step-desc { font-size: .75rem; color: var(--muted); }
+
+  /* ── Results bars ── */
+  .result-row {
+    display: flex; align-items: center; gap: 1.5rem;
+    padding: 1.2rem 0; border-bottom: 1px solid rgba(31,45,69,.5);
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-name {
+    width: 160px; font-size: .88rem; font-weight: 600; flex-shrink: 0;
+  }
+  .result-bars { flex: 1; display: flex; flex-direction: column; gap: .4rem; }
+  .bar-row { display: flex; align-items: center; gap: .6rem; }
+  .bar-label {
+    width: 80px; font-family: 'DM Mono', monospace;
+    font-size: .65rem; color: var(--muted); letter-spacing: .06em; flex-shrink: 0;
+  }
+  .bar-track {
+    flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 1s ease;
+  }
+  .bar-fill.acc  { background: linear-gradient(90deg, var(--accent), #00e6b8); }
+  .bar-fill.spec { background: linear-gradient(90deg, var(--accent2), #6aa8ff); }
+  .bar-fill.sens { background: linear-gradient(90deg, var(--accent4), #ffda8a); }
+  .bar-val {
+    font-family: 'DM Mono', monospace; font-size: .72rem;
+    color: var(--text); width: 50px; text-align: right; flex-shrink: 0;
+  }
+
+  /* ── Winner highlight ── */
+  .winner-card {
+    background: linear-gradient(135deg, rgba(10,158,128,.08), rgba(37,99,235,.06));
+    border: 1px solid rgba(0,200,160,.35);
+    border-radius: 16px; padding: 2.5rem; margin-top: 2.5rem;
+    display: flex; gap: 2.5rem; align-items: center;
+  }
+  .winner-badge {
+    font-family: 'DM Serif Display', serif;
+    font-size: 5rem; color: var(--accent); line-height: 1;
+    flex-shrink: 0;
+  }
+  .winner-meta h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem; font-weight: 400; margin-bottom: .5rem;
+  }
+  .winner-meta p { color: var(--muted); font-size: .9rem; line-height: 1.7; }
+  .winner-metrics {
+    display: flex; gap: 2rem; margin-top: 1.2rem;
+  }
+  .w-metric .wval {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.5rem; color: var(--accent); display: block;
+  }
+  .w-metric .wlbl {
+    font-size: .72rem; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  /* ── Algorithm detail blocks ── */
+  .algo-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .algo-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+  .algo-number {
+    font-family: 'DM Mono', monospace; font-size: .65rem;
+    color: var(--accent); letter-spacing: .1em;
+    background: rgba(0,200,160,.1); padding: .2rem .6rem;
+    border-radius: 4px;
+  }
+  .algo-card h3 { font-size: 1.1rem; font-weight: 600; }
+  .algo-card .formula {
+    font-family: 'DM Mono', monospace; font-size: .82rem;
+    color: var(--accent4); background: rgba(217,119,6,.06);
+    border: 1px solid rgba(217,119,6,.2);
+    border-radius: 6px; padding: .8rem 1rem; margin: 1rem 0;
+    letter-spacing: .04em;
+  }
+  .algo-card p { color: var(--muted); font-size: .88rem; line-height: 1.7; }
+
+  /* ── Conclusion ── */
+  .conclusion-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1.5rem; margin-top: 2rem;
+  }
+  .conc-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.5rem;
+  }
+  .conc-item .icon { font-size: 1.4rem; margin-bottom: .6rem; }
+  .conc-item h4 { font-size: .95rem; font-weight: 600; margin-bottom: .5rem; }
+  .conc-item p { font-size: .84rem; color: var(--muted); line-height: 1.65; }
+
+  /* ── Footer ── */
+  footer {
+    padding: 3rem 6rem; text-align: center;
+    border-top: 1px solid rgba(255,255,255,.08);
+    background: var(--bg);
+    font-family: 'DM Mono', monospace; font-size: .72rem;
+    color: rgba(255,255,255,.25); letter-spacing: .08em;
+  }
+
+  /* ── Keyframes ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 3px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .slide { padding: 5rem 2rem 3rem; }
+    nav { padding: 0 1.5rem; }
+    .nav-links { display: none; }
+    .card-grid.cols-3, .card-grid.cols-4 { grid-template-columns: repeat(2,1fr); }
+    .card-grid.cols-2 { grid-template-columns: 1fr; }
+    .pipeline { flex-direction: column; }
+    .pipeline-step { border-radius: 8px !important; }
+    .pipeline-step:not(:last-child)::after { content: '↓'; right: auto; left: 50%; top: auto; bottom: -14px; }
+    .winner-card { flex-direction: column; }
+    .conclusion-grid { grid-template-columns: 1fr; }
+    .hero-stats { flex-wrap: wrap; gap: 1.5rem; }
+    footer { padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <span class="nav-brand">ML Cancer Study</span>
+  <div class="nav-links">
+    <a href="#slide-intro">Introduction</a>
+    <a href="#slide-dataset">Dataset</a>
+    <a href="#slide-preprocessing">Preprocessing</a>
+    <a href="#slide-algorithms">Algorithms</a>
+    <a href="#slide-results">Results</a>
+    <a href="#slide-conclusion">Conclusion</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="slide-hero" class="slide">
+  <div>
+    <div class="hero-tag">Research Project · Machine Learning in Healthcare</div>
+    <h1 class="hero-title">
+      Evaluating ML Algorithms for Prediction of<br>
+      <span>Cancer Recurrence</span>
+    </h1>
+    <p class="hero-subtitle">
+      A comparative analysis of SVM, Random Forest, AdaBoost, and XGBoost on breast cancer recurrence data from the University of Wisconsin Hospitals.
+    </p>
+    <p class="hero-author">VINAY GANDHI</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="num">198</span>
+        <span class="label">Observations</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">35</span>
+        <span class="label">Variables</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">4</span>
+        <span class="label">ML Algorithms</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">99.37%</span>
+        <span class="label">Best Accuracy</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ABSTRACT ── -->
+<section id="slide-abstract" class="slide">
+  <div class="section-label">Abstract</div>
+  <h2 class="section-title">The <em>Problem</em> We Set Out to Solve</h2>
+  <p style="color:var(--muted);max-width:700px;font-size:1rem;line-height:1.8;margin-bottom:2rem;">
+    Breast cancer affects roughly <strong style="color:var(--text)">10% of women worldwide</strong> at some stage of their lives, with a 5-year survival rate of 88% post-diagnosis. However, recurrence after treatment remains a serious and unpredictable threat — one that existing manual diagnostic methods fail to address reliably. This project applies machine learning to bridge that gap.
+  </p>
+  <div class="card-grid cols-3">
+    <div class="card">
+      <div class="card-icon">⚕️</div>
+      <h3>Clinical Challenge</h3>
+      <p>Cancer may return locally, regionally, or distantly after treatment. Even oncologists cannot reliably predict recurrence from scans and records alone.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧮</div>
+      <h3>ML Approach</h3>
+      <p>Four algorithms — SVM, Random Forest, AdaBoost, and XGBoost — were trained and evaluated against a real-world clinical dataset with 35 tumour features.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <h3>Key Outcome</h3>
+      <p>Extreme Gradient Boosting achieved 99.37% accuracy, significantly outperforming the other techniques across all three evaluation metrics.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── INTRODUCTION ── -->
+<section id="slide-intro" class="slide">
+  <div class="section-label">Introduction</div>
+  <h2 class="section-title">Breast Cancer — <em>By the Numbers</em></h2>
+  <div class="card-grid cols-2" style="margin-top:2rem;">
+    <div>
+      <div class="card-grid cols-2" style="margin-top:0;">
+        <div class="card" style="border-color:rgba(0,200,160,.3)">
+          <div style="font-family:'DM Serif Display',serif;font-size:2.5rem;color:var(--accent);line-height:1">1 in 8</div>
+          <p style="margin-top:.5rem;font-size:.82rem;">U.S. women face a lifetime risk of developing breast cancer</p>
+        </div>
+        <div class="card" style="border-color:rgba(61,139,255,.3)">
+          <div style="font-family:'DM Serif Display',serif;font-size:2.5rem;color:var(--accent2);line-height:1">1 in 3</div>
+          <p style="margin-top:.5rem;font-size:.82rem;">Cancer diagnoses globally are breast cancer cases</p>
+        </div>
+        <div class="card" style="border-color:rgba(247,193,94,.3)">
+          <div style="font-family:'DM Serif Display',serif;font-size:2.5rem;color:var(--accent4);line-height:1">88%</div>
+          <p style="margin-top:.5rem;font-size:.82rem;">5-year survival rate after diagnosis, dropping to 80% at 10 years</p>
+        </div>
+        <div class="card" style="border-color:rgba(255,107,107,.3)">
+          <div style="font-family:'DM Serif Display',serif;font-size:2.5rem;color:var(--accent3);line-height:1">↑</div>
+          <p style="margin-top:.5rem;font-size:.82rem;">Incidence rates continue to rise globally with insufficient prediction tools</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="height:100%;">
+        <h3 style="margin-bottom:1rem;">Types of Cancer Recurrence</h3>
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div style="display:flex;gap:1rem;align-items:flex-start;">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(0,200,160,.15);border:1px solid rgba(0,200,160,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;">🏠</div>
+            <div><strong style="font-size:.9rem;">Local Recurrence</strong><br><span style="color:var(--muted);font-size:.82rem;">Cancer returns to the same original site where it first developed.</span></div>
+          </div>
+          <div style="display:flex;gap:1rem;align-items:flex-start;">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(61,139,255,.15);border:1px solid rgba(61,139,255,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;">🔗</div>
+            <div><strong style="font-size:.9rem;">Regional Recurrence</strong><br><span style="color:var(--muted);font-size:.82rem;">Cancer returns to nearby lymph nodes close to the original site.</span></div>
+          </div>
+          <div style="display:flex;gap:1rem;align-items:flex-start;">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,107,107,.15);border:1px solid rgba(255,107,107,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;">🌐</div>
+            <div><strong style="font-size:.9rem;">Distant Recurrence</strong><br><span style="color:var(--muted);font-size:.82rem;">Cancer spreads and returns in a completely different part of the body.</span></div>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;padding:1rem;background:rgba(0,200,160,.05);border-radius:8px;border:1px solid rgba(0,200,160,.15);">
+          <p style="font-size:.82rem;color:var(--muted);">Data mining can significantly reduce both <strong style="color:var(--text)">false positives</strong> and <strong style="color:var(--text)">false negatives</strong> in clinical decision-making, enabling earlier and more reliable recurrence prediction.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DATASET ── -->
+<section id="slide-dataset" class="slide">
+  <div class="section-label">Dataset</div>
+  <h2 class="section-title">Data Source & <em>Structure</em></h2>
+  <p style="color:var(--muted);max-width:700px;margin-bottom:2rem;font-size:.92rem;">
+    Dataset sourced from the <strong style="color:var(--text)">University of Wisconsin Hospitals, Madison</strong>, collected by Dr. William H. Wolberg. Available via UCI Machine Learning Repository.
+  </p>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Column(s)</th>
+        <th>Description</th>
+        <th>Type</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="pill pill-blue">Col 1</span></td>
+        <td>Patient ID Number</td>
+        <td><span class="pill pill-yellow">Identifier</span></td>
+        <td>Removed before modelling</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-green">Col 2</span></td>
+        <td>Cancer Outcome — Recurrence / Non-Recurrence</td>
+        <td><span class="pill pill-red">Target</span></td>
+        <td>Binary class label</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-blue">Col 3</span></td>
+        <td>Time elapsed since first cancer occurrence</td>
+        <td><span class="pill pill-yellow">Temporal</span></td>
+        <td>Continuous numeric</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-blue">Col 4–33</span></td>
+        <td>Tumour measurements: radius, texture, perimeter, smoothness, compactness, concavity, concave points, symmetry, fractal dimension (mean, SE, max)</td>
+        <td><span class="pill pill-yellow">Feature</span></td>
+        <td>30 numeric features from imaging</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-blue">Col 34</span></td>
+        <td>Tumour Size (diameter in cm)</td>
+        <td><span class="pill pill-yellow">Feature</span></td>
+        <td>Continuous numeric</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-blue">Col 35</span></td>
+        <td>Lymph Node Status (axillary nodes at surgery)</td>
+        <td><span class="pill pill-yellow">Feature</span></td>
+        <td style="color:var(--accent3);">⚠ 4 missing values</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card-grid cols-3" style="margin-top:2rem;">
+    <div class="card" style="border-color:rgba(0,200,160,.3);">
+      <div style="font-family:'DM Serif Display',serif;font-size:2.2rem;color:var(--accent)">151</div>
+      <h3 style="margin-top:.3rem;">Non-Recurrence</h3>
+      <p>76.3% of the dataset — represents treated patients where cancer did not return.</p>
+    </div>
+    <div class="card" style="border-color:rgba(255,107,107,.3);">
+      <div style="font-family:'DM Serif Display',serif;font-size:2.2rem;color:var(--accent3)">47</div>
+      <h3 style="margin-top:.3rem;">Recurrence</h3>
+      <p>23.7% of the dataset — class imbalance noted; handled during preprocessing and boosting.</p>
+    </div>
+    <div class="card" style="border-color:rgba(61,139,255,.3);">
+      <div style="font-family:'DM Serif Display',serif;font-size:2.2rem;color:var(--accent2)">198</div>
+      <h3 style="margin-top:.3rem;">Total Observations</h3>
+      <p>Real-world clinical data — raw, uncleaned, and representative of actual hospital records.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── PREPROCESSING ── -->
+<section id="slide-preprocessing" class="slide">
+  <div class="section-label">Data Preprocessing</div>
+  <h2 class="section-title">Cleaning the <em>Raw Signal</em></h2>
+  <p style="color:var(--muted);max-width:680px;margin-bottom:2.5rem;font-size:.92rem;">
+    Real-world medical data is noisy by nature — missing values, outliers, and correlated features all degrade model accuracy. A 5-step preprocessing pipeline was applied before any ML training.
+  </p>
+
+  <div class="pipeline">
+    <div class="pipeline-step">
+      <div class="step-num">STEP 01</div>
+      <div class="step-name">Missing Values</div>
+      <div class="step-desc">K-Means imputation on 4 missing Lymph Node values using centroidal nearest-neighbour averaging</div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">STEP 02</div>
+      <div class="step-name">Outlier Removal</div>
+      <div class="step-desc">Histograms and box plots visualised per variable; outliers far from mean with &lt;2 occurrences removed</div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">STEP 03</div>
+      <div class="step-name">Constant Features</div>
+      <div class="step-desc">Zero-variance and near-zero-variance predictors eliminated using prevalence ratio thresholds</div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">STEP 04</div>
+      <div class="step-name">Correlated Variables</div>
+      <div class="step-desc">Linearly dependent and highly correlated features removed for SVM/Naive Bayes; retained for RF and XGBoost</div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">STEP 05</div>
+      <div class="step-name">Normalisation</div>
+      <div class="step-desc">Data scaled and normalised for distance-based algorithms; feature selection via Wrapper method applied</div>
+    </div>
+  </div>
+
+  <div class="card-grid cols-2" style="margin-top:2rem;">
+    <div class="card">
+      <h3>Feature Selection Approach</h3>
+      <p style="margin-top:.5rem;">Wrapper method used — iteratively adds/removes predictors and evaluates model performance to find the maximally reproducible feature subset. Feature importance visualised prior to selection.</p>
+      <div style="margin-top:1rem;">
+        <span class="pill pill-green">Wrapper Method</span>
+        <span class="pill pill-blue">Importance Visualisation</span>
+        <span class="pill pill-yellow">Cross-Validation</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Why Outlier Analysis Was Done Twice</h3>
+      <p style="margin-top:.5rem;">The study ran models both with and without outlier removal. Accuracy was significantly lower when outliers were retained, confirming their detrimental effect. However, not all outliers were deleted — those that helped models learn edge behaviours were preserved.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── ALGORITHMS ── -->
+<section id="slide-algorithms" class="slide">
+  <div class="section-label">Algorithms</div>
+  <h2 class="section-title">Four <em>Techniques</em> Evaluated</h2>
+
+  <div class="algo-card">
+    <div class="algo-header">
+      <span class="algo-number">ALGO 01</span>
+      <h3>Support Vector Machine (SVM)</h3>
+    </div>
+    <div class="formula">y = w · X' + b &nbsp;&nbsp;|&nbsp;&nbsp; Kernels: Linear · Gaussian (RBF)</div>
+    <p>SVM finds an optimal separating hyperplane between recurrence and non-recurrence classes by maximising the margin between support vectors — the nearest data points to the boundary. Two kernels were implemented: a <strong style="color:var(--text)">linear kernel</strong> for linearly separable data and a <strong style="color:var(--text)">Gaussian (RBF) kernel</strong> for non-linear boundaries. Correlated features were removed prior to SVM training.</p>
+    <div style="margin-top:.8rem;">
+      <span class="pill pill-blue">Binary Classifier</span>
+      <span class="pill pill-green">Two Kernels</span>
+      <span class="pill pill-yellow">Margin Maximisation</span>
+    </div>
+  </div>
+
+  <div class="algo-card">
+    <div class="algo-header">
+      <span class="algo-number">ALGO 02</span>
+      <h3>Random Forest</h3>
+    </div>
+    <div class="formula">Ensemble: N decision trees → majority vote → final prediction</div>
+    <p>An ensemble method that builds multiple decision trees on bootstrapped samples and aggregates their votes. The "divide and conquer" approach converts many weak learners into a single strong learner, reducing variance and overfitting. Correlated variables were retained for Random Forest training as it naturally handles multicollinearity.</p>
+    <div style="margin-top:.8rem;">
+      <span class="pill pill-blue">Ensemble Method</span>
+      <span class="pill pill-green">Bootstrap Sampling</span>
+      <span class="pill pill-yellow">Variance Reduction</span>
+    </div>
+  </div>
+
+  <div class="card-grid cols-2">
+    <div class="algo-card" style="margin-bottom:0;">
+      <div class="algo-header">
+        <span class="algo-number">ALGO 03</span>
+        <h3>AdaBoost</h3>
+      </div>
+      <div class="formula" style="font-size:.75rem;">F(x) = Σ αₜhₜ(x) &nbsp;|&nbsp; Loss: exp(-yᵢF(xᵢ))</div>
+      <p>Adaptive Boosting iteratively trains weak classifiers, weighting misclassified samples more heavily in each round. The final prediction is a weighted combination of all weak hypotheses. It minimises exponential loss to produce a robust, high-accuracy ensemble.</p>
+    </div>
+    <div class="algo-card" style="margin-bottom:0;">
+      <div class="algo-header">
+        <span class="algo-number">ALGO 04</span>
+        <h3>Extreme Gradient Boosting (XGBoost)</h3>
+      </div>
+      <div class="formula" style="font-size:.75rem;">ŷᵢ = Σⱼ θⱼxᵢⱼ &nbsp;|&nbsp; Regularised tree ensemble</div>
+      <p>XGBoost builds trees sequentially, each correcting the errors of the previous one, with L1/L2 regularisation preventing overfitting. It is computationally efficient and handles class imbalance well — a critical property for this dataset's 76/24 class split.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── RESULTS ── -->
+<section id="slide-results" class="slide">
+  <div class="section-label">Experimental Results</div>
+  <h2 class="section-title">Performance <em>Comparison</em></h2>
+  <p style="color:var(--muted);max-width:680px;margin-bottom:2rem;font-size:.92rem;">
+    Models evaluated by Accuracy, Specificity, and Sensitivity derived from confusion matrices on train/test splits. Cross-validation applied throughout.
+  </p>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2rem;">
+    <div style="display:grid;grid-template-columns:80px 1fr;gap:.5rem;margin-bottom:1rem;padding-bottom:.8rem;border-bottom:1px solid var(--border);">
+      <span></span>
+      <div style="display:flex;gap:2rem;padding-left:88px;">
+        <span style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.08em;">ACCURACY</span>
+        <span style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent2);letter-spacing:.08em;">SPECIFICITY</span>
+        <span style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent4);letter-spacing:.08em;">SENSITIVITY</span>
+      </div>
+    </div>
+
+    <!-- SVM -->
+    <div class="result-row">
+      <div class="result-name">SVM</div>
+      <div class="result-bars">
+        <div class="bar-row">
+          <span class="bar-label">Accuracy</span>
+          <div class="bar-track"><div class="bar-fill acc" style="width:82.05%"></div></div>
+          <span class="bar-val">82.05%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Specificity</span>
+          <div class="bar-track"><div class="bar-fill spec" style="width:22.22%"></div></div>
+          <span class="bar-val">22.22%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Sensitivity</span>
+          <div class="bar-track"><div class="bar-fill sens" style="width:100%"></div></div>
+          <span class="bar-val">100.00%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AdaBoost -->
+    <div class="result-row">
+      <div class="result-name">AdaBoost</div>
+      <div class="result-bars">
+        <div class="bar-row">
+          <span class="bar-label">Accuracy</span>
+          <div class="bar-track"><div class="bar-fill acc" style="width:74.36%"></div></div>
+          <span class="bar-val">74.36%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Specificity</span>
+          <div class="bar-track"><div class="bar-fill spec" style="width:22.22%"></div></div>
+          <span class="bar-val">22.22%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Sensitivity</span>
+          <div class="bar-track"><div class="bar-fill sens" style="width:90%"></div></div>
+          <span class="bar-val">90.00%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Random Forest -->
+    <div class="result-row">
+      <div class="result-name">Random Forest</div>
+      <div class="result-bars">
+        <div class="bar-row">
+          <span class="bar-label">Accuracy</span>
+          <div class="bar-track"><div class="bar-fill acc" style="width:76.92%"></div></div>
+          <span class="bar-val">76.92%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Specificity</span>
+          <div class="bar-track"><div class="bar-fill spec" style="width:22.22%"></div></div>
+          <span class="bar-val">22.22%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Sensitivity</span>
+          <div class="bar-track"><div class="bar-fill sens" style="width:93.33%"></div></div>
+          <span class="bar-val">93.33%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- XGBoost -->
+    <div class="result-row" style="border-bottom:none;background:rgba(10,158,128,.06);border-radius:8px;padding:1.2rem;">
+      <div class="result-name" style="color:var(--accent);">XGBoost ⭐</div>
+      <div class="result-bars">
+        <div class="bar-row">
+          <span class="bar-label">Accuracy</span>
+          <div class="bar-track"><div class="bar-fill acc" style="width:99.37%"></div></div>
+          <span class="bar-val" style="color:var(--accent);">99.37%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Specificity</span>
+          <div class="bar-track"><div class="bar-fill spec" style="width:100%"></div></div>
+          <span class="bar-val" style="color:var(--accent2);">100.00%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Sensitivity</span>
+          <div class="bar-track"><div class="bar-fill sens" style="width:97.37%"></div></div>
+          <span class="bar-val" style="color:var(--accent4);">97.37%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Winner card -->
+  <div class="winner-card">
+    <div class="winner-badge">🏆</div>
+    <div class="winner-meta">
+      <h3>Extreme Gradient Boosting Wins</h3>
+      <p>XGBoost outperformed all other techniques across every evaluation metric. Critically, it achieved <strong>perfect specificity (100%)</strong> — meaning it correctly identified every true non-recurrence case — while maintaining near-perfect sensitivity and accuracy. Its computational efficiency also exceeded that of competing algorithms.</p>
+      <div class="winner-metrics">
+        <div class="w-metric">
+          <span class="wval">99.37%</span>
+          <span class="wlbl">Accuracy</span>
+        </div>
+        <div class="w-metric">
+          <span class="wval" style="color:var(--accent2);">100%</span>
+          <span class="wlbl">Specificity</span>
+        </div>
+        <div class="w-metric">
+          <span class="wval" style="color:var(--accent4);">97.37%</span>
+          <span class="wlbl">Sensitivity</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ANALYSIS ── -->
+<section id="slide-analysis" class="slide">
+  <div class="section-label">Analysis</div>
+  <h2 class="section-title">Reading the <em>Results</em></h2>
+
+  <div class="card-grid cols-2">
+    <div class="card">
+      <div class="card-icon" style="background:rgba(231,76,60,.1);">📊</div>
+      <h3>Specificity Gap</h3>
+      <p>SVM, AdaBoost, and Random Forest all share an identical specificity of 22.22% — suggesting they struggle to correctly classify the minority "recurrence" class. This is a direct consequence of class imbalance (151 vs 47). XGBoost's regularisation and sequential correction mechanism resolves this completely.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(0,200,160,.1);">🎯</div>
+      <h3>Why SVM Scores 100% Sensitivity</h3>
+      <p>SVM achieves perfect sensitivity — it never misses a recurrence case — but at the cost of specificity. It over-classifies patients as recurrence-positive (high false positive rate), making it overly conservative. For clinical use, this trades unnecessary treatment against missed recurrences.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(61,139,255,.1);">⚖️</div>
+      <h3>The Accuracy–Balance Trade-off</h3>
+      <p>Overall accuracy alone is misleading when class imbalance is present. XGBoost wins on all three metrics simultaneously — accuracy, specificity, and sensitivity — demonstrating it has truly learned the underlying pattern rather than exploiting class frequency shortcuts.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(247,193,94,.1);">⚡</div>
+      <h3>Computational Efficiency</h3>
+      <p>XGBoost also demonstrated superior computational speed compared to the other algorithms. This is significant for real-world clinical deployment where timely predictions from large patient databases are required at scale.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;">
+    <h3 style="margin-bottom:1rem;font-size:.95rem;">Literature Comparison</h3>
+    <table class="data-table" style="margin-top:0;">
+      <thead>
+        <tr>
+          <th>Study</th>
+          <th>Method</th>
+          <th>Best Accuracy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Delen et al. (SEER database, 202k records)</td>
+          <td>ANN, Decision Trees, Logistic Regression</td>
+          <td>~93%</td>
+        </tr>
+        <tr>
+          <td>Lundin et al. (951 patients)</td>
+          <td>ANN + Logistic Regression</td>
+          <td>5/10/15-yr survival</td>
+        </tr>
+        <tr>
+          <td>Ebrahimi & Razavi AR</td>
+          <td>SVM (declared best predictor)</td>
+          <td>SVM best in literature</td>
+        </tr>
+        <tr style="background:rgba(0,200,160,.05);">
+          <td><strong style="color:var(--accent);">This Study (Gandhi)</strong></td>
+          <td><strong style="color:var(--accent);">XGBoost</strong></td>
+          <td><strong style="color:var(--accent);">99.37%</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── CONCLUSION ── -->
+<section id="slide-conclusion" class="slide">
+  <div class="section-label">Conclusion & Future Work</div>
+  <h2 class="section-title">What We <em>Proved</em></h2>
+  <p style="color:var(--muted);max-width:680px;margin-bottom:2rem;font-size:.92rem;">
+    This study demonstrates that ML — and XGBoost specifically — can achieve near-perfect accuracy in predicting breast cancer recurrence, outperforming all existing benchmarks in the literature.
+  </p>
+
+  <div class="conclusion-grid">
+    <div class="conc-item">
+      <div class="icon">✅</div>
+      <h4>XGBoost Validated for Medical Prediction</h4>
+      <p>With 99.37% accuracy and perfect specificity, XGBoost is demonstrated as the superior algorithm for this recurrence prediction task — both in accuracy and computational speed.</p>
+    </div>
+    <div class="conc-item">
+      <div class="icon">🔬</div>
+      <h4>Real-World Data Successfully Processed</h4>
+      <p>The 5-step preprocessing pipeline effectively cleaned noisy clinical data, handling missing values, outliers, and correlated features to maximise model performance.</p>
+    </div>
+    <div class="conc-item">
+      <div class="icon">🏥</div>
+      <h4>Clinical Deployment Potential</h4>
+      <p>An automatic, reliable recurrence prediction system built on this framework could directly assist oncologists in follow-up planning and early intervention, reducing late-stage recurrence deaths.</p>
+    </div>
+    <div class="conc-item">
+      <div class="icon">🔭</div>
+      <h4>Future Work Directions</h4>
+      <p>Expand dataset size beyond 198 observations; explore deep learning approaches (CNN, LSTM on imaging data); integrate genomic/proteomic features; and validate on diverse patient populations.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:2.5rem;padding:2rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;">
+    <div class="section-label" style="margin-bottom:1rem;">Key Takeaway</div>
+    <p style="font-family:'DM Serif Display',serif;font-size:1.5rem;font-weight:400;line-height:1.5;color:var(--text);">
+      Machine learning — specifically <em style="color:var(--accent);">Extreme Gradient Boosting</em> — can serve as the automatic, reliable recurrence prediction system that clinical practice urgently needs, achieving <em style="color:var(--accent);">99.37% accuracy</em> on real-world tumour data.
+    </p>
+  </div>
+</section>
+
+<!-- ── REFERENCES ── -->
+<section id="slide-refs" class="slide" style="min-height:auto;padding-bottom:4rem;">
+  <div class="section-label">References</div>
+  <h2 class="section-title" style="font-size:1.8rem;">Bibliography</h2>
+  <div style="margin-top:2rem;display:flex;flex-direction:column;gap:.8rem;">
+    <div style="display:flex;gap:1rem;align-items:flex-start;padding:.8rem;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+      <span style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);background:rgba(0,200,160,.1);padding:.2rem .5rem;border-radius:4px;flex-shrink:0;">[1]</span>
+      <span style="font-size:.85rem;color:var(--muted);">Ahmad LG et al. "Using Three Machine Learning Techniques for Predicting Breast Cancer." <em style="color:var(--text);">Health and Medical Informatics.</em></span>
+    </div>
+    <div style="display:flex;gap:1rem;align-items:flex-start;padding:.8rem;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+      <span style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);background:rgba(0,200,160,.1);padding:.2rem .5rem;border-radius:4px;flex-shrink:0;">[2]</span>
+      <span style="font-size:.85rem;color:var(--muted);">Ikoro GO. "Using SAS Enterprise Miner to predict breast cancer at early stage." <em style="color:var(--text);">Queen Mary University of London; University of East Anglia.</em></span>
+    </div>
+    <div style="display:flex;gap:1rem;align-items:flex-start;padding:.8rem;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+      <span style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);background:rgba(0,200,160,.1);padding:.2rem .5rem;border-radius:4px;flex-shrink:0;">[3]</span>
+      <span style="font-size:.85rem;color:var(--muted);">Mandeep Rana et al. "Breast Cancer Diagnosis and Recurrence Prediction Using Machine Learning Techniques." <em style="color:var(--text);">IJRET: International Journal of Research in Engineering and Technology.</em></span>
+    </div>
+    <div style="display:flex;gap:1rem;align-items:flex-start;padding:.8rem;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+      <span style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);background:rgba(0,200,160,.1);padding:.2rem .5rem;border-radius:4px;flex-shrink:0;">[4]</span>
+      <span style="font-size:.85rem;color:var(--muted);">American Cancer Society. <em style="color:var(--text);">http://www.cancer.org/</em></span>
+    </div>
+    <div style="display:flex;gap:1rem;align-items:flex-start;padding:.8rem;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+      <span style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);background:rgba(0,200,160,.1);padding:.2rem .5rem;border-radius:4px;flex-shrink:0;">[5]</span>
+      <span style="font-size:.85rem;color:var(--muted);">Dumitru D. "Prediction of recurrent events in breast cancer using the Naive Bayesian classification." 2000.</span>
+    </div>
+    <div style="display:flex;gap:1rem;align-items:flex-start;padding:.8rem;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+      <span style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);background:rgba(0,200,160,.1);padding:.2rem .5rem;border-radius:4px;flex-shrink:0;">[6]</span>
+      <span style="font-size:.85rem;color:var(--muted);">Mangasarian OL & Wolberg WH. "Cancer diagnosis via linear programming." <em style="color:var(--text);">SIAM News,</em> pp. 1–18, 1990.</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Vinay Gandhi · Evaluating ML Algorithms for Prediction of Cancer Recurrence · University of Wisconsin Dataset
+</footer>
+
+<script>
+  // Intersection observer for slide animations
+  const slides = document.querySelectorAll('.slide');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.08 });
+  slides.forEach(s => observer.observe(s));
+
+  // Animate bars when results slide comes into view
+  const resultsSlide = document.getElementById('slide-results');
+  const barObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      // bars already set via inline style; trigger CSS transition by re-applying
+      document.querySelectorAll('.bar-fill').forEach(b => {
+        const w = b.style.width;
+        b.style.width = '0%';
+        requestAnimationFrame(() => {
+          setTimeout(() => { b.style.width = w; }, 100);
+        });
+      });
+      barObserver.disconnect();
+    }
+  }, { threshold: 0.2 });
+  barObserver.observe(resultsSlide);
+</script>
+
+</body>
+</html>

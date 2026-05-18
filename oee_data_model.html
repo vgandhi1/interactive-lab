@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OEE Data Model — Ag-Equipment Manufacturing (2021 Stack)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Barlow:wght@300;400;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #5cd65c;
+    --green-dark: #3a9e3a;
+    --green-dim: #2d6e2d;
+    --green-bg: #0d1f0d;
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --surface3: #252525;
+    --border: #2a2a2a;
+    --border-green: #2d5c2d;
+    --text: #e8e8e8;
+    --text-muted: #888;
+    --text-dim: #555;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Barlow', sans-serif;
+    --cond: 'Barlow Condensed', sans-serif;
+    --red: #e05252;
+    --amber: #e0a030;
+    --blue: #4a9fd4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(14,14,14,.96); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-green);
+    display: flex; align-items: center; gap: 0; padding: 0 2rem;
+    height: 52px; overflow-x: auto;
+  }
+  .nav-brand { font-family: var(--cond); font-size: 16px; font-weight: 700; color: var(--green); letter-spacing: .05em; white-space: nowrap; margin-right: 2rem; }
+  nav a { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; padding: 0 1rem; height: 52px; display: flex; align-items: center; border-bottom: 2px solid transparent; white-space: nowrap; transition: color .2s, border-color .2s; }
+  nav a:hover { color: var(--green); border-bottom-color: var(--green-dim); }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(160deg, #0d1f0d 0%, #0e0e0e 60%);
+    border-bottom: 1px solid var(--border-green);
+    padding: 5rem 2rem 4rem;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(93,214,93,.04) 39px, rgba(93,214,93,.04) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(93,214,93,.04) 39px, rgba(93,214,93,.04) 40px);
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 1100px; margin: 0 auto; position: relative; }
+  .hero-tag { font-family: var(--mono); font-size: 11px; color: var(--green); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 1rem; }
+  .hero h1 { font-family: var(--cond); font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 700; line-height: 1.05; letter-spacing: .02em; }
+  .hero h1 span { color: var(--green); }
+  .hero-sub { font-size: 1rem; color: var(--text-muted); margin-top: 1rem; max-width: 600px; }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2rem; }
+  .pill { font-family: var(--mono); font-size: 11px; padding: 4px 12px; border-radius: 3px; border: 1px solid var(--border-green); color: var(--green); background: rgba(93,214,93,.05); letter-spacing: .05em; }
+  .pill.amber { border-color: #5a3d10; color: var(--amber); background: rgba(224,160,48,.05); }
+  .pill.blue { border-color: #1a3a52; color: var(--blue); background: rgba(74,159,212,.05); }
+  .pill.red { border-color: #4a1a1a; color: var(--red); background: rgba(224,82,82,.05); }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 1100px; margin: 0 auto; padding: 0 2rem 5rem; }
+  section { padding: 4rem 0 0; }
+  .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-green); padding-bottom: 1rem; }
+  .section-num { font-family: var(--mono); font-size: 11px; color: var(--green); letter-spacing: .1em; }
+  .section-title { font-family: var(--cond); font-size: 1.7rem; font-weight: 700; letter-spacing: .03em; }
+
+  /* ── CARDS ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; }
+  .card-green { border-left: 3px solid var(--green); }
+  .card-amber { border-left: 3px solid var(--amber); }
+  .card-blue { border-left: 3px solid var(--blue); }
+  .card-red { border-left: 3px solid var(--red); }
+  .card h3 { font-family: var(--cond); font-size: 1rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green); margin-bottom: .75rem; }
+  .card h3.amber { color: var(--amber); }
+  .card h3.blue { color: var(--blue); }
+  .card h3.red { color: var(--red); }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+
+  /* ── OEE FORMULA ── */
+  .formula-box {
+    background: var(--green-bg); border: 1px solid var(--border-green);
+    border-radius: 4px; padding: 2.5rem;
+    text-align: center; margin: 2rem 0;
+  }
+  .formula { font-family: var(--cond); font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight: 700; color: var(--green); letter-spacing: .05em; }
+  .formula span { color: var(--text-muted); margin: 0 .5rem; }
+
+  .pillar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+  .pillar { background: var(--surface); border: 1px solid var(--border-green); border-radius: 4px; padding: 1.5rem; }
+  .pillar-name { font-family: var(--cond); font-size: 1.2rem; font-weight: 700; color: var(--green); letter-spacing: .05em; }
+  .pillar-formula { font-family: var(--mono); font-size: 12px; color: var(--green-dark); margin: 6px 0 10px; padding: 4px 8px; background: rgba(93,214,93,.05); border-radius: 3px; display: inline-block; }
+  .pillar p { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
+
+  /* ── DATA SOURCE TABLE ── */
+  .ds-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .ds-table th { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--green); padding: 10px 14px; border-bottom: 1px solid var(--border-green); text-align: left; background: var(--green-bg); }
+  .ds-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text-muted); vertical-align: top; }
+  .ds-table tr:last-child td { border-bottom: none; }
+  .ds-table tr:hover td { background: var(--surface2); }
+  .ds-table .source-tag { font-family: var(--mono); font-size: 11px; padding: 3px 8px; border-radius: 3px; white-space: nowrap; display: inline-block; }
+  .tag-scada { background: rgba(224,160,48,.1); color: var(--amber); border: 1px solid rgba(224,160,48,.2); }
+  .tag-sap { background: rgba(74,159,212,.1); color: var(--blue); border: 1px solid rgba(74,159,212,.2); }
+  .tag-plc { background: rgba(93,214,93,.08); color: var(--green); border: 1px solid var(--border-green); }
+  .oee-badge { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 2px; background: var(--surface3); color: var(--text-muted); border: 1px solid var(--border); }
+
+  /* ── STAR SCHEMA ── */
+  .schema-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; overflow-x: auto; }
+  .schema-tables { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; align-items: flex-start; }
+  .db-table { background: var(--surface2); border: 1px solid var(--border-green); border-radius: 4px; min-width: 190px; }
+  .db-table .tbl-head { font-family: var(--mono); font-size: 11px; padding: 8px 12px; background: var(--green-bg); border-bottom: 1px solid var(--border-green); color: var(--green); letter-spacing: .06em; }
+  .db-table .tbl-head.fact { background: #1a2d1a; color: #7de87d; font-weight: 700; }
+  .db-table .tbl-head.dim { background: #1a1a2d; color: #7db8de; }
+  .db-table ul { list-style: none; padding: 8px 0; }
+  .db-table ul li { font-family: var(--mono); font-size: 11px; padding: 4px 12px; color: var(--text-muted); display: flex; justify-content: space-between; gap: 8px; }
+  .db-table ul li .col-type { color: var(--text-dim); font-size: 10px; }
+  .db-table ul li.pk { color: var(--amber); }
+  .db-table ul li.fk { color: var(--blue); }
+  .db-table ul li.measure { color: #7de87d; }
+  .schema-center { background: var(--green-bg); border: 2px solid var(--green-dim); }
+
+  /* ── PIPELINE ── */
+  .pipeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0; position: relative; margin: 1.5rem 0; }
+  .p-step { background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; position: relative; }
+  .p-step::after { content: '→'; position: absolute; right: -13px; top: 50%; transform: translateY(-50%); color: var(--green); font-size: 1.2rem; z-index: 2; }
+  .p-step:last-child::after { display: none; }
+  .p-num { font-family: var(--mono); font-size: 22px; font-weight: 600; color: var(--green-dim); line-height: 1; margin-bottom: 8px; }
+  .p-title { font-family: var(--cond); font-size: 1rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green); margin-bottom: 8px; }
+  .p-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+  .p-tech { font-family: var(--mono); font-size: 10px; color: var(--amber); margin-top: 8px; }
+
+  /* ── CODE BLOCKS ── */
+  .code-block { background: #0a0a0a; border: 1px solid var(--border); border-radius: 4px; overflow-x: auto; margin: 1rem 0; }
+  .code-header { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-dim); padding: 8px 14px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; justify-content: space-between; }
+  .code-header .lang { color: var(--green); }
+  pre { font-family: var(--mono); font-size: 12px; line-height: 1.7; padding: 1.2rem 1.4rem; overflow-x: auto; tab-size: 2; }
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .str { color: #c3e88d; }
+  .cmt { color: #546e7a; font-style: italic; }
+  .num { color: var(--amber); }
+  .tbl { color: #7de87d; }
+  .col { color: #89ddff; }
+  .op { color: var(--text-muted); }
+
+  /* ── PERF BARS ── */
+  .perf-row { display: flex; align-items: center; gap: 1rem; margin: 1rem 0; }
+  .perf-label { font-family: var(--cond); font-size: 13px; font-weight: 700; letter-spacing: .05em; min-width: 120px; color: var(--text-muted); }
+  .perf-bar-wrap { flex: 1; background: var(--surface3); border-radius: 3px; height: 32px; position: relative; overflow: hidden; }
+  .perf-bar-pre { position: absolute; left: 0; top: 0; height: 100%; background: var(--green-dim); border-radius: 3px 0 0 3px; display: flex; align-items: center; padding-left: 10px; }
+  .perf-bar-post { position: absolute; left: 0; top: 0; height: 100%; background: var(--green); border-radius: 3px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; transition: width 1s ease; }
+  .perf-label-inner { font-family: var(--mono); font-size: 11px; font-weight: 600; color: #0a1a0a; }
+  .perf-label-pre { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,.5); }
+  .delta-badge { font-family: var(--mono); font-size: 12px; color: var(--green); min-width: 56px; text-align: right; }
+
+  /* ── IMPACT CARDS ── */
+  .impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+  .impact-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; }
+  .impact-icon { font-size: 1.5rem; margin-bottom: .5rem; }
+  .impact-title { font-family: var(--cond); font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--green); margin-bottom: .5rem; }
+  .impact-body { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  /* ── SLA BOX ── */
+  .sla-box { display: flex; align-items: center; gap: 2rem; background: var(--green-bg); border: 1px solid var(--border-green); border-radius: 4px; padding: 1.5rem 2rem; flex-wrap: wrap; }
+  .sla-num { font-family: var(--cond); font-size: 4rem; font-weight: 700; color: var(--green); line-height: 1; }
+  .sla-unit { font-family: var(--cond); font-size: 1rem; color: var(--green-dark); letter-spacing: .1em; text-transform: uppercase; }
+  .sla-desc { font-size: 14px; color: var(--text-muted); max-width: 500px; }
+
+  /* ── ETL SECTION ── */
+  .etl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 700px) { .etl-grid { grid-template-columns: 1fr; } }
+  .etl-option { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; }
+  .etl-title { font-family: var(--cond); font-size: 1rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; margin-bottom: .5rem; }
+  .etl-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: .75rem; }
+  .etl-tag { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 2px; border: 1px solid var(--border); color: var(--text-dim); }
+
+  /* ── FOOTER ── */
+  footer { border-top: 1px solid var(--border-green); padding: 2rem; text-align: center; font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: .08em; }
+  footer span { color: var(--green-dark); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .pipeline { grid-template-columns: 1fr; }
+    .p-step::after { content: '↓'; right: auto; left: 50%; bottom: -14px; top: auto; transform: translateX(-50%); }
+    .schema-tables { flex-direction: column; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">OEE // 2021</div>
+  <a href="#overview">Overview</a>
+  <a href="#pillars">OEE Framework</a>
+  <a href="#datasources">Data Sources</a>
+  <a href="#schema">Star Schema</a>
+  <a href="#pipeline">Pipeline</a>
+  <a href="#etl">ETL Options</a>
+  <a href="#sql">T-SQL</a>
+  <a href="#powerbi">Power BI</a>
+  <a href="#results">Results</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">// Manufacturing Intelligence Platform</div>
+    <h1>OEE Data <span>Model</span></h1>
+    <p class="hero-sub">Reporting pipeline for Ag-Equipment manufacturing — 15-minute SLA, end-of-shift OEE reporting on 100% on-premise infrastructure.</p>
+    <div class="hero-pills">
+      <span class="pill">Ignition SCADA</span>
+      <span class="pill">SAP ERP</span>
+      <span class="pill">MS SQL Server</span>
+      <span class="pill amber">Python Scheduler</span>
+      <span class="pill amber">T-SQL Stored Procs</span>
+      <span class="pill blue">Power BI Gateway</span>
+      <span class="pill red">2021 Stack</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <div class="section-header">
+      <span class="section-num">01 //</span>
+      <span class="section-title">Engineering Objective</span>
+    </div>
+    <div class="formula-box">
+      <p style="font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1rem;">Primary Engineering Question</p>
+      <p style="font-size:1.1rem;color:var(--text-muted);line-height:1.7;max-width:700px;margin:0 auto;">How do we design a data model to calculate OEE with a <strong style="color:var(--green);">15-minute SLA</strong> for end-of-shift reporting, using our existing <strong style="color:var(--green);">on-premise infrastructure?</strong></p>
+    </div>
+
+    <div class="sla-box">
+      <div>
+        <div class="sla-num">10</div>
+        <div class="sla-unit">Min Update Cycle</div>
+      </div>
+      <div class="sla-desc">
+        OS Task Scheduler runs Python extraction scripts every <strong style="color:var(--text);">10 minutes</strong>, feeding a T-SQL aggregation that completes well within the 15-minute SLA. Pre-aggregated summary tables ensure Power BI loads in <strong style="color:var(--text);">near-instant</strong> time without hammering raw PLC cycle rows.
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-top:1.5rem;">
+      <div class="card card-amber">
+        <h3 class="amber">Ignition SCADA</h3>
+        <p style="font-size:13px;color:var(--text-muted);">Direct machine fault logging. Captures downtime events with timestamps and reason codes. Handles micro-stops under 5 minutes — events operators historically missed on paper clipboards.</p>
+      </div>
+      <div class="card card-blue">
+        <h3 class="blue">SAP ERP</h3>
+        <p style="font-size:13px;color:var(--text-muted);">Source of truth for shift schedules (planned minutes), quality outcomes (good units, scrap counts), and production orders. Queried via RFC/API every 10 minutes.</p>
+      </div>
+      <div class="card card-green">
+        <h3>MS SQL Server</h3>
+        <p style="font-size:13px;color:var(--text-muted);">Central on-premise data warehouse. Hosts the star schema, staging tables, and stored procedures. SQL Server Agent drives the Transform step on a tight schedule.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- OEE PILLARS -->
+  <section id="pillars">
+    <div class="section-header">
+      <span class="section-num">02 //</span>
+      <span class="section-title">The OEE Framework</span>
+    </div>
+    <div class="formula-box">
+      <div class="formula">OEE <span>=</span> Availability <span>×</span> Performance <span>×</span> Quality</div>
+    </div>
+    <div class="pillar-grid">
+      <div class="pillar">
+        <div class="pillar-name">Availability</div>
+        <div class="pillar-formula">run_mins ÷ planned_mins</div>
+        <p>Measures planned production time against actual operating time. Tracks major downtime events, setups, and scheduled changeovers. Ignition SCADA provides the downtime log; SAP provides the planned shift window.</p>
+        <div style="margin-top:1rem;padding:10px 12px;background:var(--surface3);border-radius:3px;">
+          <p style="font-family:var(--mono);font-size:11px;color:var(--amber);">Sources: Ignition SCADA Logs + SAP Shift Schedules</p>
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-name">Performance</div>
+        <div class="pillar-formula">actual_rate ÷ ideal_rate</div>
+        <p>Evaluates machine speed vs. standard cycle rate. Accounts for speed losses, idling, and micro-stops — events under 5 minutes that operators routinely failed to manually log, now captured automatically by SCADA/PLC.</p>
+        <div style="margin-top:1rem;padding:10px 12px;background:var(--surface3);border-radius:3px;">
+          <p style="font-family:var(--mono);font-size:11px;color:var(--amber);">Sources: PLC Sensor (direct to MS SQL) + Ignition SCADA</p>
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-name">Quality</div>
+        <div class="pillar-formula">units_good ÷ units_total</div>
+        <p>Measures first-pass yield logic. Captures manufactured items that do not meet quality standards, relying heavily on defect and scrap counts extracted from SAP Quality Module each cycle.</p>
+        <div style="margin-top:1rem;padding:10px 12px;background:var(--surface3);border-radius:3px;">
+          <p style="font-family:var(--mono);font-size:11px;color:var(--blue);">Source: SAP Quality Module (QM)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA SOURCES -->
+  <section id="datasources">
+    <div class="section-header">
+      <span class="section-num">03 //</span>
+      <span class="section-title">Floor Data Source Mapping</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Data Point Required</th>
+            <th>Origin System</th>
+            <th>Protocol / Method</th>
+            <th>Frequency</th>
+            <th>OEE Variable</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Scheduled production time &amp; planned minutes per shift</td>
+            <td><span class="source-tag tag-sap">SAP ERP — HR/PP</span></td>
+            <td>RFC BAPI / REST API</td>
+            <td>On shift creation + 10 min refresh</td>
+            <td><span class="oee-badge">Availability</span></td>
+          </tr>
+          <tr>
+            <td>Downtime events — timestamps, duration, reason code, line ID</td>
+            <td><span class="source-tag tag-scada">Ignition SCADA Logs</span></td>
+            <td>Ignition SDK → Python JDBC pull</td>
+            <td>Every 10 min (Python Scheduler)</td>
+            <td><span class="oee-badge">Availability</span></td>
+          </tr>
+          <tr>
+            <td>Total units produced — cycle counter per machine</td>
+            <td><span class="source-tag tag-plc">PLC Sensor → MS SQL</span></td>
+            <td>OPC-UA tag historian → direct DB write</td>
+            <td>Real-time / sub-minute</td>
+            <td><span class="oee-badge">Performance</span></td>
+          </tr>
+          <tr>
+            <td>Micro-stops — process faults under 5 minutes</td>
+            <td><span class="source-tag tag-scada">Ignition SCADA / PLC</span></td>
+            <td>Ignition alarm log extract via Python</td>
+            <td>Every 10 min</td>
+            <td><span class="oee-badge">Performance</span></td>
+          </tr>
+          <tr>
+            <td>Good units passed &amp; specific scrap counts by defect code</td>
+            <td><span class="source-tag tag-sap">SAP QM Module</span></td>
+            <td>RFC BAPI_INSPOPER_GETLIST / REST</td>
+            <td>Every 10 min (end-of-lot trigger)</td>
+            <td><span class="oee-badge">Quality</span></td>
+          </tr>
+          <tr>
+            <td>Ideal cycle rate (spec_rate) per SKU / machine</td>
+            <td><span class="source-tag tag-sap">SAP PP — Work Centers</span></td>
+            <td>Loaded once to dim_product / dim_machine</td>
+            <td>Static — updated on engineering change</td>
+            <td><span class="oee-badge">Performance</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- STAR SCHEMA -->
+  <section id="schema">
+    <div class="section-header">
+      <span class="section-num">04 //</span>
+      <span class="section-title">SQL Server Star Schema</span>
+    </div>
+    <div class="schema-wrap">
+      <div class="schema-tables">
+
+        <div class="db-table">
+          <div class="tbl-head dim">dbo.dim_shift</div>
+          <ul>
+            <li class="pk">shift_id <span class="col-type">INT PK</span></li>
+            <li>shift_date <span class="col-type">DATE</span></li>
+            <li>shift_name <span class="col-type">VARCHAR(20)</span></li>
+            <li>shift_start <span class="col-type">DATETIME</span></li>
+            <li>shift_end <span class="col-type">DATETIME</span></li>
+            <li>planned_mins <span class="col-type">INT</span></li>
+            <li>sap_shift_code <span class="col-type">VARCHAR(10)</span></li>
+          </ul>
+        </div>
+
+        <div class="db-table">
+          <div class="tbl-head dim">dbo.dim_machine</div>
+          <ul>
+            <li class="pk">machine_id <span class="col-type">INT PK</span></li>
+            <li>machine_code <span class="col-type">VARCHAR(20)</span></li>
+            <li>line_id <span class="col-type">VARCHAR(20)</span></li>
+            <li>department <span class="col-type">VARCHAR(50)</span></li>
+            <li>ideal_cycle_rate <span class="col-type">DECIMAL(8,4)</span></li>
+            <li>sap_work_center <span class="col-type">VARCHAR(20)</span></li>
+          </ul>
+        </div>
+
+        <div class="db-table schema-center">
+          <div class="tbl-head fact">dbo.fact_production_event</div>
+          <ul>
+            <li class="pk">event_id <span class="col-type">BIGINT PK</span></li>
+            <li class="fk">machine_id <span class="col-type">INT FK</span></li>
+            <li class="fk">shift_id <span class="col-type">INT FK</span></li>
+            <li class="fk">product_id <span class="col-type">INT FK</span></li>
+            <li class="fk">downtime_reason_id <span class="col-type">INT FK</span></li>
+            <li>event_ts <span class="col-type">DATETIME</span></li>
+            <li class="measure">run_mins <span class="col-type">DECIMAL(8,2)</span></li>
+            <li class="measure">down_mins <span class="col-type">DECIMAL(8,2)</span></li>
+            <li class="measure">units_total <span class="col-type">INT</span></li>
+            <li class="measure">units_good <span class="col-type">INT</span></li>
+            <li class="measure">actual_rate <span class="col-type">DECIMAL(8,4)</span></li>
+            <li>source_system <span class="col-type">VARCHAR(20)</span></li>
+            <li>load_ts <span class="col-type">DATETIME</span></li>
+          </ul>
+        </div>
+
+        <div class="db-table">
+          <div class="tbl-head dim">dbo.dim_product</div>
+          <ul>
+            <li class="pk">product_id <span class="col-type">INT PK</span></li>
+            <li>sku <span class="col-type">VARCHAR(30)</span></li>
+            <li>description <span class="col-type">VARCHAR(100)</span></li>
+            <li>spec_rate <span class="col-type">DECIMAL(8,4)</span></li>
+            <li>product_family <span class="col-type">VARCHAR(50)</span></li>
+            <li>sap_material <span class="col-type">VARCHAR(20)</span></li>
+          </ul>
+        </div>
+
+        <div class="db-table">
+          <div class="tbl-head dim">dbo.dim_reason</div>
+          <ul>
+            <li class="pk">reason_id <span class="col-type">INT PK</span></li>
+            <li>reason_code <span class="col-type">VARCHAR(20)</span></li>
+            <li>reason_desc <span class="col-type">VARCHAR(100)</span></li>
+            <li>is_planned <span class="col-type">BIT</span></li>
+            <li>downtime_category <span class="col-type">VARCHAR(30)</span></li>
+            <li>oee_impact <span class="col-type">VARCHAR(15)</span></li>
+          </ul>
+        </div>
+
+      </div>
+      <div style="margin-top:1rem;padding:10px 14px;background:var(--surface2);border-radius:3px;font-size:12px;color:var(--text-dim);">
+        <span style="color:var(--green);">●</span> Fact grain: one row per machine cycle event &nbsp;|&nbsp;
+        <span style="color:var(--amber);">PK</span> = surrogate key &nbsp;|&nbsp;
+        <span style="color:var(--blue);">FK</span> = foreign key &nbsp;|&nbsp;
+        <span style="color:#7de87d;">measure</span> = OEE-calculable fields
+      </div>
+    </div>
+
+    <!-- Pre-aggregation summary table -->
+    <div style="margin-top:1.5rem;">
+      <div class="card card-green">
+        <h3>Pre-Aggregation: dbo.oee_shift_summary</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:1rem;">Power BI connects exclusively to this lightweight summary table — <strong style="color:var(--text);">1 row per shift, per machine</strong>. Stored Procedure <code style="font-family:var(--mono);font-size:11px;background:var(--surface3);padding:2px 6px;border-radius:2px;color:var(--green);">usp_RefreshOEESummary</code> runs every 10 minutes via SQL Server Agent.</p>
+        <div class="grid-4" style="gap:.75rem;">
+          <div style="background:var(--surface3);padding:10px;border-radius:3px;font-family:var(--mono);font-size:11px;">
+            <div style="color:var(--green-dark);margin-bottom:4px;">AVAILABILITY</div>
+            <div style="color:var(--text-muted);">SUM(run_mins)<br>÷ planned_mins</div>
+          </div>
+          <div style="background:var(--surface3);padding:10px;border-radius:3px;font-family:var(--mono);font-size:11px;">
+            <div style="color:var(--green-dark);margin-bottom:4px;">PERFORMANCE</div>
+            <div style="color:var(--text-muted);">SUM(actual_rate)<br>÷ ideal_cycle_rate</div>
+          </div>
+          <div style="background:var(--surface3);padding:10px;border-radius:3px;font-family:var(--mono);font-size:11px;">
+            <div style="color:var(--green-dark);margin-bottom:4px;">QUALITY</div>
+            <div style="color:var(--text-muted);">SUM(units_good)<br>÷ SUM(units_total)</div>
+          </div>
+          <div style="background:var(--surface3);padding:10px;border-radius:3px;font-family:var(--mono);font-size:11px;">
+            <div style="color:var(--green-dark);margin-bottom:4px;">OEE</div>
+            <div style="color:#7de87d;">A × P × Q<br>(computed column)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA PIPELINE -->
+  <section id="pipeline">
+    <div class="section-header">
+      <span class="section-num">05 //</span>
+      <span class="section-title">Data Pipeline Workflow</span>
+    </div>
+    <div class="pipeline">
+      <div class="p-step">
+        <div class="p-num">01</div>
+        <div class="p-title">Extract</div>
+        <p class="p-desc">OS Windows Task Scheduler fires Python scripts every 10 minutes. Scripts call SAP RFC/BAPI endpoints and the Ignition SCADA SDK to pull downtime logs, quality data, and shift schedules.</p>
+        <div class="p-tech">python 3.9 · pyodbc · requests · pyrfc</div>
+      </div>
+      <div class="p-step">
+        <div class="p-num">02</div>
+        <div class="p-title">Stage</div>
+        <p class="p-desc">Python securely loads raw JSON/CSV payloads directly into staging tables in MS SQL Server — <code style="font-family:var(--mono);font-size:10px;background:var(--surface3);padding:1px 5px;border-radius:2px;color:var(--green);">stg_scada_downtime</code>, <code style="font-family:var(--mono);font-size:10px;background:var(--surface3);padding:1px 5px;border-radius:2px;color:var(--green);">stg_sap_quality</code>. No transformation here.</p>
+        <div class="p-tech">ms sql server 2019 · bulk insert · pyodbc</div>
+      </div>
+      <div class="p-step">
+        <div class="p-num">03</div>
+        <div class="p-title">Transform</div>
+        <p class="p-desc">SQL Server Agent triggers T-SQL Stored Procedures. Cleans timestamps, resolves dim keys, merges into <code style="font-family:var(--mono);font-size:10px;background:var(--surface3);padding:1px 5px;border-radius:2px;color:var(--green);">fact_production_event</code>, then calls pre-aggregation SP to refresh summary table.</p>
+        <div class="p-tech">t-sql stored procs · sql server agent jobs</div>
+      </div>
+      <div class="p-step">
+        <div class="p-num">04</div>
+        <div class="p-title">Report</div>
+        <p class="p-desc">Power BI Desktop connects via On-Premises Data Gateway to <code style="font-family:var(--mono);font-size:10px;background:var(--surface3);padding:1px 5px;border-radius:2px;color:var(--green);">oee_shift_summary</code>. DirectQuery or scheduled import — near-instant load from pre-aggregated data.</p>
+        <div class="p-tech">power bi · on-premises gateway · directquery</div>
+      </div>
+    </div>
+
+    <!-- Ignition SCADA detail -->
+    <div class="grid-2" style="margin-top:1.5rem;">
+      <div class="card card-amber">
+        <h3 class="amber">Ignition SCADA — Downtime Feed</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:.75rem;">Ignition logs machine faults directly to its internal SQLite/MySQL historian. The Python extractor connects via Ignition's <strong style="color:var(--text);">Gateway REST API</strong> or JDBC bridge and pulls the downtime event log on a 10-minute cycle.</p>
+        <ul style="font-size:12.5px;color:var(--text-dim);padding-left:1rem;line-height:1.9;">
+          <li>Event timestamp (start/end) → <code style="font-family:var(--mono);font-size:11px;color:var(--amber);">down_mins</code> computed</li>
+          <li>Reason code mapped to <code style="font-family:var(--mono);font-size:11px;color:var(--amber);">dim_reason.reason_id</code></li>
+          <li>Machine tag maps to <code style="font-family:var(--mono);font-size:11px;color:var(--amber);">dim_machine.machine_id</code></li>
+          <li>Micro-stops (&lt;5 min) surfaced automatically — no operator input</li>
+          <li>Planned vs. unplanned flag set by <code style="font-family:var(--mono);font-size:11px;color:var(--amber);">dim_reason.is_planned</code></li>
+        </ul>
+      </div>
+      <div class="card card-blue">
+        <h3 class="blue">SAP ERP — Quality &amp; Schedule Feed</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:.75rem;">Python calls SAP via <strong style="color:var(--text);">pyrfc</strong> (RFC-based) or the SAP OData REST API. Two datasets are pulled per cycle:</p>
+        <ul style="font-size:12.5px;color:var(--text-dim);padding-left:1rem;line-height:1.9;">
+          <li><strong style="color:var(--text);">QM Module</strong>: inspection lot results, scrap counts, good units by production order</li>
+          <li><strong style="color:var(--text);">PP / HR</strong>: active shift schedules, planned production minutes</li>
+          <li>Material number → <code style="font-family:var(--mono);font-size:11px;color:var(--blue);">dim_product.sap_material</code> lookup</li>
+          <li>Work center ID → <code style="font-family:var(--mono);font-size:11px;color:var(--blue);">dim_machine.sap_work_center</code> lookup</li>
+          <li>Ideal cycle rates loaded once; refreshed on engineering change order</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETL OPTIONS -->
+  <section id="etl">
+    <div class="section-header">
+      <span class="section-num">06 //</span>
+      <span class="section-title">ETL Incorporation Options</span>
+    </div>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:1.5rem;max-width:780px;">The 2021 on-prem stack uses a lightweight Python + SQL Server Agent approach. If ETL requirements grow — more sources, data quality gates, lineage, replay capability — the following options can be introduced without replacing the star schema.</p>
+
+    <div class="etl-grid">
+      <div class="etl-option" style="border-left:3px solid var(--green);">
+        <div class="etl-title" style="color:var(--green);">Option A — Current: Python + SQL Server Agent</div>
+        <div class="etl-tags">
+          <span class="etl-tag" style="color:var(--green);border-color:var(--border-green);">Recommended for 2021</span>
+          <span class="etl-tag">Zero new licenses</span>
+          <span class="etl-tag">On-premise only</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);">Scheduled Python scripts pull from SCADA/SAP, write to staging tables, SQL Server Agent fires stored procs. Fits inside the firewall. Lowest complexity, lowest ops overhead. Right-sized for this use case.</p>
+        <p style="font-family:var(--mono);font-size:11px;color:var(--green-dark);margin-top:.75rem;">Best for: ≤5 data sources, stable schema, ops team comfortable with SQL</p>
+      </div>
+      <div class="etl-option" style="border-left:3px solid var(--amber);">
+        <div class="etl-title" style="color:var(--amber);">Option B — SSIS (SQL Server Integration Services)</div>
+        <div class="etl-tags">
+          <span class="etl-tag" style="color:var(--amber);border-color:#5a3d10;">Native MS Stack</span>
+          <span class="etl-tag">Visual pipeline designer</span>
+          <span class="etl-tag">Already licensed</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);">Replace Python scripts with SSIS packages managed in SQL Server Data Tools (SSDT). Adds GUI-based error handling, data flow logging, and SSIS catalog for deployment. Can call SAP OData connectors via ADO.NET.</p>
+        <p style="font-family:var(--mono);font-size:11px;color:var(--amber);margin-top:.75rem;">Best for: team already using SSMS, need visual debugging, more transform logic</p>
+      </div>
+      <div class="etl-option" style="border-left:3px solid var(--blue);">
+        <div class="etl-title" style="color:var(--blue);">Option C — Apache Airflow (Self-Hosted)</div>
+        <div class="etl-tags">
+          <span class="etl-tag" style="color:var(--blue);border-color:#1a3a52;">Open source</span>
+          <span class="etl-tag">DAG-based orchestration</span>
+          <span class="etl-tag">Python-native</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);">Self-hosted Airflow replaces Task Scheduler. Provides DAG lineage, retry logic, SLA alerting, and a web UI for monitoring runs. Python operators reuse existing extraction code. Runs on a dedicated on-prem VM.</p>
+        <p style="font-family:var(--mono);font-size:11px;color:var(--blue);margin-top:.75rem;">Best for: scaling to 10+ sources, need SLA alerting, ops team is Python-first</p>
+      </div>
+      <div class="etl-option" style="border-left:3px solid var(--red);">
+        <div class="etl-title" style="color:var(--red);">Option D — dbt Core + Python (Future State)</div>
+        <div class="etl-tags">
+          <span class="etl-tag" style="color:var(--red);border-color:#4a1a1a;">Post-2021 upgrade path</span>
+          <span class="etl-tag">SQL-first transforms</span>
+          <span class="etl-tag">Data lineage DAG</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);">Replace stored procedures with dbt models targeting MS SQL Server. Staged → fact layer transformations become version-controlled SQL with auto-documentation and column-level lineage. Python + Airflow still handles extraction.</p>
+        <p style="font-family:var(--mono);font-size:11px;color:var(--red);margin-top:.75rem;">Best for: data engineering team, CI/CD culture, schema drift management needed</p>
+      </div>
+    </div>
+
+    <!-- ETL decision table -->
+    <div style="margin-top:1.5rem;overflow-x:auto;">
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Criteria</th>
+            <th>Python + Agent</th>
+            <th>SSIS</th>
+            <th>Airflow</th>
+            <th>dbt Core</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Setup complexity</td>
+            <td style="color:var(--green);">Low</td>
+            <td style="color:var(--amber);">Medium</td>
+            <td style="color:var(--amber);">Medium</td>
+            <td style="color:var(--red);">High</td>
+          </tr>
+          <tr>
+            <td>Monitoring / alerting</td>
+            <td style="color:var(--red);">Manual</td>
+            <td style="color:var(--amber);">SSISDB catalog</td>
+            <td style="color:var(--green);">Airflow UI + SLA</td>
+            <td style="color:var(--green);">dbt docs + lineage</td>
+          </tr>
+          <tr>
+            <td>Version control</td>
+            <td style="color:var(--amber);">Git for .py</td>
+            <td style="color:var(--red);">XML packages (messy)</td>
+            <td style="color:var(--green);">Git for DAGs</td>
+            <td style="color:var(--green);">Full SQL in Git</td>
+          </tr>
+          <tr>
+            <td>SAP connectivity</td>
+            <td style="color:var(--green);">pyrfc / OData</td>
+            <td style="color:var(--green);">ADO.NET / OData</td>
+            <td style="color:var(--green);">Python operators</td>
+            <td style="color:var(--amber);">Extraction via Python</td>
+          </tr>
+          <tr>
+            <td>SCADA (Ignition) connectivity</td>
+            <td style="color:var(--green);">REST API / JDBC</td>
+            <td style="color:var(--amber);">JDBC only (custom)</td>
+            <td style="color:var(--green);">Python operators</td>
+            <td style="color:var(--amber);">Extraction via Python</td>
+          </tr>
+          <tr>
+            <td>Fits 2021 on-prem firewall</td>
+            <td style="color:var(--green);">Yes</td>
+            <td style="color:var(--green);">Yes</td>
+            <td style="color:var(--green);">Yes (self-hosted)</td>
+            <td style="color:var(--green);">Yes (SQL Server target)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- T-SQL CODE -->
+  <section id="sql">
+    <div class="section-header">
+      <span class="section-num">07 //</span>
+      <span class="section-title">T-SQL Reference</span>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span>Stored Procedure — OEE Shift Summary Refresh</span><span class="lang">T-SQL</span></div>
+      <pre><span class="kw">CREATE</span> <span class="kw">OR ALTER</span> <span class="kw">PROCEDURE</span> <span class="fn">dbo.usp_RefreshOEESummary</span>
+<span class="kw">AS</span>
+<span class="kw">BEGIN</span>
+    <span class="kw">SET NOCOUNT ON</span>;
+
+    <span class="cmt">-- Truncate & re-populate summary table (10-min SLA compatible)</span>
+    <span class="kw">TRUNCATE TABLE</span> <span class="tbl">dbo.oee_shift_summary</span>;
+
+    <span class="kw">INSERT INTO</span> <span class="tbl">dbo.oee_shift_summary</span> (
+        machine_id, shift_id, product_id,
+        planned_mins, run_mins, down_mins,
+        units_total, units_good,
+        actual_rate_avg, ideal_rate,
+        availability, performance, quality, oee
+    )
+    <span class="kw">SELECT</span>
+        f.<span class="col">machine_id</span>,
+        f.<span class="col">shift_id</span>,
+        f.<span class="col">product_id</span>,
+        s.<span class="col">planned_mins</span>,
+        <span class="fn">SUM</span>(f.<span class="col">run_mins</span>)                                          <span class="kw">AS</span> run_mins,
+        <span class="fn">SUM</span>(f.<span class="col">down_mins</span>)                                         <span class="kw">AS</span> down_mins,
+        <span class="fn">SUM</span>(f.<span class="col">units_total</span>)                                       <span class="kw">AS</span> units_total,
+        <span class="fn">SUM</span>(f.<span class="col">units_good</span>)                                        <span class="kw">AS</span> units_good,
+        <span class="fn">AVG</span>(f.<span class="col">actual_rate</span>)                                       <span class="kw">AS</span> actual_rate_avg,
+        m.<span class="col">ideal_cycle_rate</span>,
+
+        <span class="cmt">-- Availability: run_mins / planned_mins</span>
+        <span class="fn">CAST</span>(<span class="fn">SUM</span>(f.<span class="col">run_mins</span>) <span class="op">*</span> <span class="num">1.0</span> <span class="op">/</span> <span class="fn">NULLIF</span>(s.<span class="col">planned_mins</span>, <span class="num">0</span>) <span class="kw">AS</span> <span class="kw">DECIMAL</span>(<span class="num">5</span>,<span class="num">4</span>))  <span class="kw">AS</span> availability,
+
+        <span class="cmt">-- Performance: avg actual_rate / ideal_cycle_rate</span>
+        <span class="fn">CAST</span>(<span class="fn">AVG</span>(f.<span class="col">actual_rate</span>) <span class="op">/</span> <span class="fn">NULLIF</span>(m.<span class="col">ideal_cycle_rate</span>, <span class="num">0</span>) <span class="kw">AS</span> <span class="kw">DECIMAL</span>(<span class="num">5</span>,<span class="num">4</span>))  <span class="kw">AS</span> performance,
+
+        <span class="cmt">-- Quality: good units / total units</span>
+        <span class="fn">CAST</span>(<span class="fn">SUM</span>(f.<span class="col">units_good</span>) <span class="op">*</span> <span class="num">1.0</span> <span class="op">/</span> <span class="fn">NULLIF</span>(<span class="fn">SUM</span>(f.<span class="col">units_total</span>), <span class="num">0</span>) <span class="kw">AS</span> <span class="kw">DECIMAL</span>(<span class="num">5</span>,<span class="num">4</span>))  <span class="kw">AS</span> quality,
+
+        <span class="cmt">-- OEE = A × P × Q</span>
+        <span class="fn">CAST</span>(
+            (<span class="fn">SUM</span>(f.<span class="col">run_mins</span>) <span class="op">*</span> <span class="num">1.0</span> <span class="op">/</span> <span class="fn">NULLIF</span>(s.<span class="col">planned_mins</span>, <span class="num">0</span>))
+            <span class="op">*</span> (<span class="fn">AVG</span>(f.<span class="col">actual_rate</span>) <span class="op">/</span> <span class="fn">NULLIF</span>(m.<span class="col">ideal_cycle_rate</span>, <span class="num">0</span>))
+            <span class="op">*</span> (<span class="fn">SUM</span>(f.<span class="col">units_good</span>) <span class="op">*</span> <span class="num">1.0</span> <span class="op">/</span> <span class="fn">NULLIF</span>(<span class="fn">SUM</span>(f.<span class="col">units_total</span>), <span class="num">0</span>))
+        <span class="kw">AS</span> <span class="kw">DECIMAL</span>(<span class="num">5</span>,<span class="num">4</span>))                                                         <span class="kw">AS</span> oee
+
+    <span class="kw">FROM</span>       <span class="tbl">dbo.fact_production_event</span>  f
+    <span class="kw">INNER JOIN</span> <span class="tbl">dbo.dim_shift</span>              s  <span class="kw">ON</span>  s.shift_id        <span class="op">=</span> f.shift_id
+    <span class="kw">INNER JOIN</span> <span class="tbl">dbo.dim_machine</span>            m  <span class="kw">ON</span>  m.machine_id      <span class="op">=</span> f.machine_id
+    <span class="kw">WHERE</span>  f.<span class="col">event_ts</span> <span class="op">&gt;=</span> <span class="fn">DATEADD</span>(<span class="num">DAY</span>, <span class="op">-</span><span class="num">30</span>, <span class="fn">GETDATE</span>())  <span class="cmt">-- rolling 30-day window</span>
+    <span class="kw">GROUP BY</span>   f.machine_id, f.shift_id, f.product_id, s.planned_mins, m.ideal_cycle_rate;
+
+<span class="kw">END</span>;</pre>
+    </div>
+
+    <div class="code-block" style="margin-top:1rem;">
+      <div class="code-header"><span>Python Extract — Ignition SCADA Downtime</span><span class="lang">Python 3.9</span></div>
+      <pre><span class="kw">import</span> requests, pyodbc, pandas <span class="kw">as</span> pd
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime, timedelta
+
+<span class="cmt"># ── Config ─────────────────────────────────────────────────</span>
+IGNITION_BASE  <span class="op">=</span> <span class="str">"http://ignition-server:8088/data/historian"</span>
+SQL_CONN       <span class="op">=</span> <span class="str">"Driver={SQL Server};Server=MSSQL-PROD;Database=OEE_DW;Trusted_Connection=yes;"</span>
+LOOKBACK_MINS  <span class="op">=</span> <span class="num">15</span>
+
+<span class="kw">def</span> <span class="fn">extract_scada_downtime</span>():
+    since <span class="op">=</span> (datetime.now() <span class="op">-</span> timedelta(minutes<span class="op">=</span>LOOKBACK_MINS)).isoformat()
+
+    <span class="cmt"># Pull downtime events from Ignition REST API</span>
+    resp <span class="op">=</span> requests.<span class="fn">get</span>(
+        <span class="str">f"{IGNITION_BASE}/alarms/events"</span>,
+        params<span class="op">=</span>{<span class="str">"startDate"</span>: since, <span class="str">"state"</span>: <span class="str">"cleared"</span>, <span class="str">"priority"</span>: <span class="str">"high"</span>},
+        timeout<span class="op">=</span><span class="num">10</span>
+    )
+    events <span class="op">=</span> resp.<span class="fn">json</span>()[<span class="str">"data"</span>]
+
+    df <span class="op">=</span> pd.<span class="fn">DataFrame</span>(events)[[
+        <span class="str">"eventId"</span>, <span class="str">"sourceTag"</span>, <span class="str">"ackTime"</span>, <span class="str">"clearTime"</span>, <span class="str">"reasonCode"</span>
+    ]]
+    df[<span class="str">"down_mins"</span>] <span class="op">=</span> (
+        pd.<span class="fn">to_datetime</span>(df[<span class="str">"clearTime"</span>]) <span class="op">-</span> pd.<span class="fn">to_datetime</span>(df[<span class="str">"ackTime"</span>])
+    ).dt.total_seconds() <span class="op">/</span> <span class="num">60</span>
+    df[<span class="str">"load_ts"</span>] <span class="op">=</span> datetime.<span class="fn">now</span>()
+
+    <span class="cmt"># Stage into SQL Server</span>
+    conn <span class="op">=</span> pyodbc.<span class="fn">connect</span>(SQL_CONN)
+    cursor <span class="op">=</span> conn.<span class="fn">cursor</span>()
+    <span class="kw">for</span> _, row <span class="kw">in</span> df.<span class="fn">iterrows</span>():
+        cursor.<span class="fn">execute</span>(<span class="str">"""
+            INSERT INTO dbo.stg_scada_downtime
+              (event_id, source_tag, ack_time, clear_time, reason_code, down_mins, load_ts)
+            VALUES (?,?,?,?,?,?,?)
+        """</span>, row[<span class="str">"eventId"</span>], row[<span class="str">"sourceTag"</span>], row[<span class="str">"ackTime"</span>],
+               row[<span class="str">"clearTime"</span>], row[<span class="str">"reasonCode"</span>], row[<span class="str">"down_mins"</span>], row[<span class="str">"load_ts"</span>])
+    conn.<span class="fn">commit</span>()
+    conn.<span class="fn">close</span>()
+
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="str">"__main__"</span>:
+    <span class="fn">extract_scada_downtime</span>()</pre>
+    </div>
+
+    <div class="code-block" style="margin-top:1rem;">
+      <div class="code-header"><span>Python Extract — SAP QM Quality Data via pyrfc</span><span class="lang">Python 3.9</span></div>
+      <pre><span class="kw">import</span> pyrfc, pyodbc
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime, timedelta
+
+SAP_CONN <span class="op">=</span> {<span class="str">"ashost"</span>: <span class="str">"sap-prod.plant.local"</span>, <span class="str">"sysnr"</span>: <span class="str">"00"</span>,
+            <span class="str">"client"</span>: <span class="str">"100"</span>, <span class="str">"user"</span>: <span class="str">"svc_oee"</span>, <span class="str">"passwd"</span>: <span class="str">"***"</span>}
+
+<span class="kw">def</span> <span class="fn">extract_sap_quality</span>():
+    conn    <span class="op">=</span> pyrfc.<span class="fn">Connection</span>(<span class="op">**</span>SAP_CONN)
+    results <span class="op">=</span> conn.<span class="fn">call</span>(
+        <span class="str">"BAPI_INSPOPER_GETLIST"</span>,
+        PLANT      <span class="op">=</span> <span class="str">"P001"</span>,
+        DATE_FROM  <span class="op">=</span> (datetime.now() <span class="op">-</span> timedelta(minutes<span class="op">=</span><span class="num">15</span>)).<span class="fn">strftime</span>(<span class="str">"%Y%m%d"</span>),
+        DATE_TO    <span class="op">=</span> datetime.now().<span class="fn">strftime</span>(<span class="str">"%Y%m%d"</span>)
+    )
+    conn.<span class="fn">close</span>()
+
+    sql_conn <span class="op">=</span> pyodbc.<span class="fn">connect</span>(SQL_CONN)
+    cursor   <span class="op">=</span> sql_conn.<span class="fn">cursor</span>()
+    <span class="kw">for</span> lot <span class="kw">in</span> results[<span class="str">"INSPOPERLIST"</span>]:
+        cursor.<span class="fn">execute</span>(<span class="str">"""
+            INSERT INTO dbo.stg_sap_quality
+              (insp_lot, material, work_center, total_qty, ok_qty, scrap_qty, load_ts)
+            VALUES (?,?,?,?,?,?,?)
+        """</span>, lot[<span class="str">"INSPOPER"</span>], lot[<span class="str">"MATNR"</span>], lot[<span class="str">"ARBPL"</span>],
+               lot[<span class="str">"SOLLMENGE"</span>], lot[<span class="str">"ISTMENGE"</span>], lot[<span class="str">"AUSSCHUSS"</span>],
+               datetime.<span class="fn">now</span>())
+    sql_conn.<span class="fn">commit</span>()
+    sql_conn.<span class="fn">close</span>()</pre>
+    </div>
+  </section>
+
+  <!-- POWER BI -->
+  <section id="powerbi">
+    <div class="section-header">
+      <span class="section-num">08 //</span>
+      <span class="section-title">Power BI Dashboard Design</span>
+    </div>
+    <div class="grid-2">
+      <div class="card card-blue">
+        <h3 class="blue">Architecture</h3>
+        <ul style="font-size:13px;color:var(--text-muted);padding-left:1rem;line-height:2;list-style:disc;">
+          <li>On-Premises Data Gateway installed on SQL Server host</li>
+          <li>Power BI Desktop connects via Gateway to <code style="font-family:var(--mono);font-size:11px;background:var(--surface3);padding:1px 5px;border-radius:2px;color:var(--green);">oee_shift_summary</code></li>
+          <li>Scheduled refresh every 10 minutes — matches extraction cycle</li>
+          <li>No DirectQuery on raw fact table (millions of PLC rows) — summary only</li>
+          <li>Row-level security by production line / department</li>
+        </ul>
+      </div>
+      <div class="card card-green">
+        <h3>Recommended Visuals (End-of-Shift Report)</h3>
+        <ul style="font-size:13px;color:var(--text-muted);padding-left:1rem;line-height:2;list-style:disc;">
+          <li>KPI cards: OEE %, Availability %, Performance %, Quality %</li>
+          <li>Clustered bar: OEE by machine line, current shift vs. target</li>
+          <li>Waterfall chart: OEE loss decomposition (A, P, Q losses)</li>
+          <li>Pareto: downtime by reason code — planned vs. unplanned</li>
+          <li>Trend line: 30-day rolling OEE per machine</li>
+          <li>Table: micro-stop frequency by machine + shift</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-block" style="margin-top:1rem;">
+      <div class="code-header"><span>Power BI DAX — OEE Measures</span><span class="lang">DAX</span></div>
+      <pre><span class="cmt">-- Availability measure</span>
+Availability % <span class="op">=</span>
+<span class="fn">DIVIDE</span>(
+    <span class="fn">SUM</span>( oee_shift_summary[run_mins] ),
+    <span class="fn">SUM</span>( oee_shift_summary[planned_mins] ),
+    <span class="num">0</span>
+)
+
+<span class="cmt">-- OEE = A × P × Q (recalculated for slicer context)</span>
+OEE % <span class="op">=</span>
+<span class="kw">VAR</span> _A <span class="op">=</span> <span class="fn">DIVIDE</span>( <span class="fn">SUM</span>(oee_shift_summary[run_mins]),  <span class="fn">SUM</span>(oee_shift_summary[planned_mins]), <span class="num">0</span> )
+<span class="kw">VAR</span> _P <span class="op">=</span> <span class="fn">DIVIDE</span>( <span class="fn">SUM</span>(oee_shift_summary[units_total]) <span class="op">*</span> <span class="fn">AVERAGE</span>(oee_shift_summary[actual_rate_avg]),
+                 <span class="fn">SUM</span>(oee_shift_summary[run_mins]) <span class="op">*</span> <span class="fn">AVERAGE</span>(oee_shift_summary[ideal_rate]), <span class="num">0</span> )
+<span class="kw">VAR</span> _Q <span class="op">=</span> <span class="fn">DIVIDE</span>( <span class="fn">SUM</span>(oee_shift_summary[units_good]), <span class="fn">SUM</span>(oee_shift_summary[units_total]), <span class="num">0</span> )
+<span class="kw">RETURN</span>  _A <span class="op">*</span> _P <span class="op">*</span> _Q
+
+<span class="cmt">-- Micro-stop count (from fact table via relationship)</span>
+Micro-Stop Count <span class="op">=</span>
+<span class="fn">CALCULATE</span>(
+    <span class="fn">COUNTROWS</span>( fact_production_event ),
+    fact_production_event[down_mins] <span class="op">&lt;</span> <span class="num">5</span>,
+    dim_reason[is_planned] <span class="op">=</span> <span class="num">FALSE</span>()
+)</pre>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results">
+    <div class="section-header">
+      <span class="section-num">09 //</span>
+      <span class="section-title">OEE Performance Results</span>
+    </div>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:1.5rem;">Identified micro-stops and baseline discrepancies led to measurable cycle time reductions. Pre vs. Post implementation.</p>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.5rem;">
+      <div class="perf-row">
+        <div class="perf-label">Machine Line A</div>
+        <div class="perf-bar-wrap">
+          <div class="perf-bar-pre" style="width:65%;"><span class="perf-label-pre">65% pre</span></div>
+          <div class="perf-bar-post" style="width:82%;"><span class="perf-label-inner">82% OEE</span></div>
+        </div>
+        <div class="delta-badge">+17 pts</div>
+      </div>
+      <div class="perf-row">
+        <div class="perf-label">Machine Line B</div>
+        <div class="perf-bar-wrap">
+          <div class="perf-bar-pre" style="width:58%;"><span class="perf-label-pre">58% pre</span></div>
+          <div class="perf-bar-post" style="width:78%;"><span class="perf-label-inner">78% OEE</span></div>
+        </div>
+        <div class="delta-badge">+20 pts</div>
+      </div>
+      <div class="perf-row">
+        <div class="perf-label">Machine Line C</div>
+        <div class="perf-bar-wrap">
+          <div class="perf-bar-pre" style="width:62%;"><span class="perf-label-pre">62% pre</span></div>
+          <div class="perf-bar-post" style="width:75%;"><span class="perf-label-inner">75% OEE</span></div>
+        </div>
+        <div class="delta-badge">+13 pts</div>
+      </div>
+      <div class="perf-row">
+        <div class="perf-label">Machine Line D</div>
+        <div class="perf-bar-wrap">
+          <div class="perf-bar-pre" style="width:71%;"><span class="perf-label-pre">71% pre</span></div>
+          <div class="perf-bar-post" style="width:88%;"><span class="perf-label-inner">88% OEE</span></div>
+        </div>
+        <div class="delta-badge">+17 pts</div>
+      </div>
+    </div>
+
+    <div class="impact-grid" style="margin-top:1.5rem;">
+      <div class="impact-card">
+        <div class="impact-icon" style="color:var(--amber);">⚙</div>
+        <div class="impact-title">Micro-Stop Visibility</div>
+        <p class="impact-body">Surfaced automated faults under 5 minutes that operators previously failed to manually log on paper clipboards. SCADA alarm integration eliminated the gap entirely.</p>
+      </div>
+      <div class="impact-card">
+        <div class="impact-icon" style="color:var(--blue);">⬢</div>
+        <div class="impact-title">Automated Logging</div>
+        <p class="impact-body">Ignition SCADA data flows directly to SQL Server, completely removing human reporting bias. No clipboard, no post-shift data entry, no shift-boundary data loss.</p>
+      </div>
+      <div class="impact-card">
+        <div class="impact-icon" style="color:var(--green);">◎</div>
+        <div class="impact-title">Leadership Action</div>
+        <p class="impact-body">Enabled shift supervisors to confidently prioritize maintenance resources using accurate, end-of-shift OEE data delivered within the 15-minute SLA window.</p>
+      </div>
+      <div class="impact-card">
+        <div class="impact-icon" style="color:var(--red);">▲</div>
+        <div class="impact-title">Baseline Accuracy</div>
+        <p class="impact-body">SAP-sourced ideal cycle rates and planned minutes replaced manually-maintained spreadsheets as the standard baseline, ensuring Performance and Availability calculations are defensible.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span>OEE Data Model</span> — Ag-Equipment Manufacturing Reporting Pipeline — 2021 On-Premise Stack<br>
+  MS SQL Server · Ignition SCADA · SAP ERP · Python Scheduler · Power BI
+</footer>
+
+</body>
+</html>
