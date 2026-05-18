@@ -79,6 +79,7 @@
         }
         
         .animate-delay-100 { animation-delay: 0.15s; }
+        .animate-delay-150 { animation-delay: 0.22s; }
         .animate-delay-200 { animation-delay: 0.3s; }
         .animate-delay-250 { animation-delay: 0.35s; }
         .animate-delay-300 { animation-delay: 0.45s; }
@@ -338,60 +339,112 @@
             </div>
 
         <!-- Decks hosted in this repo -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch mb-8 lg:mb-12">
-            <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover animate-fade-in-up animate-delay-250 flex-none">
-                <div class="flex items-center gap-3 mb-6 lg:mb-8">
-                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100/80">Interactive lab</span>
-                    <h3 class="text-xl sm:text-2xl font-bold text-slate-800">Homelab</h3>
-                </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8 lg:mb-12">
 
-                    <a href="Homelab/HomelabPortal.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-purple-500 hover:to-pink-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 group block">
-                        <div class="flex items-center gap-4 lg:gap-6">
-                            <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-purple-100 to-purple-200 text-purple-800 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">🏠</div>
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-bold text-lg lg:text-xl text-slate-900 group-hover:text-white transition-colors mb-2">HomeLab Setup</h4>
-                                <p class="text-slate-600 text-sm lg:text-base leading-relaxed group-hover:text-purple-50 transition-colors">
-                                    Raspberry Pi 4B (8GB) setup guide for self-hosting enthusiasts. Complete architecture with Cloudflare Tunnel, Tailscale VPN, and self-hosted services.
-                                </p>
-                            </div>
-                            <div class="ml-auto text-purple-500 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl lg:text-3xl font-bold" aria-hidden="true">→</div>
+            <!-- LEFT COLUMN: Homelab + CVML & IIoT stacked -->
+            <div class="flex flex-col gap-6 lg:gap-8">
+
+            <!-- Homelab -->
+            <div class="section-card rounded-3xl p-6 sm:p-8 card-hover animate-fade-in-up animate-delay-250">
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100/80">Interactive lab</span>
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-800">Homelab</h3>
+                </div>
+                <a href="Homelab/HomelabPortal.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-purple-500 hover:to-pink-600 hover:text-white rounded-2xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 group block">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 text-purple-800 rounded-xl flex items-center justify-center text-2xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">🏠</div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-base text-slate-900 group-hover:text-white transition-colors mb-1">HomeLab Setup</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed group-hover:text-purple-50 transition-colors">
+                                Raspberry Pi 4B (8GB) — Cloudflare Tunnel, Tailscale VPN, self-hosted services.
+                            </p>
                         </div>
-                    </a>
+                        <div class="ml-auto text-purple-500 group-hover:text-white group-hover:translate-x-2 transition-all text-xl font-bold shrink-0" aria-hidden="true">→</div>
+                    </div>
+                </a>
             </div>
 
-                <div class="section-card rounded-3xl p-6 sm:p-8 lg:p-10 card-hover animate-fade-in-up animate-delay-200 flex-none">
-                    <div class="flex items-center gap-3 mb-6 lg:mb-8">
-                        <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100/80">Interactive lab</span>
-                        <h3 class="text-xl sm:text-2xl font-bold text-slate-800">CVML &amp; IIoT decks</h3>
-                    </div>
-
-                    <div class="flex flex-col gap-4 lg:gap-5">
-                        <a href="CVML_Project_Overview.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-rose-500 hover:to-rose-700 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 group block">
-                            <div class="flex items-center gap-4 lg:gap-6">
-                                <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-rose-100 to-rose-300 text-rose-800 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">👁️</div>
-                                <div class="flex-1 min-w-0">
-                                    <h4 class="font-bold text-lg lg:text-xl text-slate-900 group-hover:text-white transition-colors mb-2">CVML — manufacturing QA</h4>
-                                    <p class="text-slate-600 text-sm lg:text-base leading-relaxed group-hover:text-rose-50 transition-colors">
-                                        Slide deck: edge CV, MQTT, AWS ML, MES/SCADA.
-                                    </p>
-                                </div>
-                                <div class="ml-auto text-rose-500 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl lg:text-3xl font-bold" aria-hidden="true">→</div>
-                            </div>
-                        </a>
-                        <a href="monitron-IIoT-sensors.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-orange-500 hover:to-amber-600 hover:text-white rounded-2xl p-5 lg:p-6 shadow-md hover:shadow-2xl transition-all duration-300 group block">
-                            <div class="flex items-center gap-4 lg:gap-6">
-                                <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-orange-100 to-amber-200 text-orange-900 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">📡</div>
-                                <div class="flex-1 min-w-0">
-                                    <h4 class="font-bold text-lg lg:text-xl text-slate-900 group-hover:text-white transition-colors mb-2">Amazon Monitron TE1A001 — IIoT Sensor Demo</h4>
-                                    <p class="text-slate-600 text-sm lg:text-base leading-relaxed group-hover:text-orange-50 transition-colors">
-                                        Interactive slide deck: vibration sensing, gateway, AWS Monitron, IIoT workflow.
-                                    </p>
-                                </div>
-                                <div class="ml-auto text-orange-500 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl lg:text-3xl font-bold" aria-hidden="true">→</div>
-                            </div>
-                        </a>
-                    </div>
+            <!-- CVML & IIoT -->
+            <div class="section-card rounded-3xl p-6 sm:p-8 card-hover animate-fade-in-up animate-delay-200">
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100/80">Interactive lab</span>
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-800">CVML &amp; IIoT decks</h3>
                 </div>
+                <div class="flex flex-col gap-3">
+                    <a href="CVML_Project_Overview.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-rose-500 hover:to-rose-700 hover:text-white rounded-2xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 group block">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-rose-100 to-rose-300 text-rose-800 rounded-xl flex items-center justify-center text-2xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">👁️</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-base text-slate-900 group-hover:text-white transition-colors mb-1">CVML — manufacturing QA</h4>
+                                <p class="text-slate-600 text-sm leading-relaxed group-hover:text-rose-50 transition-colors">Slide deck: edge CV, MQTT, AWS ML, MES/SCADA.</p>
+                            </div>
+                            <div class="ml-auto text-rose-500 group-hover:text-white group-hover:translate-x-2 transition-all text-xl font-bold shrink-0" aria-hidden="true">→</div>
+                        </div>
+                    </a>
+                    <a href="monitron-IIoT-sensors.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-orange-500 hover:to-amber-600 hover:text-white rounded-2xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 group block">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-amber-200 text-orange-900 rounded-xl flex items-center justify-center text-2xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">📡</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-base text-slate-900 group-hover:text-white transition-colors mb-1">Amazon Monitron — IIoT Sensor Demo</h4>
+                                <p class="text-slate-600 text-sm leading-relaxed group-hover:text-orange-50 transition-colors">Vibration sensing, gateway, AWS Monitron, IIoT workflow.</p>
+                            </div>
+                            <div class="ml-auto text-orange-500 group-hover:text-white group-hover:translate-x-2 transition-all text-xl font-bold shrink-0" aria-hidden="true">→</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            </div><!-- /left column -->
+
+            <!-- RIGHT COLUMN: Data & ML Research -->
+            <div class="section-card rounded-3xl p-6 sm:p-8 card-hover animate-fade-in-up animate-delay-300">
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="badge py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-100/80">Interactive lab</span>
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-800">Data &amp; ML research</h3>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <a href="oee_data_model.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-green-600 hover:to-emerald-800 hover:text-white rounded-2xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 group block">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-100 to-emerald-200 text-green-900 rounded-xl flex items-center justify-center text-2xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">🏭</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-base text-slate-900 group-hover:text-white transition-colors mb-1">OEE Data Model — Ag-Equipment Mfg</h4>
+                                <p class="text-slate-600 text-sm leading-relaxed group-hover:text-green-50 transition-colors">Star schema, T-SQL, Power BI — 15-min SLA on-premise OEE reporting.</p>
+                            </div>
+                            <div class="ml-auto text-green-600 group-hover:text-white group-hover:translate-x-2 transition-all text-xl font-bold shrink-0" aria-hidden="true">→</div>
+                        </div>
+                    </a>
+                    <a href="cancer_recurrence_ml_presentation.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-teal-500 hover:to-cyan-700 hover:text-white rounded-2xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 group block">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-teal-100 to-cyan-200 text-teal-900 rounded-xl flex items-center justify-center text-2xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">🔬</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-base text-slate-900 group-hover:text-white transition-colors mb-1">Cancer Recurrence — ML Study</h4>
+                                <p class="text-slate-600 text-sm leading-relaxed group-hover:text-teal-50 transition-colors">SVM, RF, AdaBoost, XGBoost — 99.37% accuracy on clinical data.</p>
+                            </div>
+                            <div class="ml-auto text-teal-500 group-hover:text-white group-hover:translate-x-2 transition-all text-xl font-bold shrink-0" aria-hidden="true">→</div>
+                        </div>
+                    </a>
+                    <a href="arima_report.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-blue-600 hover:to-indigo-800 hover:text-white rounded-2xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 group block">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-indigo-200 text-blue-900 rounded-xl flex items-center justify-center text-2xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">📊</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-base text-slate-900 group-hover:text-white transition-colors mb-1">ARIMA Forecasting — eCommerce Sales</h4>
+                                <p class="text-slate-600 text-sm leading-relaxed group-hover:text-blue-50 transition-colors">ARIMA(2,1,1) · walk-forward validation · 9.6% MAPE · SQL pipeline.</p>
+                            </div>
+                            <div class="ml-auto text-blue-500 group-hover:text-white group-hover:translate-x-2 transition-all text-xl font-bold shrink-0" aria-hidden="true">→</div>
+                        </div>
+                    </a>
+                    <a href="DOE_Summary_Document.html" class="project-card glass-card hover:bg-gradient-to-br hover:from-slate-700 hover:to-blue-900 hover:text-white rounded-2xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 group block">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-slate-100 to-blue-200 text-slate-800 rounded-xl flex items-center justify-center text-2xl shrink-0 group-hover:from-white/20 group-hover:to-white/10 group-hover:text-white group-hover:scale-110 transition-all icon-float" aria-hidden="true">📐</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-base text-slate-900 group-hover:text-white transition-colors mb-1">DOE — Packaging Seal Strength</h4>
+                                <p class="text-slate-600 text-sm leading-relaxed group-hover:text-slate-200 transition-colors">2³ Full Factorial · Minitab 16 ANOVA · optimal process settings for food wrapping machinery.</p>
+                            </div>
+                            <div class="ml-auto text-slate-500 group-hover:text-white group-hover:translate-x-2 transition-all text-xl font-bold shrink-0" aria-hidden="true">→</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
         </div>
 
@@ -494,6 +547,16 @@
                             <p class="text-slate-600 text-sm leading-relaxed flex-1">Real-world equity compensation simulator — 2026 AMT, LTCG, NIIT, FICA, qualifying vs. disqualifying dispositions.</p>
                         </a>
                     </article>
+
+                    <article class="h-full flex flex-col" role="listitem">
+                        <a href="calculator.html" class="project-card glass-card hover:bg-white hover:border-indigo-200 hover:shadow-xl rounded-2xl p-5 lg:p-6 shadow-md transition-all duration-300 group flex flex-col h-full">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-900 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-12 transition-all icon-float" style="animation-delay: 0.8s;" aria-hidden="true">🧮</div>
+                                <h3 class="font-bold text-base md:text-lg text-slate-900 group-hover:text-indigo-800 transition-colors">Calculator</h3>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed flex-1">Keyboard-friendly browser calculator with expression history, operator chaining, and a clean monospace UI.</p>
+                        </a>
+                    </article>
                 </div>
             </div>
         </section>
@@ -511,6 +574,8 @@
                             <li><a href="https://vgandhi1.github.io/#learn" target="_blank" rel="noopener">Learning paths (theory &amp; code)</a></li>
                             <li><a href="#decks">Decks &amp; EV (this page)</a></li>
                             <li><a href="#tools">Tools &amp; simulators</a></li>
+                            <li><a href="arima_report.html">ARIMA Forecasting report</a></li>
+                            <li><a href="DOE_Summary_Document.html">DOE — Packaging Seal Strength</a></li>
                             <li><a href="git_101.html">Git 101 guide &amp; lab</a></li>
                         </ul>
                     </div>

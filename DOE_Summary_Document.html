@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOE Study Summary — Improving Packaging Seal Strength Through Design of Experiments</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset & Root ─────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:      #0D1B3E;
+    --teal:      #0B7285;
+    --teal-l:    #13A5C2;
+    --orange:    #E8652A;
+    --cream:     #F7F4EF;
+    --cream-d:   #EDE9E1;
+    --white:     #FFFFFF;
+    --slate:     #475569;
+    --slate-l:   #94A3B8;
+    --green:     #15803D;
+    --red:       #B91C1C;
+    --amber:     #B45309;
+    --ink:       #1A1A2E;
+
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'Source Sans 3', sans-serif;
+    --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── Top bar ─────────────────────────────────────── */
+  .topbar {
+    background: var(--navy);
+    height: 5px;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal) 0%, var(--orange) 60%, var(--teal-l) 100%);
+  }
+
+  /* ── Layout ──────────────────────────────────────── */
+  .page-wrap {
+    max-width: 1020px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+  }
+
+  /* ── Hero ─────────────────────────────────────────── */
+  .hero {
+    background: var(--navy);
+    margin: 0 -2rem;
+    padding: 3.5rem 2rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    border: 50px solid rgba(11,114,133,0.18);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 30%;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    border: 38px solid rgba(232,101,42,0.12);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: var(--teal-l);
+    text-transform: uppercase;
+    margin-bottom: 0.9rem;
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 4vw, 2.8rem);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.15;
+    max-width: 680px;
+    margin-bottom: 1rem;
+  }
+  .hero-title span { color: var(--orange); }
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--slate-l);
+    max-width: 580px;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    font-size: 0.82rem;
+  }
+  .hero-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--slate-l);
+  }
+  .hero-meta-item strong { color: var(--white); }
+  .hero-meta-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    flex-shrink: 0;
+  }
+
+  /* ── Document source badges ───────────────────────── */
+  .source-bar {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 2rem 0 0;
+    padding: 1.25rem 1.5rem;
+    background: var(--cream-d);
+    border-radius: 10px;
+    border: 1px solid #D6CFC4;
+  }
+  .source-badge {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    flex: 1;
+    min-width: 220px;
+  }
+  .badge-icon {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .badge-icon.html  { background: #EFF6FF; color: var(--teal); }
+  .badge-icon.pptx  { background: #FFF7ED; color: var(--orange); }
+  .badge-label { font-size: 0.78rem; color: var(--slate); line-height: 1.4; }
+  .badge-label strong { display: block; font-size: 0.85rem; color: var(--ink); font-weight: 600; }
+
+  /* ── Nav pills ────────────────────────────────────── */
+  .nav-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 2rem 0 0;
+    padding-bottom: 0.25rem;
+    border-bottom: 2px solid var(--cream-d);
+  }
+  .nav-pill {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.9rem;
+    border-radius: 99px;
+    text-decoration: none;
+    color: var(--slate);
+    background: var(--cream-d);
+    border: 1px solid transparent;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .nav-pill:hover { background: var(--navy); color: var(--white); }
+
+  /* ── Sections ─────────────────────────────────────── */
+  section {
+    margin-top: 2.75rem;
+    scroll-margin-top: 1rem;
+  }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.35rem;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  .divider {
+    height: 2px;
+    background: linear-gradient(90deg, var(--teal) 0%, transparent 80%);
+    margin-bottom: 1.25rem;
+    border: none;
+  }
+
+  /* ── Cards ────────────────────────────────────────── */
+  .card {
+    background: var(--white);
+    border-radius: 10px;
+    border: 1px solid #E2D9CE;
+    box-shadow: 0 2px 8px rgba(13,27,62,0.05);
+    padding: 1.25rem 1.4rem;
+  }
+  .card + .card { margin-top: 0.85rem; }
+
+  .card-accent {
+    border-left: 4px solid var(--teal);
+  }
+  .card-accent-orange {
+    border-left: 4px solid var(--orange);
+  }
+  .card-accent-green {
+    border-left: 4px solid var(--green);
+  }
+  .card-accent-red {
+    border-left: 4px solid var(--red);
+  }
+
+  /* ── Two-column grid ──────────────────────────────── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.85rem;
+  }
+  @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; } }
+
+  /* ── Stat callout ─────────────────────────────────── */
+  .stat-block {
+    background: var(--navy);
+    border-radius: 10px;
+    padding: 1.25rem 1.4rem;
+    text-align: center;
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal-l);
+    margin-bottom: 0.4rem;
+  }
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1;
+  }
+  .stat-sub {
+    font-size: 0.78rem;
+    color: var(--slate-l);
+    margin-top: 0.35rem;
+  }
+
+  /* ── Factor cards ─────────────────────────────────── */
+  .factor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.85rem;
+  }
+  .factor-card {
+    background: var(--white);
+    border-radius: 10px;
+    border: 1px solid #E2D9CE;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(13,27,62,0.05);
+  }
+  .factor-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1rem;
+  }
+  .factor-letter {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+  .factor-body { padding: 0 1rem 0.9rem; }
+  .factor-levels {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .level-pill {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 99px;
+  }
+  .level-low  { background: #EFF6FF; color: var(--teal); }
+  .level-high { background: #FFF7ED; color: var(--orange); }
+
+  /* ── Data table ───────────────────────────────────── */
+  .data-table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid #E2D9CE;
+    box-shadow: 0 2px 6px rgba(13,27,62,0.05);
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    font-family: var(--font-body);
+  }
+  .data-table thead tr {
+    background: var(--navy);
+  }
+  .data-table thead th {
+    padding: 0.7rem 0.9rem;
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-align: center;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .data-table thead th:nth-child(8) {
+    background: var(--teal);
+  }
+  .data-table tbody tr:nth-child(even) { background: #F8F6F2; }
+  .data-table tbody tr:nth-child(odd)  { background: var(--white); }
+  .data-table tbody tr.row-opt { background: #DBEAFE; }
+  .data-table tbody tr.row-worst { background: #FEF9C3; }
+  .data-table td {
+    padding: 0.6rem 0.9rem;
+    text-align: center;
+    border-bottom: 1px solid #EDE9E1;
+    color: var(--ink);
+  }
+  .data-table td.avg {
+    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .data-table td.avg-opt   { color: var(--teal); }
+  .data-table td.avg-worst { color: var(--amber); }
+
+  /* ── ANOVA result badges ──────────────────────────── */
+  .coeff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0.85rem;
+  }
+  .coeff-card {
+    border-radius: 10px;
+    border: 1px solid #E2D9CE;
+    overflow: hidden;
+    background: var(--white);
+    box-shadow: 0 2px 6px rgba(13,27,62,0.04);
+  }
+  .coeff-top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+  }
+  .coeff-badge {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.22rem 0.55rem;
+    border-radius: 6px;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+  .coeff-value {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0 1rem 0.2rem;
+  }
+  .coeff-body { padding: 0 1rem 0.85rem; }
+  .coeff-name { font-weight: 600; font-size: 0.9rem; color: var(--navy); margin-bottom: 0.2rem; }
+  .coeff-note { font-size: 0.8rem; color: var(--slate); line-height: 1.5; }
+
+  /* ── Model equation ───────────────────────────────── */
+  .equation-box {
+    background: var(--navy);
+    border-radius: 10px;
+    padding: 1.1rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--white);
+    text-align: center;
+    letter-spacing: 0.03em;
+    line-height: 1.8;
+    margin-top: 1rem;
+  }
+  .equation-box em {
+    color: var(--orange);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  /* ── Optimal settings ─────────────────────────────── */
+  .optimal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 560px) { .optimal-grid { grid-template-columns: 1fr; } }
+
+  .optimal-card {
+    background: #0F2447;
+    border-radius: 10px;
+    padding: 1.2rem 1rem;
+    text-align: center;
+    border: 1px solid rgba(11,114,133,0.3);
+  }
+  .optimal-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .optimal-value {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1;
+  }
+  .optimal-sub {
+    font-size: 0.75rem;
+    color: var(--slate-l);
+    margin-top: 0.4rem;
+  }
+  .result-banner {
+    background: var(--teal);
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .result-banner .rb-label { font-size: 0.85rem; color: #CFFAFE; font-weight: 600; }
+  .result-banner .rb-value {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1;
+  }
+  .result-banner .rb-note { font-size: 0.82rem; color: #CFFAFE; }
+  .result-banner .rb-note strong { color: var(--white); }
+
+  /* ── Gap table ────────────────────────────────────── */
+  .gap-table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid #E2D9CE;
+  }
+  .gap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+  }
+  .gap-table thead tr { background: var(--navy); }
+  .gap-table thead th {
+    padding: 0.7rem 0.9rem;
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.77rem;
+    text-align: left;
+    letter-spacing: 0.04em;
+  }
+  .gap-table thead th:nth-child(3) { background: var(--teal); }
+  .gap-table tbody tr:nth-child(even) { background: #F8F6F2; }
+  .gap-table tbody tr:nth-child(odd)  { background: var(--white); }
+  .gap-table td {
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid #EDE9E1;
+    vertical-align: top;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .gap-table td:first-child { font-weight: 600; color: var(--navy); white-space: nowrap; }
+  .priority-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.18rem 0.55rem;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+  .p-high   { background: #FEE2E2; color: var(--red); }
+  .p-medium { background: #FEF9C3; color: var(--amber); }
+  .p-phase2 { background: #DBEAFE; color: var(--teal); }
+
+  /* ── Comparison boxes ─────────────────────────────── */
+  .compare-box {
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid #E2D9CE;
+  }
+  .compare-box h4 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.65rem;
+  }
+  .compare-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .compare-list li {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.83rem;
+    color: var(--slate);
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+  .compare-list li .ci {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .ci-check  { background: #D1FAE5; color: var(--green); }
+  .ci-cross  { background: #FEE2E2; color: var(--red); }
+  .ci-info   { background: #DBEAFE; color: var(--teal); }
+
+  /* ── Roadmap ──────────────────────────────────────── */
+  .roadmap-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+  }
+  @media (max-width: 560px) { .roadmap-grid { grid-template-columns: 1fr; } }
+
+  .roadmap-card {
+    background: var(--white);
+    border-radius: 10px;
+    border: 1px solid #E2D9CE;
+    box-shadow: 0 2px 6px rgba(13,27,62,0.04);
+    overflow: hidden;
+  }
+  .roadmap-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid #F0EBE3;
+  }
+  .roadmap-num {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--navy);
+    color: var(--orange);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .roadmap-title { font-weight: 700; font-size: 0.88rem; color: var(--navy); }
+  .roadmap-body { padding: 0.75rem 1rem; font-size: 0.82rem; color: var(--slate); line-height: 1.55; }
+
+  /* ── Takeaways ────────────────────────────────────── */
+  .takeaway-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .takeaway {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    align-items: flex-start;
+  }
+  .takeaway-icon {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .takeaway-text { font-size: 0.88rem; color: var(--ink); line-height: 1.55; }
+  .t-confirmed { background: #F0FDF4; border: 1px solid #BBF7D0; }
+  .t-gap       { background: #FFF7ED; border: 1px solid #FED7AA; }
+  .t-next      { background: #EFF6FF; border: 1px solid #BFDBFE; }
+  .ti-check { background: #BBF7D0; color: var(--green); }
+  .ti-warn  { background: #FED7AA; color: var(--orange); }
+  .ti-arrow { background: #BFDBFE; color: var(--teal); }
+
+  /* ── Footer ───────────────────────────────────────── */
+  .doc-footer {
+    margin-top: 3rem;
+    padding: 1.5rem 0 0;
+    border-top: 2px solid var(--cream-d);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .doc-footer p { font-size: 0.77rem; color: var(--slate-l); line-height: 1.6; }
+  .doc-footer strong { color: var(--slate); }
+
+  /* ── Inline code ─────────────────────────────────── */
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    background: #EDE9E1;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    color: var(--navy);
+  }
+
+  /* ── Print ────────────────────────────────────────── */
+  @media print {
+    .nav-pills { display: none; }
+    .topbar { display: none; }
+    section { break-inside: avoid; }
+    .hero { background: #0D1B3E !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .equation-box, .stat-block, .result-banner, .optimal-card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner"></div></div>
+
+<div class="page-wrap">
+
+  <!-- ── HERO ───────────────────────────────────────── -->
+  <header class="hero">
+    <p class="hero-eyebrow">Technical Study Summary · Process Engineering</p>
+    <h1 class="hero-title">Improving <span>Packaging Seal Strength</span><br>Through Design of Experiments</h1>
+    <p class="hero-sub">A structured Design of Experiments (DoE) study applying a 2³ Full Factorial design to identify the optimal machine settings for maximising seal strength on food wrapping equipment.</p>
+    <div class="hero-meta">
+      <span class="hero-meta-item"><span class="hero-meta-dot"></span><strong>Study Period:</strong>&nbsp;January – March 2013</span>
+      <span class="hero-meta-item"><span class="hero-meta-dot"></span><strong>Design:</strong>&nbsp;2³ Full Factorial · 24 Randomised Runs</span>
+      <span class="hero-meta-item"><span class="hero-meta-dot"></span><strong>Application:</strong>&nbsp;Food Wrapping Machinery</span>
+      <span class="hero-meta-item"><span class="hero-meta-dot"></span><strong>Analysis Tool:</strong>&nbsp;Minitab 16 · ANOVA</span>
+    </div>
+  </header>
+
+  <!-- ── NAV ────────────────────────────────────────── -->
+  <nav class="nav-pills">
+    <a href="#background"   class="nav-pill">Background</a>
+    <a href="#design"       class="nav-pill">Experimental Design</a>
+    <a href="#theory"       class="nav-pill">Theory</a>
+    <a href="#dataset"      class="nav-pill">Dataset</a>
+    <a href="#anova"        class="nav-pill">ANOVA &amp; Coefficients</a>
+    <a href="#interaction"  class="nav-pill">Interaction</a>
+    <a href="#optimal"      class="nav-pill">Optimal Settings</a>
+    <a href="#gaps"         class="nav-pill">Gaps &amp; Improvements</a>
+    <a href="#roadmap"      class="nav-pill">Roadmap</a>
+    <a href="#takeaways"    class="nav-pill">Key Takeaways</a>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════════
+       1. BACKGROUND
+  ═══════════════════════════════════════════════════ -->
+  <section id="background">
+    <p class="section-label">Section 01</p>
+    <h2 class="section-title">Study Background &amp; Objective</h2>
+    <hr class="divider">
+
+    <div class="grid-2">
+      <div class="card card-accent">
+        <p style="font-weight:700;color:var(--navy);margin-bottom:0.5rem;">Business Driver</p>
+        <p style="font-size:0.85rem;color:var(--slate);">Recurring customer complaints regarding package seal failures during transit had led to an estimated <strong>3–4% product return rate</strong> in the quarter preceding the study. The QA team identified inconsistent sealing as the root cause, prompting a structured DoE investigation rather than continued OVAT (one-factor-at-a-time) testing.</p>
+      </div>
+      <div class="card card-accent-orange">
+        <p style="font-weight:700;color:var(--navy);margin-bottom:0.5rem;">Primary Objective</p>
+        <p style="font-size:0.85rem;color:var(--slate);">Identify the optimal combination of <strong>sealing temperature, sealing pressure, and machine speed</strong> on the food wrapping machine to maximise seal strength, ensure product integrity, and reduce field returns — while building internal statistical capability within the engineering team.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:0.85rem;background:#F0FDF4;border-color:#BBF7D0;">
+      <p style="font-size:0.83rem;color:var(--slate);">
+        <strong style="color:var(--green);">Context note:</strong> This study represented a significant methodological step forward — moving from OVAT testing to a statistically rigorous full factorial framework. Analysis was performed in <strong>Minitab 16</strong>. Seal strength was measured using a calibrated digital tensile tester per <strong>ASTM F88</strong> Standard Peel Test on 5 samples per run.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       2. EXPERIMENTAL DESIGN
+  ═══════════════════════════════════════════════════ -->
+  <section id="design">
+    <p class="section-label">Section 02</p>
+    <h2 class="section-title">Experimental Design</h2>
+    <hr class="divider">
+
+    <div class="factor-grid">
+      <div class="factor-card">
+        <div class="factor-header">
+          <div class="factor-letter" style="background:var(--teal);">A</div>
+          <div>
+            <p style="font-weight:700;font-size:0.9rem;color:var(--navy);">Sealing Temperature</p>
+            <p style="font-size:0.76rem;color:var(--slate-l);">Factor A · Positive Effect</p>
+          </div>
+        </div>
+        <div class="factor-body">
+          <p style="font-size:0.8rem;color:var(--slate);">Drives polymer chain diffusion to sealing initiation temperature. Largest positive lever in the study.</p>
+          <div class="factor-levels">
+            <span class="level-pill level-low">150°C (Low)</span>
+            <span class="level-pill level-high">170°C (High)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="factor-card">
+        <div class="factor-header">
+          <div class="factor-letter" style="background:#0D6EFD;">B</div>
+          <div>
+            <p style="font-weight:700;font-size:0.9rem;color:var(--navy);">Sealing Pressure</p>
+            <p style="font-size:0.76rem;color:var(--slate-l);">Factor B · Positive Effect</p>
+          </div>
+        </div>
+        <div class="factor-body">
+          <p style="font-size:0.8rem;color:var(--slate);">Acts as a thermal conductor — compresses film layers, removes air pockets and enables heat penetration to the sealant core.</p>
+          <div class="factor-levels">
+            <span class="level-pill level-low">40 psi (Low)</span>
+            <span class="level-pill level-high">60 psi (High)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="factor-card">
+        <div class="factor-header">
+          <div class="factor-letter" style="background:var(--red);">C</div>
+          <div>
+            <p style="font-weight:700;font-size:0.9rem;color:var(--navy);">Machine Speed</p>
+            <p style="font-size:0.76rem;color:var(--slate-l);">Factor C · Negative Effect</p>
+          </div>
+        </div>
+        <div class="factor-body">
+          <p style="font-size:0.8rem;color:var(--slate);">Higher speed reduces dwell time between jaws — film core cannot reach sealing initiation temperature, producing a shallow bond.</p>
+          <div class="factor-levels">
+            <span class="level-pill level-low">80 ppm (Low)</span>
+            <span class="level-pill level-high">100 ppm (High)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="factor-card">
+        <div class="factor-header">
+          <div class="factor-letter" style="background:var(--navy);">Y</div>
+          <div>
+            <p style="font-weight:700;font-size:0.9rem;color:var(--navy);">Response Variable</p>
+            <p style="font-size:0.76rem;color:var(--slate-l);">Seal Strength — N/m</p>
+          </div>
+        </div>
+        <div class="factor-body">
+          <p style="font-size:0.8rem;color:var(--slate);">Force required to peel apart sealed edge per ASTM F88. 5 samples per run, averaged. Minimum specification: <strong>650 N/m</strong>.</p>
+          <div class="factor-levels">
+            <span class="level-pill level-low">Min spec: 650</span>
+            <span class="level-pill level-high">Target: 887+</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1rem;background:#EFF6FF;border-color:#BFDBFE;">
+      <p style="font-size:0.83rem;color:var(--slate);">
+        <strong style="color:var(--teal);">Design structure:</strong> 2³ full factorial · 8 unique treatment combinations · 3 replicates = <strong>24 total randomised runs</strong> · Resolution V (no confounding between main effects or 2-factor interactions) · Statistical power &gt;90% for effect sizes ≥30 N/m · Software: Minitab 16
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       3. THEORY
+  ═══════════════════════════════════════════════════ -->
+  <section id="theory">
+    <p class="section-label">Section 03</p>
+    <h2 class="section-title">Theoretical Foundations</h2>
+    <hr class="divider">
+
+    <div class="grid-2">
+      <div class="compare-box" style="background:#EFF6FF;border-color:#BFDBFE;">
+        <h4 style="color:var(--teal);">✓ Full Factorial 2³ — Used Here</h4>
+        <ul class="compare-list">
+          <li><span class="ci ci-check">✓</span><span><strong>Orthogonality:</strong> Each factor's effect is estimated independently — no cross-contamination of results.</span></li>
+          <li><span class="ci ci-check">✓</span><span><strong>Interaction Detection:</strong> Captures synergies like Temp × Pressure that OVAT permanently misses.</span></li>
+          <li><span class="ci ci-check">✓</span><span><strong>Efficiency:</strong> 8 unique runs cover the complete experimental space. With replication: 24 total runs.</span></li>
+          <li><span class="ci ci-check">✓</span><span><strong>Resolution V:</strong> No confounding between main effects or 2-factor interactions — all terms estimable.</span></li>
+        </ul>
+      </div>
+
+      <div class="compare-box" style="background:#FEF2F2;border-color:#FECACA;">
+        <h4 style="color:var(--red);">✗ OVAT — Avoided in This Study</h4>
+        <ul class="compare-list">
+          <li><span class="ci ci-cross">✗</span><span><strong>Interaction Blind:</strong> Changes one variable while holding others fixed — cannot detect synergies between factors.</span></li>
+          <li><span class="ci ci-cross">✗</span><span><strong>Runs Inefficient:</strong> More total experiments for less information; poor signal-to-noise ratio.</span></li>
+          <li><span class="ci ci-cross">✗</span><span><strong>Optimum Missed:</strong> The true optimal is often at an interaction point invisible to OVAT.</span></li>
+          <li><span class="ci ci-cross">✗</span><span><strong>No Error Estimate:</strong> Without replication structure, experimental error cannot be properly quantified.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card card-accent" style="margin-top:1rem;">
+      <p style="font-weight:700;color:var(--navy);margin-bottom:0.6rem;">ANOVA — Key Statistical Concepts</p>
+      <div class="grid-3" style="margin-top:0.2rem;">
+        <div>
+          <p style="font-size:0.78rem;font-weight:700;color:var(--teal);margin-bottom:0.2rem;">Variance Decomposition</p>
+          <code style="font-size:0.78rem;display:block;padding:0.4rem 0.6rem;margin-bottom:0.4rem;">SS_Total = SS_Model + SS_Error</code>
+          <p style="font-size:0.78rem;color:var(--slate);">Separates the variation explained by controlled factors from random experimental noise.</p>
+        </div>
+        <div>
+          <p style="font-size:0.78rem;font-weight:700;color:var(--teal);margin-bottom:0.2rem;">F-Statistic &amp; p-value</p>
+          <p style="font-size:0.78rem;color:var(--slate);">F = MS_Factor / MS_Error. If <code>p &lt; 0.05</code>, reject H₀ — factor has a real effect with 95% confidence.</p>
+        </div>
+        <div>
+          <p style="font-size:0.78rem;font-weight:700;color:var(--teal);margin-bottom:0.2rem;">R² &amp; Adequate Precision</p>
+          <p style="font-size:0.78rem;color:var(--slate);">R² = proportion of variance explained (0–1). Adequate Precision = signal-to-noise; must exceed 4.0 for a navigable model.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       4. DATASET
+  ═══════════════════════════════════════════════════ -->
+  <section id="dataset">
+    <p class="section-label">Section 04</p>
+    <h2 class="section-title">2013 Analytical Dataset</h2>
+    <hr class="divider">
+
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Run</th>
+            <th>Temp A (°C)</th>
+            <th>Pressure B (psi)</th>
+            <th>Speed C (ppm)</th>
+            <th>Rep 1 (N/m)</th>
+            <th>Rep 2 (N/m)</th>
+            <th>Rep 3 (N/m)</th>
+            <th>Average (N/m)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>150 (−)</td><td>40 (−)</td><td>80 (−)</td><td>610</td><td>625</td><td>618</td><td class="avg">617.7</td></tr>
+          <tr><td>2</td><td>170 (+)</td><td>40 (−)</td><td>80 (−)</td><td>755</td><td>740</td><td>762</td><td class="avg">752.3</td></tr>
+          <tr><td>3</td><td>150 (−)</td><td>60 (+)</td><td>80 (−)</td><td>690</td><td>705</td><td>698</td><td class="avg">697.7</td></tr>
+          <tr class="row-opt"><td>4</td><td><strong>170 (+)</strong></td><td><strong>60 (+)</strong></td><td><strong>80 (−)</strong></td><td>880</td><td>895</td><td>887</td><td class="avg avg-opt">887.3 ★</td></tr>
+          <tr class="row-worst"><td>5</td><td>150 (−)</td><td>40 (−)</td><td>100 (+)</td><td>550</td><td>565</td><td>558</td><td class="avg avg-worst">557.7 ▼</td></tr>
+          <tr><td>6</td><td>170 (+)</td><td>40 (−)</td><td>100 (+)</td><td>640</td><td>655</td><td>647</td><td class="avg">647.3</td></tr>
+          <tr><td>7</td><td>150 (−)</td><td>60 (+)</td><td>100 (+)</td><td>615</td><td>630</td><td>622</td><td class="avg">622.3</td></tr>
+          <tr><td>8</td><td>170 (+)</td><td>60 (+)</td><td>100 (+)</td><td>710</td><td>725</td><td>718</td><td class="avg">717.7</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-3" style="margin-top:1rem;">
+      <div class="stat-block">
+        <p class="stat-label">Optimal (Run 4)</p>
+        <p class="stat-value">887.3</p>
+        <p class="stat-sub">N/m · 170°C / 60 psi / 80 ppm</p>
+      </div>
+      <div class="stat-block" style="background:#4A2900;">
+        <p class="stat-label" style="color:#FED7AA;">Worst (Run 5)</p>
+        <p class="stat-value" style="color:#FED7AA;">557.7</p>
+        <p class="stat-sub">N/m · 150°C / 40 psi / 100 ppm</p>
+      </div>
+      <div class="stat-block" style="background:var(--teal);">
+        <p class="stat-label" style="color:#CFFAFE;">Range</p>
+        <p class="stat-value">329.6</p>
+        <p class="stat-sub">N/m spread · Min spec: 650 N/m</p>
+      </div>
+    </div>
+
+    <p style="font-size:0.78rem;color:var(--slate-l);margin-top:0.6rem;">★ Optimal row highlighted blue &nbsp;▼ Worst row highlighted amber &nbsp;· Runs 5 &amp; 6 below the 650 N/m minimum specification at original settings.</p>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       5. ANOVA & COEFFICIENTS
+  ═══════════════════════════════════════════════════ -->
+  <section id="anova">
+    <p class="section-label">Section 05</p>
+    <h2 class="section-title">ANOVA Results &amp; Factor Coefficients</h2>
+    <hr class="divider">
+
+    <div class="coeff-grid">
+      <div class="coeff-card">
+        <div class="coeff-top" style="background:#EFF6FF;">
+          <span class="coeff-badge" style="background:var(--teal);">A</span>
+          <span style="font-size:0.72rem;font-weight:700;color:var(--teal);letter-spacing:0.08em;">POSITIVE · p &lt; 0.001</span>
+        </div>
+        <div class="coeff-value" style="color:var(--teal);">+65</div>
+        <div class="coeff-body">
+          <p class="coeff-name">Sealing Temperature</p>
+          <p class="coeff-note">Highest sensitivity. Drives polymer diffusion; dominant single factor in the model.</p>
+        </div>
+      </div>
+
+      <div class="coeff-card">
+        <div class="coeff-top" style="background:#FEF2F2;">
+          <span class="coeff-badge" style="background:var(--red);">C</span>
+          <span style="font-size:0.72rem;font-weight:700;color:var(--red);letter-spacing:0.08em;">NEGATIVE · p &lt; 0.001</span>
+        </div>
+        <div class="coeff-value" style="color:var(--red);">−55</div>
+        <div class="coeff-body">
+          <p class="coeff-name">Machine Speed</p>
+          <p class="coeff-note">Reduces jaw dwell time. Film core cannot reach sealing initiation temperature — shallow bond results.</p>
+        </div>
+      </div>
+
+      <div class="coeff-card">
+        <div class="coeff-top" style="background:#EFF6FF;">
+          <span class="coeff-badge" style="background:#0D6EFD;">B</span>
+          <span style="font-size:0.72rem;font-weight:700;color:#0D6EFD;letter-spacing:0.08em;">POSITIVE · p &lt; 0.001</span>
+        </div>
+        <div class="coeff-value" style="color:#0D6EFD;">+40</div>
+        <div class="coeff-body">
+          <p class="coeff-name">Sealing Pressure</p>
+          <p class="coeff-note">Thermal conductor — flattens film layers, removes air pockets, enables heat to reach sealant core.</p>
+        </div>
+      </div>
+
+      <div class="coeff-card">
+        <div class="coeff-top" style="background:#FFF7ED;">
+          <span class="coeff-badge" style="background:var(--orange);">AB</span>
+          <span style="font-size:0.72rem;font-weight:700;color:var(--orange);letter-spacing:0.08em;">INTERACTION · p = 0.015</span>
+        </div>
+        <div class="coeff-value" style="color:var(--orange);">+20</div>
+        <div class="coeff-body">
+          <p class="coeff-name">Temp × Pressure</p>
+          <p class="coeff-note">Significant synergy. Benefit of increasing temperature is much greater at 60 psi than at 40 psi.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="equation-box">
+      Seal Strength (N/m) &nbsp;=&nbsp; 715 &nbsp;<em>+65·A</em>&nbsp; +40·B &nbsp;<em style="color:#ef4444;">−55·C</em>&nbsp; <em>+20·A×B</em>
+      <br>
+      <span style="font-size:0.75rem;color:var(--slate-l);">Coded factors: A=(T−160)/10 &nbsp;·&nbsp; B=(P−50)/10 &nbsp;·&nbsp; C=(S−90)/10</span>
+    </div>
+
+    <div class="card card-accent-orange" style="margin-top:0.85rem;">
+      <p style="font-size:0.82rem;color:var(--slate);"><strong style="color:var(--amber);">⚠ Important gap:</strong> The model as reported does not include the ABC three-factor interaction term, and R², Adjusted R², Predicted R², and Adequate Precision were not formally presented. Published comparable 2³ studies have found the three-factor interaction highly significant. This term should be estimated and tested before deploying the regression model for process control.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       6. INTERACTION
+  ═══════════════════════════════════════════════════ -->
+  <section id="interaction">
+    <p class="section-label">Section 06</p>
+    <h2 class="section-title">Temperature × Pressure Interaction (AB)</h2>
+    <hr class="divider">
+
+    <div class="grid-2">
+      <div class="card card-accent">
+        <p style="font-weight:700;color:var(--navy);margin-bottom:0.7rem;">The Physics Behind the Interaction</p>
+        <ul class="compare-list">
+          <li><span class="ci ci-info">→</span><span><strong>Thermal Conductivity:</strong> High pressure (60 psi) compresses film layers, removing microscopic air pockets that otherwise act as thermal insulators.</span></li>
+          <li><span class="ci ci-info">→</span><span><strong>Sealing Initiation Temp:</strong> At 40 psi, only the film surface reaches sealing temperature. The polymer core remains unactivated, producing a shallow bond.</span></li>
+          <li><span class="ci ci-info">→</span><span><strong>Synergistic Gain:</strong> At 60 psi + 170°C, both film surfaces achieve full polymer diffusion — the mechanism behind the non-parallel interaction plot lines.</span></li>
+          <li><span class="ci ci-info">→</span><span><strong>Practical Implication:</strong> Optimising temperature or pressure independently misses the true optimum. Both must be set jointly.</span></li>
+        </ul>
+      </div>
+
+      <div class="card" style="background:var(--navy);">
+        <p style="font-size:0.78rem;font-weight:700;color:var(--teal-l);text-align:center;margin-bottom:0.75rem;letter-spacing:0.06em;">INTERACTION PLOT — Temp × Pressure</p>
+        <!-- SVG Interaction Plot -->
+        <svg viewBox="0 0 280 160" style="width:100%;display:block;" xmlns="http://www.w3.org/2000/svg">
+          <!-- Grid -->
+          <line x1="40" y1="20" x2="40" y2="130" stroke="#334155" stroke-width="1"/>
+          <line x1="40" y1="130" x2="260" y2="130" stroke="#334155" stroke-width="1"/>
+          <!-- Grid horizontals -->
+          <line x1="40" y1="20" x2="260" y2="20" stroke="#1e293b" stroke-width="0.5" stroke-dasharray="3,3"/>
+          <line x1="40" y1="75" x2="260" y2="75" stroke="#1e293b" stroke-width="0.5" stroke-dasharray="3,3"/>
+          <!-- Y-axis labels -->
+          <text x="36" y="23" fill="#64748b" font-size="8" text-anchor="end">900</text>
+          <text x="36" y="78" fill="#64748b" font-size="8" text-anchor="end">750</text>
+          <text x="36" y="133" fill="#64748b" font-size="8" text-anchor="end">600</text>
+          <!-- X-axis labels -->
+          <text x="65" y="143" fill="#64748b" font-size="8" text-anchor="middle">150°C</text>
+          <text x="235" y="143" fill="#64748b" font-size="8" text-anchor="middle">170°C</text>
+          <text x="150" y="153" fill="#475569" font-size="7.5" text-anchor="middle">Temperature</text>
+          <!-- N/m label -->
+          <text x="42" y="14" fill="#64748b" font-size="7">N/m</text>
+
+          <!-- Data points mapped: 
+               Y range 550–950 → pixel range 130 (bottom) to 20 (top), span 110px
+               150°C: 40psi=617.7 → 130 - (617.7-600)/350*110 = 124.4; 60psi=697.7 → 130 - (97.7/350)*110 = 99.3
+               170°C: 40psi=752.3 → 130 - (152.3/350)*110 = 82.2; 60psi=887.3 → 130 - (287.3/350)*110 = 40.0
+          -->
+
+          <!-- 60 psi line (orange) -->
+          <line x1="65" y1="99" x2="235" y2="40" stroke="#E8652A" stroke-width="2.5"/>
+          <circle cx="65" cy="99" r="4" fill="#E8652A"/>
+          <circle cx="235" cy="40" r="4" fill="#E8652A"/>
+
+          <!-- 40 psi line (teal dashed) -->
+          <line x1="65" y1="124" x2="235" y2="82" stroke="#0B7285" stroke-width="2" stroke-dasharray="5,3"/>
+          <circle cx="65" cy="124" r="3.5" fill="#0B7285"/>
+          <circle cx="235" cy="82" r="3.5" fill="#0B7285"/>
+
+          <!-- Legend -->
+          <line x1="50" y1="160" x2="68" y2="160" stroke="#E8652A" stroke-width="2"/>
+          <text x="71" y="163" fill="#94a3b8" font-size="7">60 psi (High)</text>
+          <line x1="140" y1="160" x2="158" y2="160" stroke="#0B7285" stroke-width="2" stroke-dasharray="4,2"/>
+          <text x="161" y="163" fill="#94a3b8" font-size="7">40 psi (Low)</text>
+        </svg>
+        <p style="font-size:0.72rem;color:var(--slate-l);text-align:center;margin-top:0.5rem;">Non-parallel lines confirm significant interaction · p = 0.015</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:0.85rem;background:#FFF7ED;border-color:#FED7AA;">
+      <p style="font-size:0.83rem;color:var(--slate);">
+        <strong style="color:var(--amber);">Key implication:</strong> The gain from raising temperature is <strong>+190 N/m</strong> at 60 psi but only <strong>+135 N/m</strong> at 40 psi. Operating at high temperature with low pressure wastes energy and underperforms. The two parameters must always be set in concert.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       7. OPTIMAL SETTINGS
+  ═══════════════════════════════════════════════════ -->
+  <section id="optimal">
+    <p class="section-label">Section 07</p>
+    <h2 class="section-title">Identified Optimal Process Settings</h2>
+    <hr class="divider">
+
+    <div style="background:var(--navy);border-radius:12px;padding:1.5rem;">
+      <div class="optimal-grid">
+        <div class="optimal-card">
+          <p class="optimal-label" style="color:var(--teal-l);">Temperature</p>
+          <p class="optimal-value">170°C</p>
+          <p class="optimal-sub">Factor A — High Level</p>
+        </div>
+        <div class="optimal-card" style="border-color:rgba(232,101,42,0.4);">
+          <p class="optimal-label" style="color:#FDBA74;">Pressure</p>
+          <p class="optimal-value">60 psi</p>
+          <p class="optimal-sub">Factor B — High Level</p>
+        </div>
+        <div class="optimal-card" style="border-color:rgba(93,141,239,0.4);">
+          <p class="optimal-label" style="color:#93C5FD;">Machine Speed</p>
+          <p class="optimal-value">80 ppm</p>
+          <p class="optimal-sub">Factor C — Low Level</p>
+        </div>
+      </div>
+      <div class="result-banner">
+        <div>
+          <p class="rb-label">Achieved Seal Strength</p>
+          <p class="rb-value">887.3 N/m</p>
+        </div>
+        <div>
+          <p class="rb-note">vs. worst case 557.7 N/m</p>
+          <p class="rb-note"><strong>+59% improvement</strong></p>
+          <p class="rb-note">Well above 650 N/m minimum specification</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       8. GAPS & IMPROVEMENTS
+  ═══════════════════════════════════════════════════ -->
+  <section id="gaps">
+    <p class="section-label">Section 08</p>
+    <h2 class="section-title">Study Gaps vs. Modern DoE Best Practice</h2>
+    <hr class="divider">
+
+    <div class="gap-table-wrap">
+      <table class="gap-table">
+        <thead>
+          <tr>
+            <th style="width:18%;">Gap Area</th>
+            <th style="width:28%;">2013 Original Approach</th>
+            <th style="width:42%;">Recommended Improvement</th>
+            <th style="width:12%;text-align:center;">Priority</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ABC 3-Factor Interaction</td>
+            <td>Not tested in ANOVA table</td>
+            <td>Published 2³ full factorial studies have found the three-factor interaction significant (F&gt;100, p&lt;0.0001) in comparable processes. This term must be explicitly estimated — omitting it leaves the model underspecified.</td>
+            <td><span class="priority-badge p-high">High</span></td>
+          </tr>
+          <tr>
+            <td>Model Diagnostics</td>
+            <td>R², Adj R², Pred R² not reported</td>
+            <td>Report R², Adj R², Pred R², and Adequate Precision (must exceed 4.0). A well-specified 2³ model should achieve R²&gt;0.98 and Adequate Precision&gt;30 for reliable process navigation.</td>
+            <td><span class="priority-badge p-high">High</span></td>
+          </tr>
+          <tr>
+            <td>Gage R&R</td>
+            <td>No measurement system study conducted</td>
+            <td>Pre-study Gage R&R required per AIAG MSA 4th Edition. Measurement variation must be &lt;10% of total process variation before committing to a DoE.</td>
+            <td><span class="priority-badge p-high">High</span></td>
+          </tr>
+          <tr>
+            <td>Centre Points</td>
+            <td>Not included — curvature undetectable</td>
+            <td>Add 3–5 centre-point runs (160°C, 50 psi, 90 ppm) in Phase 2 to detect non-linearity in the response surface.</td>
+            <td><span class="priority-badge p-medium">Medium</span></td>
+          </tr>
+          <tr>
+            <td>Residual Analysis</td>
+            <td>No normality / variance checks shown</td>
+            <td>Generate: normal probability plot of residuals, residuals vs. fitted, and run-order plot. Non-constant variance is common in heat-sealing processes.</td>
+            <td><span class="priority-badge p-medium">Medium</span></td>
+          </tr>
+          <tr>
+            <td>Response Surface &amp; Contour Plots</td>
+            <td>Not generated in either document</td>
+            <td>Phase 2 RSM study (Central Composite Design) to map the full seal strength response surface — identify exact optimal ridge and throughput trade-off zones.</td>
+            <td><span class="priority-badge p-phase2">Phase 2</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       9. IMPLEMENTATION ROADMAP
+  ═══════════════════════════════════════════════════ -->
+  <section id="roadmap">
+    <p class="section-label">Section 09</p>
+    <h2 class="section-title">Implementation Roadmap</h2>
+    <hr class="divider">
+
+    <p style="font-size:0.85rem;color:var(--slate);margin-bottom:1rem;">Four immediate actions before full plant deployment, followed by a structured Phase 2 programme:</p>
+
+    <div class="roadmap-grid">
+      <div class="roadmap-card">
+        <div class="roadmap-header" style="border-left:4px solid var(--teal);">
+          <div class="roadmap-num">01</div>
+          <p class="roadmap-title">Parameter Locking — SOP Update</p>
+        </div>
+        <div class="roadmap-body">Lock 170°C / 60 psi / 80 ppm as the standard SOP for the food wrapping machine. Update machine setup card and Andon board immediately. Maintain 60 psi jaw pressure via bi-weekly mechanical audit.</div>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-header" style="border-left:4px solid var(--orange);">
+          <div class="roadmap-num">02</div>
+          <p class="roadmap-title">Jaw Hardware Audit</p>
+        </div>
+        <div class="roadmap-body">Inspect seal jaw heating elements for cold spots using a thermal camera. Temperature uniformity across the jaw face is critical — localised cold zones directly undermine the large positive effect of Factor A.</div>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-header" style="border-left:4px solid #0D6EFD;">
+          <div class="roadmap-num">03</div>
+          <p class="roadmap-title">Sensor &amp; PID Upgrade</p>
+        </div>
+        <div class="roadmap-body">Upgrade thermocouple precision to ±1°C. Install jaw pressure transducers for real-time PSI monitoring. Consider PID loop auto-tuning to eliminate thermal drift between production shifts.</div>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-header" style="border-left:4px solid var(--green);">
+          <div class="roadmap-num">04</div>
+          <p class="roadmap-title">Cpk Validation Run</p>
+        </div>
+        <div class="roadmap-body">Execute 50-pack stress run at optimal settings. Compute Cpk (Process Capability Index). Target Cpk ≥ 1.33 before full plant rollout. Document prediction interval compliance and confirm model predictions.</div>
+      </div>
+    </div>
+
+    <div class="card card-accent" style="margin-top:0.85rem;background:#EFF6FF;border-color:#BFDBFE;">
+      <p style="font-weight:700;color:var(--navy);margin-bottom:0.35rem;">Phase 2 Roadmap</p>
+      <ul class="compare-list">
+        <li><span class="ci ci-info">→</span><span>Conduct RSM study (Central Composite Design) with centre points to explore non-linear response and generate full 3D contour maps of the seal strength surface.</span></li>
+        <li><span class="ci ci-info">→</span><span>Investigate film type and thickness as additional factors — significant cost levers in the FMCG packaging market.</span></li>
+        <li><span class="ci ci-info">→</span><span>Explore whether intermediate speed (90 ppm) with compensated temperature/pressure settings can recover throughput without sacrificing seal quality.</span></li>
+        <li><span class="ci ci-info">→</span><span>Consider pre-heating film as a mechanism to unlock higher throughput (100–120 ppm) without dwell-time trade-off.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       10. KEY TAKEAWAYS
+  ═══════════════════════════════════════════════════ -->
+  <section id="takeaways">
+    <p class="section-label">Section 10</p>
+    <h2 class="section-title">Key Takeaways</h2>
+    <hr class="divider">
+
+    <div class="takeaway-list">
+      <div class="takeaway t-confirmed">
+        <div class="takeaway-icon ti-check">✓</div>
+        <p class="takeaway-text"><strong>Optimal settings confirmed:</strong> 170°C / 60 psi / 80 ppm delivers 887.3 N/m seal strength — 59% above the worst-case combination and well above the 650 N/m minimum specification.</p>
+      </div>
+      <div class="takeaway t-confirmed">
+        <div class="takeaway-icon ti-check">✓</div>
+        <p class="takeaway-text"><strong>Factor hierarchy established:</strong> Temperature is the primary lever (+65), Machine Speed the greatest threat (−55), and Pressure the structural foundation (+40). Speed should never be increased without compensating adjustments to the other two.</p>
+      </div>
+      <div class="takeaway t-confirmed">
+        <div class="takeaway-icon ti-check">✓</div>
+        <p class="takeaway-text"><strong>Temperature × Pressure interaction is real and significant (p = 0.015):</strong> The synergy is not additive — temperature and pressure must be jointly optimised. Setting them independently leaves significant seal strength on the table.</p>
+      </div>
+      <div class="takeaway t-confirmed">
+        <div class="takeaway-icon ti-check">✓</div>
+        <p class="takeaway-text"><strong>Full Factorial design was the correct choice:</strong> The AB interaction would have been permanently invisible under OVAT. The 2013 team's decision to use a 2³ full factorial was methodologically sound and enabled the most important finding of the study.</p>
+      </div>
+      <div class="takeaway t-gap">
+        <div class="takeaway-icon ti-warn">!</div>
+        <p class="takeaway-text"><strong>Three open items before production rollout:</strong> (1) ABC three-factor interaction not tested, (2) model diagnostics (R², Adequate Precision) not reported, (3) pre-study Gage R&R on the tensile tester not conducted. All three are classified <strong>High Priority</strong>.</p>
+      </div>
+      <div class="takeaway t-next">
+        <div class="takeaway-icon ti-arrow">→</div>
+        <p class="takeaway-text"><strong>Phase 2 path is clear:</strong> RSM study with centre points to map the full response surface, detect curvature, and unlock throughput at 90–100 ppm without sacrificing seal integrity.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ──────────────────────────────────────── -->
+  <footer class="doc-footer">
+    <p>
+      <strong>Study Period:</strong> January – March 2013 &nbsp;·&nbsp;
+      <strong>Design:</strong> 2³ Full Factorial · 24 Runs · Minitab 16 &nbsp;·&nbsp;
+      <strong>Standard:</strong> ASTM F88 Peel Test
+    </p>
+    <p style="text-align:right;">Process Engineering · DoE Technical Summary</p>
+  </footer>
+
+</div><!-- /page-wrap -->
+</body>
+</html>
