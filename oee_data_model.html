@@ -9,43 +9,43 @@
 <style>
 /* ─── TOKENS ─────────────────────────────────────── */
 :root {
-  --bg:          #f4f7fb;
-  --surface:     #ffffff;
-  --surface2:    #f8fafc;
-  --border:      #e1e7ef;
-  --border-mid:  #c8d5e3;
+  --bg:          #dce5f0;
+  --surface:     #edf3fa;
+  --surface2:    #e3eaf4;
+  --border:      #c0cfe0;
+  --border-mid:  #a3b8cf;
   --text:        #0d1829;
   --text-mid:    #3d5066;
-  --text-muted:  #6b7f96;
-  --text-dim:    #9bafc4;
+  --text-muted:  #5e7590;
+  --text-dim:    #8aa0b8;
 
-  --amber:       #d97706;
-  --amber-bg:    #fffbeb;
-  --amber-border:#fde68a;
+  --amber:       #b45309;
+  --amber-bg:    #fef3c7;
+  --amber-border:#fbbf24;
 
-  --purple:      #7c3aed;
-  --purple-bg:   #f5f3ff;
-  --purple-border:#ddd6fe;
+  --purple:      #6d28d9;
+  --purple-bg:   #ede9fe;
+  --purple-border:#a78bfa;
 
-  --teal:        #0891b2;
-  --teal-bg:     #ecfeff;
-  --teal-border: #a5f3fc;
+  --teal:        #0e7490;
+  --teal-bg:     #cffafe;
+  --teal-border: #22d3ee;
 
-  --orange:      #ea580c;
-  --orange-bg:   #fff7ed;
-  --orange-border:#fed7aa;
+  --orange:      #c2410c;
+  --orange-bg:   #ffedd5;
+  --orange-border:#fb923c;
 
-  --green:       #16a34a;
-  --green-bg:    #f0fdf4;
-  --green-border:#bbf7d0;
+  --green:       #15803d;
+  --green-bg:    #dcfce7;
+  --green-border:#4ade80;
 
-  --blue:        #2563eb;
-  --blue-bg:     #eff6ff;
-  --blue-border: #bfdbfe;
+  --blue:        #1d4ed8;
+  --blue-bg:     #dbeafe;
+  --blue-border: #60a5fa;
 
-  --red:         #dc2626;
-  --red-bg:      #fef2f2;
-  --red-border:  #fecaca;
+  --red:         #b91c1c;
+  --red-bg:      #fee2e2;
+  --red-border:  #f87171;
 
   --shadow-sm:   0 1px 2px rgba(13,24,41,.06), 0 2px 8px rgba(13,24,41,.04);
   --shadow-md:   0 4px 12px rgba(13,24,41,.08), 0 1px 3px rgba(13,24,41,.06);
@@ -62,22 +62,22 @@
 html { scroll-behavior: smooth; }
 body {
   font-family: var(--sans);
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--text);
   font-size: 15px;
   line-height: 1.65;
   min-height: 100vh;
   /* blueprint grid overlay */
   background-image:
-    linear-gradient(rgba(37,99,235,.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37,99,235,.035) 1px, transparent 1px);
+    linear-gradient(rgba(29,78,216,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29,78,216,.055) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 /* ─── NAV ─────────────────────────────────────── */
 nav {
   position: sticky; top: 0; z-index: 200;
-  background: rgba(255,255,255,.92);
+  background: rgba(237,243,250,.94);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
@@ -104,8 +104,8 @@ nav a:hover { color: var(--blue); border-bottom-color: var(--blue); }
 
 /* ─── HERO ─────────────────────────────────────── */
 .hero {
-  background: linear-gradient(135deg, #fff 0%, #f0f9ff 50%, #f0fdf4 100%);
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, #dae7f5 0%, #d5e8f3 50%, #d4ecdf 100%);
+  border-bottom: 1px solid var(--border-mid);
   padding: 5rem 2rem 4.5rem;
   position: relative; overflow: hidden;
 }
@@ -176,7 +176,7 @@ section { padding: 5rem 0 0; }
 .formula-hero::before {
   content:'';
   position:absolute;inset:0;
-  background: radial-gradient(ellipse at 50% 0%, rgba(22,163,74,.07) 0%, transparent 70%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(21,128,61,.10) 0%, transparent 70%);
   pointer-events:none;
 }
 .formula-label {
@@ -245,7 +245,7 @@ section { padding: 5rem 0 0; }
 .arch-wrap::before {
   content:'';
   position:absolute;inset:0;
-  background: linear-gradient(180deg, rgba(37,99,235,.02) 0%, transparent 30%, transparent 70%, rgba(22,163,74,.02) 100%);
+  background: linear-gradient(180deg, rgba(29,78,216,.03) 0%, transparent 30%, transparent 70%, rgba(21,128,61,.03) 100%);
   pointer-events:none;
 }
 
