@@ -1,0 +1,12 @@
+{
+  "name": "web-interactive-collection",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i tailwind.input.css -o tailwind.min.css --content '*.html,Homelab/*.html' --minify",
+    "watch:css": "tailwindcss -i tailwind.input.css -o tailwind.min.css --content '*.html,Homelab/*.html' --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.0.0",
+    "tailwindcss": "^4.0.0"
+  }
+}

@@ -1,0 +1,43 @@
+name: Build Tailwind CSS
+
+on:
+  push:
+    paths:
+      - '*.html'
+      - 'Homelab/*.html'
+      - 'tailwind.input.css'
+      - '.github/workflows/build-css.yml'
+  workflow_dispatch: # allow manual runs from the Actions tab
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to commit the built CSS back
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Tailwind CSS
+        run: |
+          npx @tailwindcss/cli \
+            -i tailwind.input.css \
+            -o tailwind.min.css \
+            --content '*.html,Homelab/*.html' \
+            --minify
+
+      - name: Commit built CSS if changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'build: regenerate tailwind.min.css'
+          file_pattern: tailwind.min.css
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com
