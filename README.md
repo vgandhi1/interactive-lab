@@ -51,6 +51,7 @@ The landing page groups artifacts into three areas (in-page anchors):
 | Page | File | Summary |
 |------|------|---------|
 | AI Buzzwords | [AI-buzzwords.html](AI-buzzwords.html) | Visual explainers — transformers, RAG, agents, temperature, etc. |
+| Claude Ecosystem Guide | [claude-ecosystem-guide.html](claude-ecosystem-guide.html) | Anthropic 2026 — Chat, Code, Skills, Coworker, MCP, Academy |
 | AI Glossary | [AI-terminology.html](AI-terminology.html) | Searchable LLM terminology |
 | DSA Architect | [DSA.html](DSA.html) | Data structures & algorithms reference with complexity notes |
 | Mastering uv | [uv-guide.html](uv-guide.html) | Interactive guide to the `uv` Python package manager |
@@ -78,13 +79,13 @@ These are linked from the [main portfolio](https://vgandhi1.github.io/) rather t
 
 | Category | Technologies |
 |----------|----------------|
-| Markup & style | Static HTML, [Tailwind CSS](https://tailwindcss.com/) (CDN on hub), custom CSS per page |
+| Markup & style | Static HTML; [Tailwind CSS v4 browser CDN](https://tailwindcss.com/docs/installation/play-cdn) on the hub and a few tool pages; inline custom CSS everywhere else |
 | Charts / viz | [Chart.js](https://www.chartjs.org/), [Plotly.js](https://plotly.com/javascript/) where used |
 | Logic | Vanilla JavaScript (ES6+) |
 | Fonts | Inter (hub), per-page fonts elsewhere |
 | Hosting | GitHub Pages (project site under `/web-interactive-collection/`) |
 
-Design goals: fast load, no build step for most pages, and readable offline after first fetch (CDN assets excepted).
+**No build step** — clone, open `index.html` via a local server, or push to GitHub Pages. Pages that use Tailwind load it from jsDelivr at runtime.
 
 ---
 

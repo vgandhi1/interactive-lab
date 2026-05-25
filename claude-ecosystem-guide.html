@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Ecosystem Guide — Anthropic 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0c0f1a;--ink-2:#3a3f52;--ink-3:#6b7185;
+  --paper:#f9f8f5;--paper-2:#f0ede6;--paper-3:#e8e3d8;--line:#d8d3c8;
+  --purple:#6a3de8;--purple-lt:#ede8fc;--purple-dk:#3d1fa3;
+  --teal:#0d8c72;--teal-lt:#e0f5f0;
+  --amber:#c47a0a;--amber-lt:#fdf3dc;
+  --red:#c0392b;--red-lt:#fdecea;
+  --blue:#1a5fcc;--blue-lt:#e8f0fd;
+  --green:#2a7a3b;--green-lt:#e8f7ec;
+  --sans:'IBM Plex Sans',sans-serif;
+  --serif:'Fraunces',serif;
+  --mono:'IBM Plex Mono',monospace;
+  --r:8px;--r-lg:14px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+nav{position:sticky;top:0;z-index:100;background:rgba(249,248,245,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:0 1.5rem;display:flex;align-items:center;height:52px;overflow-x:auto}
+nav::-webkit-scrollbar{display:none}
+.nav-brand{font-family:var(--serif);font-weight:600;font-size:.95rem;color:var(--ink);white-space:nowrap;margin-right:1.5rem;flex-shrink:0}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:0;flex-shrink:0}
+.nav-links a{font-size:12px;font-weight:500;color:var(--ink-3);text-decoration:none;padding:0 11px;height:52px;line-height:52px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.nav-links a:hover{color:var(--ink);border-color:var(--purple)}
+.hero{background:var(--ink);color:#fff;padding:5rem 2rem 4rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(106,61,232,.3),transparent),radial-gradient(ellipse 40% 60% at 20% 80%,rgba(13,140,114,.2),transparent)}
+.hero-inner{max-width:820px;margin:0 auto;position:relative}
+.hero-tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;margin-bottom:1.5rem}
+.hero h1{font-family:var(--serif);font-size:clamp(2.2rem,5vw,3.8rem);font-weight:700;line-height:1.12;margin-bottom:1.25rem;letter-spacing:-.02em}
+.hero h1 em{font-style:italic;font-weight:300;color:rgba(255,255,255,.65)}
+.hero-sub{font-size:1.05rem;color:rgba(255,255,255,.65);max-width:600px;margin-bottom:2.5rem;line-height:1.7}
+.hero-chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 14px;font-size:12.5px;color:rgba(255,255,255,.8)}
+.chip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.wrap{max-width:960px;margin:0 auto;padding:0 2rem}
+.section-gap{padding:4rem 0 2rem}
+.sec-eyebrow{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:.6rem}
+.sec-title{font-family:var(--serif);font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:600;line-height:1.2;letter-spacing:-.025em;color:var(--ink);margin-bottom:.75rem}
+.sec-sub{font-size:1rem;color:var(--ink-3);max-width:680px;line-height:1.7;margin-bottom:2.5rem}
+hr.sec-rule{border:none;border-top:1px solid var(--line);margin:0 0 2.5rem}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:1.5rem}
+.card-title{font-weight:600;font-size:.95rem;color:var(--ink);display:flex;align-items:center;gap:10px;margin-bottom:.6rem}
+.card-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.card p,.card li{font-size:.875rem;color:var(--ink-3);line-height:1.65}
+.card ul{padding-left:1.1rem}
+.card li{margin-bottom:.3rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+@media(max-width:760px){.g2,.g3{grid-template-columns:1fr}}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:20px}
+.badge-ui{background:var(--blue-lt);color:var(--blue)}
+.badge-cli{background:var(--purple-lt);color:var(--purple-dk)}
+.badge-agent{background:var(--green-lt);color:var(--green)}
+.badge-free{background:var(--teal-lt);color:var(--teal)}
+.badge-pro{background:var(--amber-lt);color:var(--amber)}
+.badge-dev{background:#f0e8ff;color:#4a1fa8}
+.badge-cert{background:var(--amber-lt);color:var(--amber)}
+.badge-new{background:#fdf3dc;color:#7a4a00;border:1px solid #f0c96a}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:.75rem}
+.tag{font-size:11.5px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--paper-2);color:var(--ink-3);border:1px solid var(--line)}
+code{font-family:var(--mono);background:var(--paper-2);color:var(--purple-dk);padding:2px 6px;border-radius:4px;font-size:.8em}
+pre{background:var(--ink);color:#e2e8f0;padding:1.25rem 1.5rem;border-radius:var(--r);overflow-x:auto;font-family:var(--mono);font-size:.8rem;line-height:1.6;margin:1rem 0}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+.callout{border-left:3px solid var(--purple);background:var(--purple-lt);border-radius:0 var(--r) var(--r) 0;padding:1.25rem 1.5rem;margin:1.5rem 0}
+.callout.teal{border-color:var(--teal);background:var(--teal-lt)}
+.callout.amber{border-color:var(--amber);background:var(--amber-lt)}
+.callout.red{border-color:var(--red);background:var(--red-lt)}
+.callout.green{border-color:var(--green);background:var(--green-lt)}
+.callout-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-dk);margin-bottom:.4rem}
+.callout.teal .callout-label{color:var(--teal)}
+.callout.amber .callout-label{color:var(--amber)}
+.callout.red .callout-label{color:var(--red)}
+.callout.green .callout-label{color:var(--green)}
+.callout p{font-size:.875rem;color:var(--ink-2);line-height:1.65;margin:0}
+.callout p+p{margin-top:.5rem}
+.table-wrap{overflow-x:auto;margin:1.25rem 0}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:.75rem 1rem;font-size:.85rem;border-bottom:1px solid var(--line)}
+th{background:var(--paper-2);font-weight:600;color:var(--ink);font-size:.8rem;letter-spacing:.02em}
+td{color:var(--ink-2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--paper-2)}
+td code{font-size:.78em}
+.steps{display:flex;flex-direction:column;gap:.75rem;margin:1.25rem 0}
+.step{display:flex;align-items:flex-start;gap:1rem;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:1rem 1.25rem}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;margin-top:1px}
+.step-body strong{font-weight:600;font-size:.9rem;color:var(--ink);display:block;margin-bottom:2px}
+.step-body span{font-size:.83rem;color:var(--ink-3)}
+.decision-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+@media(max-width:760px){.decision-grid{grid-template-columns:1fr}}
+.decision-card{border-radius:var(--r-lg);padding:1.75rem;border:1px solid var(--line)}
+.decision-card.ui-card{background:#fff;border-top:3px solid var(--blue)}
+.decision-card.cli-card{background:#fff;border-top:3px solid var(--purple)}
+.decision-card.cowork-card{background:#fff;border-top:3px solid var(--teal)}
+.decision-card h3{font-family:var(--serif);font-size:1.3rem;font-weight:600;margin-bottom:.3rem;color:var(--ink)}
+.decision-card .audience{font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem}
+.ui-card .audience{color:var(--blue)}
+.cli-card .audience{color:var(--purple)}
+.cowork-card .audience{color:var(--teal)}
+.decision-card p{font-size:.85rem;color:var(--ink-3);line-height:1.65;margin-bottom:1rem}
+.use-cases{font-size:.8rem}
+.use-cases li{color:var(--ink-2);margin-bottom:.3rem;list-style:none;display:flex;gap:6px;align-items:baseline}
+.use-cases li::before{content:"→";color:var(--ink-3);flex-shrink:0}
+kbd{display:inline-block;font-family:var(--mono);font-size:.72em;font-weight:500;background:var(--paper-2);color:var(--ink);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 7px}
+.trick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-top:1rem}
+.trick-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:1rem 1.1rem;border-left:3px solid var(--purple)}
+.trick-num{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);margin-bottom:.25rem}
+.trick-card h4{font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:.35rem}
+.trick-card p{font-size:.8rem;color:var(--ink-3);line-height:1.55;margin:0}
+.folder-tree{background:var(--ink);color:#e2e8f0;border-radius:var(--r);padding:1.25rem 1.5rem;font-family:var(--mono);font-size:.8rem;line-height:1.8;margin:1rem 0}
+.folder-tree .dir{color:#60d9b4}
+.folder-tree .file{color:#b4c6f0}
+.folder-tree .cmt{color:#6b7185}
+.skill-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;text-decoration:none;color:inherit;transition:border-color .15s,box-shadow .15s;margin-bottom:.75rem}
+.skill-card:hover{border-color:var(--purple);box-shadow:0 2px 12px rgba(106,61,232,.08)}
+.skill-badge{width:44px;height:44px;border-radius:10px;background:var(--ink);color:#e2662a;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:600;flex-shrink:0;line-height:1.3;text-align:center;padding:4px}
+.skill-body strong{font-size:.9rem;font-weight:600;color:var(--ink);display:block;margin-bottom:2px}
+.skill-body p{font-size:.8rem;color:var(--ink-3);margin:0;line-height:1.5}
+.skill-meta{display:flex;gap:6px;margin-top:.4rem;flex-wrap:wrap}
+.skill-arrow{font-size:18px;color:var(--line);align-self:center;flex-shrink:0}
+.pattern-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:1.25rem;border-top:3px solid var(--purple)}
+.pattern-card.pt{border-top-color:var(--teal)}
+.pattern-card.pa{border-top-color:var(--amber)}
+.pattern-card.pb{border-top-color:var(--blue)}
+.pattern-card.pg{border-top-color:var(--green)}
+.pattern-card h4{font-weight:600;font-size:.9rem;color:var(--ink);margin-bottom:.4rem}
+.pattern-card p{font-size:.8rem;color:var(--ink-3);line-height:1.6;margin-bottom:.5rem}
+.pattern-card ul{padding-left:1rem}
+.pattern-card li{font-size:.78rem;color:var(--ink-3);margin-bottom:.2rem}
+.course-track{margin-bottom:2.5rem}
+.track-label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.75rem;display:flex;align-items:center;gap:8px}
+.track-label::after{content:'';flex:1;height:1px;background:var(--line)}
+.course-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:1rem 1.25rem;display:flex;gap:1rem;align-items:flex-start;transition:border-color .15s,box-shadow .15s;text-decoration:none;color:inherit;margin-bottom:.6rem}
+.course-card:hover{border-color:var(--purple);box-shadow:0 2px 12px rgba(106,61,232,.08)}
+.course-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.course-card-body{flex:1}
+.course-card-body strong{font-size:.9rem;font-weight:600;color:var(--ink);display:block;margin-bottom:2px}
+.course-card-body p{font-size:.8rem;color:var(--ink-3);margin:0;line-height:1.5}
+.course-meta{display:flex;gap:6px;margin-top:.4rem;flex-wrap:wrap}
+.course-card-arrow{font-size:18px;color:var(--line);align-self:center;flex-shrink:0}
+.checklist{list-style:none;padding:0;margin:.75rem 0}
+.checklist li{font-size:.83rem;color:var(--ink-2);padding:.3rem 0 .3rem 1.5rem;position:relative;border-bottom:1px solid var(--line)}
+.checklist li:last-child{border-bottom:none}
+.checklist li::before{content:"☐";position:absolute;left:0;color:var(--purple)}
+footer{background:var(--ink);color:rgba(255,255,255,.5);padding:3.5rem 2rem;margin-top:5rem}
+.footer-inner{max-width:960px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem}
+@media(max-width:760px){.footer-inner{grid-template-columns:1fr 1fr}}
+.footer-brand{font-family:var(--serif);font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:.5rem}
+.footer-brand span{color:rgba(106,61,232,.8)}
+.footer-tagline{font-size:.82rem;line-height:1.65;max-width:260px}
+.footer-col h4{font-size:.78rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.75rem}
+.footer-col a{display:block;font-size:.82rem;color:rgba(255,255,255,.55);text-decoration:none;margin-bottom:.4rem}
+.footer-col a:hover{color:#fff}
+.footer-bottom{max-width:960px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.08);font-size:.75rem;line-height:1.7}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Claude <span>Ecosystem</span></div>
+  <div class="nav-links">
+    <a href="#start">Start</a><a href="#chat">Chat</a><a href="#projects">Projects</a>
+    <a href="#artifacts">Artifacts</a><a href="#mcp">MCP</a><a href="#memory">Memory</a>
+    <a href="#skills">Skills</a><a href="#claude-code">Code CLI</a><a href="#tricks">35 Tricks</a>
+    <a href="#coworker">Coworker</a><a href="#decision">Which Tool?</a>
+    <a href="#oneweek">1-Week Plan</a><a href="#prompting">Prompting</a><a href="#academy">Academy</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Anthropic · 2026 Edition · Comprehensively Revised</div>
+    <h1>The Claude Ecosystem<br><em>From conversation to autonomous agent engineering</em></h1>
+    <p class="hero-sub">Complete onboarding reference for every role. Covers Claude Chat, Projects, Artifacts, MCP, Memory, Skills (with 5 workflow patterns + troubleshooting), Claude Code (35 power tricks), Coworker, the 10-step mastery plan, and the full Anthropic Academy catalog with all 17 courses.</p>
+    <div class="hero-chips">
+      <span class="chip"><span class="chip-dot" style="background:#60a5fa"></span>Claude Chat · All plans</span>
+      <span class="chip"><span class="chip-dot" style="background:#a78bfa"></span>Claude Code + 35 Tricks</span>
+      <span class="chip"><span class="chip-dot" style="background:#fb923c"></span>Skills · SKILL.md system</span>
+      <span class="chip"><span class="chip-dot" style="background:#34d399"></span>Coworker · Desktop agent</span>
+      <span class="chip"><span class="chip-dot" style="background:#fbbf24"></span>17 Free courses · Official certs</span>
+    </div>
+  </div>
+</section>
+
+<!-- ====== START HERE ====== -->
+<div id="start" class="wrap section-gap">
+  <span class="sec-eyebrow">Start here</span>
+  <h2 class="sec-title">Three products, one AI platform</h2>
+  <p class="sec-sub">The most important first step: understand which surface to use for which task. Most people underutilize Claude because they use one surface for everything.</p>
+  <hr class="sec-rule">
+  <div class="decision-grid">
+    <div class="decision-card ui-card">
+      <span class="badge badge-ui">UI · Web / Mobile / Desktop</span>
+      <h3 style="margin-top:.75rem">Claude Chat</h3>
+      <div class="audience">Everyone · No setup required</div>
+      <p>Browser-based conversational workspace. Brainstorm, analyze documents, build interactive artifacts, run deep research, connect MCP apps. Your primary daily driver.</p>
+      <ul class="use-cases">
+        <li>Writing, editing, summarizing documents</li>
+        <li>Upload PDFs, Excel, images, code files</li>
+        <li>Live interactive artifacts — HTML, React, Mermaid</li>
+        <li>Projects with persistent instructions + document library</li>
+        <li>MCP connectors: Gmail, Drive, Notion, Calendar, GitHub</li>
+      </ul>
+      <div style="margin-top:1rem"><a href="https://claude.ai" style="font-size:.8rem;color:var(--blue);text-decoration:none;font-weight:600">→ claude.ai</a></div>
+    </div>
+    <div class="decision-card cli-card">
+      <span class="badge badge-cli">CLI · Terminal-Native</span>
+      <h3 style="margin-top:.75rem">Claude Code</h3>
+      <div class="audience">Developers · Requires terminal</div>
+      <p>Agentic coding CLI in your terminal. Full codebase context, file editing, bash execution, git automation, MCP servers, subagents, hooks, and custom skills.</p>
+      <ul class="use-cases">
+        <li>Multi-file refactors with full repository context</li>
+        <li>Autonomous test execution and debugging</li>
+        <li>Git workflow automation (review, diff, commit, PR)</li>
+        <li>Custom slash commands via Skills (.claude/skills/)</li>
+        <li>CI/CD integration via non-interactive headless mode</li>
+      </ul>
+      <div style="margin-top:1rem"><a href="https://docs.claude.com/en/docs/claude-code/overview" style="font-size:.8rem;color:var(--purple);text-decoration:none;font-weight:600">→ Claude Code docs</a></div>
+    </div>
+    <div class="decision-card cowork-card">
+      <span class="badge badge-agent">Desktop Agent · GUI</span>
+      <h3 style="margin-top:.75rem">Claude Coworker</h3>
+      <div class="audience">Everyone · Desktop app only (Mac/Win)</div>
+      <p>Desktop-level agentic AI for knowledge workers. Multi-step file management, report generation, app integrations — via visual approval flow. Supports scheduled overnight tasks.</p>
+      <ul class="use-cases">
+        <li>Organize files and folders by category</li>
+        <li>Extract 50 PDFs → Excel dashboard automatically</li>
+        <li>Scheduled tasks — /schedule plugin, runs while you sleep</li>
+        <li>Browser, Asana, Notion connector integrations</li>
+        <li>Zero coding required. Download: claude.com/download</li>
+      </ul>
+      <div style="margin-top:1rem"><a href="https://claude.com/download" style="font-size:.8rem;color:var(--teal);text-decoration:none;font-weight:600">→ Download desktop app</a></div>
+    </div>
+  </div>
+  <div class="callout amber" style="margin-top:1.5rem">
+    <div class="callout-label">Desktop app requirement</div>
+    <p>Claude Coworker <strong>only runs inside the desktop app</strong> (Mac or Windows — not the web version). Pro plan required: $20/mo or $17/mo billed annually.</p>
+  </div>
+  <h3 style="font-family:var(--serif);font-size:1.15rem;margin:2rem 0 1rem">Model family — Claude 4.6</h3>
+  <div class="g3">
+    <div class="card" style="border-top:2px solid #a78bfa"><div class="card-title"><span class="card-icon" style="background:#f0e8ff">✦</span>Opus 4.6 · Architecture &amp; reasoning</div><p>Complex reasoning, system design, security reviews, architecture decisions. Use <code>/effort max</code>. API: <code>claude-opus-4-6</code></p></div>
+    <div class="card" style="border-top:2px solid var(--blue)"><div class="card-title"><span class="card-icon" style="background:var(--blue-lt)">⚡</span>Sonnet 4.6 · Daily implementation</div><p>Best speed/quality balance. Implementation, refactoring, feature work. Default choice for most tasks. API: <code>claude-sonnet-4-6</code></p></div>
+    <div class="card" style="border-top:2px solid var(--teal)"><div class="card-title"><span class="card-icon" style="background:var(--teal-lt)">◎</span>Haiku 4.5 · Quick fixes &amp; tests</div><p>Fastest, most cost-efficient. Quick bug fixes, small repetitive tasks, high-volume pipelines. API: <code>claude-haiku-4-5-20251001</code></p></div>
+  </div>
+</div>
+
+<!-- ====== CHAT ====== -->
+<div id="chat" class="wrap section-gap">
+  <span class="sec-eyebrow">Product 1 of 3</span>
+  <h2 class="sec-title">Claude Chat</h2>
+  <p class="sec-sub">Available at claude.ai on web, iOS, Android, and desktop. No installation. No coding. Your primary interface for everything that doesn't require terminal or file system access.</p>
+  <hr class="sec-rule">
+  <div class="g2">
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#fdf3dc">📁</span>File understanding</div><p>Upload PDFs, Word docs, spreadsheets, images, code files. Supports up to 1 million token context — roughly 75,000 lines of code or dozens of PDFs in one pass.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#e8f0fd">🔍</span>Web search</div><p>Real-time search and article fetching built in. Toggle from the toolbar. Claude searches automatically when queries need current info. Available on Free plan.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#f0e8ff">🔬</span>Deep research</div><p>Multi-step agent: 10–20 searches, reads full articles, synthesizes a comprehensive report. Competitive intelligence, literature reviews, market analysis. <span class="badge badge-pro">Pro / Max</span></p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#e0f5f0">⚙️</span>Code execution</div><p>Python, bash, Node.js in a sandboxed Ubuntu container. Installs packages, creates downloadable files, generates charts. Enable via "Code Execution and File Creation" in the toolbar.</p></div>
+  </div>
+</div>
+
+<!-- ====== PROJECTS ====== -->
+<div id="projects" class="wrap section-gap">
+  <span class="sec-eyebrow">Feature</span>
+  <h2 class="sec-title">Projects</h2>
+  <p class="sec-sub">Projects eliminate the cold-start problem — re-explaining context at the beginning of every conversation. Each project has its own system prompt, document library, and searchable conversation history across all sessions.</p>
+  <hr class="sec-rule">
+  <div class="g2" style="margin-bottom:1.5rem">
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#f0e8ff">📋</span>Custom instructions</div><p>Standing system prompt for the project — role, output format, domain rules. Applied to every conversation automatically. The single highest-ROI setup step.</p><div style="background:var(--paper-2);border-radius:var(--r);padding:.75rem;margin-top:.75rem;font-size:.8rem;color:var(--ink-2);font-family:var(--mono);line-height:1.6">You are a Go senior engineer reviewing AEGIS. Always use idiomatic Go. Flag goroutine leaks. Prefer context cancellation over timeout literals.</div></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#e8f7ec">📂</span>Document library</div><p>Upload PDFs, API docs, style guides, CSVs, architecture diagrams. Claude references them in every conversation. Ideal for recurring reference material you would otherwise re-paste daily.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#e8f0fd">💬</span>Persistent history</div><p>All chats are searchable. Ask "what did we decide about the ClickHouse schema last week?" and Claude finds it. History is scoped to the project so context stays focused.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#fdf3dc">👥</span>Team sharing</div><p>Share projects with teammates on Team/Enterprise — shared instructions, documents, and history. Turns Claude from a personal tool into a team multiplier. <span class="badge badge-pro">Team / Enterprise</span></p></div>
+  </div>
+  <div class="callout teal">
+    <div class="callout-label">Cowork workspace structure</div>
+    <p>Create a parent folder <strong>"Claude-Cowork"</strong> with 4 subfolders: <strong>About Me</strong> (identity + writing rules), <strong>Projects</strong> (one subfolder per live project), <strong>Templates</strong> (your best past work as reusable structure), <strong>Claude Outputs</strong> (the ONLY folder Claude ever writes to — everything else stays read-only).</p>
+  </div>
+</div>
+
+<!-- ====== ARTIFACTS ====== -->
+<div id="artifacts" class="wrap section-gap">
+  <span class="sec-eyebrow">Feature</span>
+  <h2 class="sec-title">Artifacts</h2>
+  <p class="sec-sub">A live side panel that renders generated content next to your conversation. Available on all plans. Shareable via public link — no Claude account needed to view.</p>
+  <hr class="sec-rule">
+  <div class="g3">
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#e8f0fd">🌐</span>HTML / React apps</div><p>Full interactive applications in a sandboxed iframe. Recharts, D3, Three.js, Tailwind. Can call the Anthropic API directly ("Claude in Claude") for AI-powered artifacts with MCP integrations.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#f0e8ff">📊</span>Diagrams (Mermaid / SVG)</div><p>Architecture diagrams, flowcharts, sequence diagrams, ER diagrams rendered natively. Essential for system design documentation and technical communication.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#e0f5f0">📝</span>Markdown documents</div><p>Reports, READMEs, articles, proposals rendered cleanly. Download or share as a public URL your team can open in a browser — no login required.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#fdf3dc">💾</span>Persistent storage</div><p>Artifacts save state across sessions via a key-value API — up to 5 MB per key. Build trackers, journals, leaderboards, and collaborative tools that remember data between visits.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#fdecea">🤖</span>AI-powered artifacts</div><p>"Claude in Claude" — artifacts call the Anthropic API at runtime, building fully functional AI apps with MCP integrations running inside your chat panel.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#e8f7ec">🔗</span>Public sharing</div><p>Publish any artifact as a shareable link. Recipients see a live rendered version. Great for prototypes, reports, demos, and sharing interactive tools.</p></div>
+  </div>
+</div>
+
+<!-- ====== MCP ====== -->
+<div id="mcp" class="wrap section-gap">
+  <span class="sec-eyebrow">Feature</span>
+  <h2 class="sec-title">Model Context Protocol (MCP)</h2>
+  <p class="sec-sub">Open standard that lets Claude connect to external services — databases, APIs, SaaS apps — so it can read and act on real data. One click to connect in Claude.ai, one command in Claude Code.</p>
+  <hr class="sec-rule">
+  <div class="callout green" style="margin-bottom:1.5rem">
+    <div class="callout-label">The kitchen analogy (from the official Skills guide)</div>
+    <p><strong>MCP provides the professional kitchen</strong> — access to tools, ingredients, and equipment (your real data and services). <strong>Skills provide the recipes</strong> — step-by-step instructions for how to create something valuable with that kitchen. Together, they enable complex tasks without users needing to figure out every step themselves.</p>
+  </div>
+  <div class="g2">
+    <div>
+      <h3 style="font-family:var(--serif);font-size:1.1rem;margin-bottom:.75rem">Popular connectors</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Connector</th><th>What Claude can do</th></tr>
+        <tr><td><strong>Gmail</strong></td><td>Search, read, draft, send emails</td></tr>
+        <tr><td><strong>Google Calendar</strong></td><td>Read/create events, summarize schedules</td></tr>
+        <tr><td><strong>Google Drive</strong></td><td>Search, fetch, and read Drive files</td></tr>
+        <tr><td><strong>Notion</strong></td><td>Read/write pages, databases, comments</td></tr>
+        <tr><td><strong>GitHub</strong></td><td>List PRs, read issues, manage repos</td></tr>
+        <tr><td><strong>Jira / Asana / Linear</strong></td><td>Create, update, query project tickets</td></tr>
+        <tr><td><strong>Slack</strong></td><td>Read channels, post messages, search threads</td></tr>
+        <tr><td><strong>Figma / Salesforce</strong></td><td>Design file access, CRM data operations</td></tr>
+      </table></div>
+      <div class="callout amber" style="margin-top:1rem">
+        <div class="callout-label">Connectors vs. Plugins</div>
+        <p><strong>Connectors</strong> = Claude acts inside your apps. <strong>Plugins</strong> = you do the work while Claude assists from a sidebar. Both in Settings → Integrations. Start with one — master it first, then expand.</p>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-family:var(--serif);font-size:1.1rem;margin-bottom:.75rem">Adding connectors in Claude.ai</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Settings → Integrations</strong><span>Click "Browse connectors" to see the full registry of available MCP apps.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>One-click OAuth</strong><span>Your credentials stay with the service — Claude never stores passwords or API keys.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Use naturally in chat</strong><span>"Check my calendar" or "draft a reply to Sarah's email." Claude detects intent and calls the connector.</span></div></div>
+      </div>
+      <h3 style="font-family:var(--serif);font-size:1.1rem;margin:1.25rem 0 .5rem">Claude Code — MCP via CLI</h3>
+      <pre><code># Add GitHub MCP server
+claude mcp add github   -- npx @modelcontextprotocol/server-github
+
+# List connected servers  claude mcp list
+# Manage mid-session (no restart needed)
+/mcp
+
+# MCP tools as namespaced slash commands
+/mcp__github__list_prs
+/mcp__slack__send_message</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MEMORY ====== -->
+<div id="memory" class="wrap section-gap">
+  <span class="sec-eyebrow">Feature</span>
+  <h2 class="sec-title">Memory</h2>
+  <p class="sec-sub">Two memory layers — automatic summaries from past conversations, and explicit facts you ask Claude to store. Both persist across sessions. Viewable at Settings → Capabilities → Memory.</p>
+  <hr class="sec-rule">
+  <div class="g2">
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#f0e8ff">🧠</span>Chat-derived memory</div><p>Claude summarizes things you have shared — role, projects, tools, preferences. Updates automatically. View and delete individual items in Settings at any time.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#e8f7ec">✏️</span>Explicit memory edits</div><p>Trigger with: <em>"remember that I now use ClickHouse"</em> or <em>"forget about my Form Energy prep."</em> Written to persistent memory immediately — up to 30 edits, 100k characters each.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#e8f0fd">🔍</span>Past chat search</div><p>Ask "what did we decide about the Go gateway?" Claude searches full conversation history — scoped to the current Project or outside any Project depending on context.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#fdecea">🕶️</span>Incognito mode</div><p>Memory fully disabled. Nothing stored, summarized, or surfaced. Use for completely stateless, private sessions with no persistence of any kind.</p></div>
+  </div>
+  <div class="callout teal" style="margin-top:1.5rem">
+    <div class="callout-label">Two core files that beat 50 random uploads</div>
+    <p><strong>about-me.md</strong> — Who you are, what you do, current priorities, what matters now. One well-crafted file beats 50 random uploads. Be intentional — don't dump everything.</p>
+    <p><strong>anti-patterns.md</strong> — Every phrase Claude must NEVER use: "boundaries", "delve", "it's worth noting", "certainly!", "I'd be happy to". This single file dramatically improves output quality across all tasks.</p>
+  </div>
+</div>
+
+<!-- ====== SKILLS ====== -->
+<div id="skills" class="wrap section-gap">
+  <span class="sec-eyebrow">Feature · Launched 2025 · Skills 2.0 Q1 2026</span>
+  <h2 class="sec-title">Skills</h2>
+  <p class="sec-sub">Reusable packaged workflows — teach Claude once how to handle a task, and it applies that knowledge consistently across every future conversation. An open portable standard across Claude.ai, Claude Code, and the API.</p>
+  <hr class="sec-rule">
+
+  <div class="callout green">
+    <div class="callout-label">Core principle — teach once, benefit every time</div>
+    <p>Instead of re-explaining your preferences, processes, and domain expertise in every conversation, skills let you <strong>teach Claude once and benefit every time</strong>. Skills are most powerful for repeatable workflows: generating frontend designs from specs, conducting research with consistent methodology, creating documents that follow your team's style guide, orchestrating multi-step processes that coordinate MCP servers.</p>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1.15rem;margin:2rem 0 .75rem">Anatomy of a skill</h3>
+  <div class="g3">
+    <div class="card">
+      <div class="card-title"><span class="card-icon" style="background:#f0e8ff">📂</span>Folder structure</div>
+      <div class="folder-tree">
+        <span class="dir">your-skill-name/</span><br>
+        ├── <span class="file">SKILL.md</span>  <span class="cmt"># required — exact name</span><br>
+        ├── <span class="dir">scripts/</span>     <span class="cmt"># optional bash/python</span><br>
+        ├── <span class="dir">references/</span>  <span class="cmt"># optional docs</span><br>
+        └── <span class="dir">assets/</span>      <span class="cmt"># optional templates</span>
+      </div>
+      <p>Folder: kebab-case only. <code>SKILL.md</code> is case-sensitive. No README.md inside the skill folder.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-icon" style="background:#e0f5f0">🎯</span>Progressive disclosure (3 levels)</div>
+      <p style="margin-bottom:.5rem"><strong>Level 1 — YAML frontmatter:</strong> Always loaded. Tells Claude when to use this skill. Minimizes token usage.</p>
+      <p style="margin-bottom:.5rem"><strong>Level 2 — SKILL.md body:</strong> Loaded when skill is relevant. Full instructions and guidance.</p>
+      <p><strong>Level 3 — Linked files:</strong> <code>references/</code> and <code>scripts/</code> loaded only as needed. Keep SKILL.md under 5,000 words.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-icon" style="background:#fdf3dc">⚙️</span>Installing skills</div>
+      <div class="steps" style="margin:0">
+        <div class="step" style="padding:.6rem .9rem"><div class="step-num" style="width:22px;height:22px;font-size:10px">1</div><div class="step-body"><strong>Claude.ai</strong><span>Settings → Capabilities → Skills → Upload (zip the skill folder)</span></div></div>
+        <div class="step" style="padding:.6rem .9rem"><div class="step-num" style="width:22px;height:22px;font-size:10px">2</div><div class="step-body"><strong>Claude Code</strong><span>Place in <code>.claude/skills/name/SKILL.md</code> (project) or <code>~/.claude/skills/</code> (global)</span></div></div>
+        <div class="step" style="padding:.6rem .9rem"><div class="step-num" style="width:22px;height:22px;font-size:10px">3</div><div class="step-body"><strong>API / Enterprise</strong><span>Use <code>/v1/skills</code> endpoint and <code>container.skills</code> param. Admins: deploy workspace-wide via Admin console.</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1.15rem;margin:2rem 0 .75rem">YAML frontmatter — the most critical part</h3>
+  <div class="g2">
+    <div>
+      <pre><code>---
+name: your-skill-name
+description: Analyzes Figma design files and generates
+  developer handoff documentation. Use when user uploads
+  .fig files, asks for "design specs", "component
+  documentation", or "design-to-code handoff".
+license: MIT
+allowed-tools: "Bash(python:*) WebFetch"
+metadata:
+  author: Your Name
+  version: 1.0.0
+  mcp-server: your-service
+---</code></pre>
+      <p style="font-size:.8rem;color:var(--ink-3);margin-top:.5rem"><code>name</code>: kebab-case, no spaces, no "claude"/"anthropic" prefix (reserved). <code>description</code>: max 1024 chars. No XML angle brackets anywhere (security restriction).</p>
+    </div>
+    <div>
+      <div class="callout" style="margin:0 0 .75rem">
+        <div class="callout-label">Good description = correct auto-triggering</div>
+        <p>"Manages Linear project workflows including sprint planning, task creation, and status tracking. Use when user mentions 'sprint', 'Linear tasks', 'project planning', or asks to 'create tickets'."</p>
+      </div>
+      <div class="callout red" style="margin:0">
+        <div class="callout-label">Bad descriptions — skill won't trigger reliably</div>
+        <p>"Helps with projects." → too vague, no trigger phrases<br>"Does frontend things." → no file types, no user phrasing<br><strong>Debug:</strong> ask Claude "when would you use the [skill name] skill?" — it quotes the description back.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1.15rem;margin:2rem 0 .75rem">Three skill categories</h3>
+  <div class="g3" style="margin-bottom:2rem">
+    <div class="card" style="border-top:2px solid var(--blue)"><div class="card-title">Category 1 — Document &amp; Asset Creation</div><p>Generate consistent output: documents, presentations, apps, designs. No external tools required — uses Claude's built-in capabilities. Examples: <code>docx</code>, <code>pptx</code>, <code>xlsx</code>, <code>frontend-design</code> skills.</p></div>
+    <div class="card" style="border-top:2px solid var(--purple)"><div class="card-title">Category 2 — Workflow Automation</div><p>Multi-step processes with consistent methodology. May coordinate across multiple MCP servers. Step-by-step workflow with validation gates. Examples: <code>skill-creator</code>, <code>code-review-agents</code>.</p></div>
+    <div class="card" style="border-top:2px solid var(--teal)"><div class="card-title">Category 3 — MCP Enhancement</div><p>Add workflow knowledge on top of MCP tool access — turn raw API calls into guided, reliable workflows. Embed domain expertise, best practices. Examples: <code>sentry-code-review</code>, <code>context7</code>.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1.15rem;margin:1.5rem 0 .75rem">5 workflow patterns (from the official Anthropic Skills guide)</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="pattern-card">
+      <h4>Pattern 1 — Sequential workflow orchestration</h4>
+      <p>Use when users need multi-step processes in a specific order with dependencies between steps.</p>
+      <ul>
+        <li>Explicit step ordering with validation at each stage</li>
+        <li>Clear dependencies defined between steps</li>
+        <li>Rollback instructions for failure scenarios</li>
+        <li>Example: Account creation → payment setup → subscription → welcome email</li>
+      </ul>
+    </div>
+    <div class="pattern-card pt">
+      <h4>Pattern 2 — Multi-MCP coordination</h4>
+      <p>Use when workflows span multiple services — design-to-dev handoffs, cross-system reporting.</p>
+      <ul>
+        <li>Clear phase separation between services</li>
+        <li>Data passing strategy between MCP servers</li>
+        <li>Validation before moving to next phase</li>
+        <li>Example: Figma export → Drive upload → Linear tasks → Slack notification</li>
+      </ul>
+    </div>
+    <div class="pattern-card pa">
+      <h4>Pattern 3 — Iterative refinement</h4>
+      <p>Use when output quality improves through iteration — reports, content, complex code generation.</p>
+      <ul>
+        <li>Generate draft → validate → refine loop with explicit stop conditions</li>
+        <li>Validation scripts for deterministic checking (code beats language for critical checks)</li>
+        <li>Example: Draft report → check_report.py → fix issues → re-validate → finalize</li>
+      </ul>
+    </div>
+    <div class="pattern-card pb">
+      <h4>Pattern 4 — Context-aware tool selection</h4>
+      <p>Use when same outcome requires different tools depending on context — file type, size, or role.</p>
+      <ul>
+        <li>Clear decision tree with explicit criteria</li>
+        <li>Fallback options for each branch</li>
+        <li>Transparency — explain to user which path was chosen and why</li>
+        <li>Example: Large files → cloud; collab docs → Notion; code → GitHub</li>
+      </ul>
+    </div>
+  </div>
+  <div class="pattern-card pg" style="margin-bottom:1.5rem">
+    <h4>Pattern 5 — Domain-specific intelligence</h4>
+    <p>Use when the skill adds specialized knowledge beyond tool access — compliance rules, financial logic, safety checks. Domain expertise embedded in logic, not tool access.</p>
+    <ul>
+      <li>Compliance and validation BEFORE any action (pre-checks, not post-checks)</li>
+      <li>Comprehensive audit trail documentation for every decision</li>
+      <li>Clear governance: when to escalate vs. proceed vs. block</li>
+      <li>Example: Payment processing with sanctions check → jurisdiction verification → risk assessment → audit log</li>
+    </ul>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1.15rem;margin:1.5rem 0 .75rem">Featured community skills</h3>
+  <a class="skill-card" href="https://github.com/upstash/context7" target="_blank"><div class="skill-badge">context7</div><div class="skill-body"><strong>context7 — Live library documentation</strong><p>MCP skill pulling version-specific docs from source repos into Claude's context. Instead of outdated training data, Claude gets live, accurate API docs for any library you are working with.</p><div class="skill-meta"><span class="badge badge-dev">MCP Enhancement</span><span class="tag">github.com/upstash/context7</span></div></div><span class="skill-arrow">›</span></a>
+  <a class="skill-card" href="https://github.com/frankbria/ralph-claude-code" target="_blank"><div class="skill-badge">ralph</div><div class="skill-body"><strong>ralph-loop — Self-driving development agent</strong><p>Official Anthropic skill. Stop-hook pattern enabling multi-hour autonomous coding sessions. Automatically resets Claude's context between tasks. Prevents infinite loops and API overuse.</p><div class="skill-meta"><span class="badge badge-dev">Workflow Automation</span><span class="tag">Official Anthropic</span><span class="badge badge-new">Autonomous</span></div></div><span class="skill-arrow">›</span></a>
+  <a class="skill-card" href="https://github.com/anthropics/claude-mem" target="_blank"><div class="skill-badge">claude-mem</div><div class="skill-body"><strong>claude-mem — Persistent memory across sessions</strong><p>Adds long-term memory to Claude Code. Carry context and preferences across coding sessions. Persistent memory compression system. #1 GitHub trending repo on launch day.</p><div class="skill-meta"><span class="badge badge-dev">Session Management</span><span class="tag">Official Anthropic</span></div></div><span class="skill-arrow">›</span></a>
+  <a class="skill-card" href="https://claude.com/plugins" target="_blank"><div class="skill-badge">frontend</div><div class="skill-body"><strong>frontend-design — Production-grade UI generation</strong><p>Most popular Claude skill with 96K+ installs. Transforms Claude's UI output into distinctive, production-grade interfaces with bold typography, unique color palettes, and creative layouts.</p><div class="skill-meta"><span class="badge badge-dev">Document &amp; Asset Creation</span><span class="tag">96K+ installs</span></div></div><span class="skill-arrow">›</span></a>
+
+  <h3 style="font-family:var(--serif);font-size:1.15rem;margin:2rem 0 .75rem">Skills troubleshooting</h3>
+  <div class="g2">
+    <div class="card"><div class="card-title" style="font-size:.85rem;color:var(--red)">❌ Skill won't upload</div><p style="margin-bottom:.4rem"><strong>Invalid file name:</strong> Must be exactly <code>SKILL.md</code> — case-sensitive. <code>skill.md</code> and <code>SKILL.MD</code> both fail.</p><p style="margin-bottom:.4rem"><strong>Bad YAML:</strong> Missing <code>---</code> delimiters, unclosed quotes, XML angle brackets.</p><p><strong>Bad folder name:</strong> Must be kebab-case. No spaces, no capitals, no underscores.</p></div>
+    <div class="card"><div class="card-title" style="font-size:.85rem;color:var(--amber)">⚠️ Skill doesn't trigger</div><p style="margin-bottom:.4rem">Description is too generic. Add specific trigger phrases users would actually say. Mention file types. Be more specific about scope.</p><p><strong>Test MCP independently first:</strong> Ask Claude to call the MCP tool directly (without the skill). If that fails, the issue is the MCP connection — not your skill instructions.</p></div>
+    <div class="card"><div class="card-title" style="font-size:.85rem;color:var(--amber)">⚠️ Triggers too often</div><p style="margin-bottom:.4rem">Add negative triggers in description: "Do NOT use for simple data exploration (use data-viz skill instead)."</p><p>Be more specific about scope: "PayFlow payment processing for e-commerce. Not for general financial queries."</p></div>
+    <div class="card"><div class="card-title" style="font-size:.85rem;color:var(--red)">❌ Instructions not followed</div><p style="margin-bottom:.4rem">Instructions too verbose — move detail to <code>references/</code>. Put critical rules at the top. Keep SKILL.md under 5,000 words.</p><p><strong>For critical validations:</strong> use a script in <code>scripts/</code> rather than language instructions — code is deterministic, language interpretation is not.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1.15rem;margin:2rem 0 .75rem">Pre-upload checklist</h3>
+  <div class="g2">
+    <div><div style="font-size:.78rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.5rem">Before &amp; during development</div>
+    <ul class="checklist">
+      <li>Identified 2–3 concrete use cases with specific trigger phrases</li>
+      <li>Tools identified: built-in capabilities vs. MCP server required</li>
+      <li>Folder named in kebab-case (no spaces, no capitals)</li>
+      <li>SKILL.md file exists (exact spelling, case-sensitive)</li>
+      <li>YAML frontmatter has both --- delimiters</li>
+      <li>name field: kebab-case, no "claude"/"anthropic" prefix</li>
+      <li>description includes WHAT it does AND WHEN to use it</li>
+      <li>No XML angle brackets anywhere in frontmatter</li>
+      <li>Error handling and troubleshooting section included</li>
+    </ul></div>
+    <div><div style="font-size:.78rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.5rem">Testing &amp; distribution</div>
+    <ul class="checklist">
+      <li>Triggers on obvious queries ("set up a new project in [service]")</li>
+      <li>Triggers on paraphrased requests ("initialize a workspace for...")</li>
+      <li>Does NOT trigger on unrelated topics</li>
+      <li>MCP tool calls succeed independently (test without skill first)</li>
+      <li>Workflow completes without user correction</li>
+      <li>Hosted on GitHub with README (outside skill folder) + screenshots</li>
+      <li>Enterprise: deploy workspace-wide via Admin console</li>
+      <li>API: use /v1/skills endpoint + container.skills parameter</li>
+    </ul></div>
+  </div>
+
+  <div class="callout" style="margin-top:1.5rem">
+    <div class="callout-label">Build your first skill in 15–30 minutes</div>
+    <p>Use the <code>skill-creator</code> skill built into Claude.ai. Say: <em>"Use the skill-creator skill to help me build a skill for [your use case]."</em> If you have an MCP server and know your top 2–3 workflows, you can have a working, tested skill in a single sitting.</p>
+  </div>
+</div>
+
+<!-- ====== CLAUDE CODE ====== -->
+<div id="claude-code" class="wrap section-gap">
+  <span class="sec-eyebrow">Product 2 of 3</span>
+  <h2 class="sec-title">Claude Code <span class="badge badge-cli" style="vertical-align:middle;font-size:.7rem">Developers</span></h2>
+  <p class="sec-sub">Agentic CLI in your terminal. Full codebase context, file editing, bash execution, git automation, MCP, subagents, hooks, and skills. Runs in terminal, VS Code, JetBrains, or at claude.ai/code.</p>
+  <hr class="sec-rule">
+
+  <h3 style="font-family:var(--serif);font-size:1.1rem;margin-bottom:.75rem">Essential vocabulary</h3>
+  <div class="table-wrap" style="margin-bottom:2rem"><table>
+    <tr><th>Term</th><th>Definition</th></tr>
+    <tr><td><strong>Session</strong></td><td>One run of <code>claude</code> in a directory — from launch to exit</td></tr>
+    <tr><td><strong>Context window</strong></td><td>Total text held at once. Use <code>/compact</code> at &gt;80%, <code>/clear</code> when switching tasks</td></tr>
+    <tr><td><strong>CLAUDE.md</strong></td><td>Markdown auto-loaded every session. Include: tech stack, coding rules, naming conventions, testing process, commands</td></tr>
+    <tr><td><strong>Plan mode</strong></td><td>Read-only — Claude proposes, does NOT edit files. Toggle <kbd>Shift+Tab</kbd> or <code>/plan</code>. Use before every large refactor</td></tr>
+    <tr><td><strong>Accept Edits mode</strong></td><td>Auto-approves all file edits for the session. Toggle <kbd>Shift+Tab</kbd>. Use only when you trust the direction</td></tr>
+    <tr><td><strong>Subagent</strong></td><td>Secondary Claude instance for a focused subtask in isolation — prevents context pollution. Defined in <code>.claude/agents/</code></td></tr>
+    <tr><td><strong>Hook</strong></td><td>Shell command at a defined event (PostToolUse, PreToolUse). Auto-runs tests, linting, or blocks unsafe commands</td></tr>
+    <tr><td><strong>Skill</strong></td><td>Packaged workflow in <code>.claude/skills/name/SKILL.md</code>. Skills win over legacy <code>.claude/commands/</code> on name collision</td></tr>
+  </table></div>
+
+  <h3 style="font-family:var(--serif);font-size:1.1rem;margin-bottom:.75rem">Slash command reference</h3>
+  <div class="g2" style="margin-bottom:1.5rem">
+    <div>
+      <div style="font-size:.78rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.5rem">Session &amp; Context</div>
+      <div class="table-wrap"><table>
+        <tr><th>Command</th><th>Description</th></tr>
+        <tr><td><code>/clear</code></td><td>Wipe history, fresh start (alias: /reset, /new)</td></tr>
+        <tr><td><code>/compact</code></td><td>Summarize conversation, free context (&gt;80% rule)</td></tr>
+        <tr><td><code>/context</code></td><td>Visualize what is loaded in context window</td></tr>
+        <tr><td><code>/memory</code></td><td>View or edit CLAUDE.md files in scope</td></tr>
+        <tr><td><code>/btw</code></td><td>Side question without polluting main conversation</td></tr>
+        <tr><td><code>/rewind</code></td><td>Roll back conversation and code to checkpoint</td></tr>
+        <tr><td><code>/add-dir</code></td><td>Grant Claude access to an additional directory</td></tr>
+      </table></div>
+    </div>
+    <div>
+      <div style="font-size:.78rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.5rem">Execution &amp; Code</div>
+      <div class="table-wrap"><table>
+        <tr><th>Command</th><th>Description</th></tr>
+        <tr><td><code>/plan</code></td><td>Enter read-only plan mode — propose, don't edit</td></tr>
+        <tr><td><code>/diff</code></td><td>Interactive viewer of all uncommitted changes</td></tr>
+        <tr><td><code>/review</code></td><td>Code quality review</td></tr>
+        <tr><td><code>/security-review</code></td><td>Security audit before committing changes</td></tr>
+        <tr><td><code>/debug</code></td><td>Structured debugging playbook</td></tr>
+        <tr><td><code>/mcp</code></td><td>Manage MCP server connections mid-session</td></tr>
+        <tr><td><code>/agents</code></td><td>List, create, or edit subagents</td></tr>
+        <tr><td><code>/hooks</code></td><td>Configure event hooks interactively</td></tr>
+        <tr><td><code>/skills</code></td><td>List available skills</td></tr>
+      </table></div>
+    </div>
+    <div>
+      <div style="font-size:.78rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.5rem">System &amp; Config</div>
+      <div class="table-wrap"><table>
+        <tr><th>Command</th><th>Description</th></tr>
+        <tr><td><code>/help</code></td><td>List every available command</td></tr>
+        <tr><td><code>/model</code></td><td>View or switch model (<code>/model sonnet</code>)</td></tr>
+        <tr><td><code>/effort low|max</code></td><td>Adjust reasoning depth and token spend</td></tr>
+        <tr><td><code>/cost</code></td><td>Show token usage and session cost</td></tr>
+        <tr><td><code>/config</code></td><td>Open settings — theme, defaults</td></tr>
+        <tr><td><code>/permissions</code></td><td>View/change which tools require approval</td></tr>
+        <tr><td><code>/doctor</code></td><td>Diagnose install and environment issues</td></tr>
+        <tr><td><code>/init</code></td><td>Generate CLAUDE.md for a new project</td></tr>
+        <tr><td><code>/install-github-app</code></td><td>Enable automatic PR review in GitHub Actions</td></tr>
+        <tr><td><code>/ide</code></td><td>Connect to VS Code or JetBrains inline</td></tr>
+      </table></div>
+    </div>
+    <div>
+      <div style="font-size:.78rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.5rem">Keyboard shortcuts</div>
+      <div class="table-wrap"><table>
+        <tr><th>Key</th><th>Action</th></tr>
+        <tr><td><kbd>Shift+Tab</kbd></td><td>Cycle: default → acceptEdits → plan</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Interrupt Claude mid-response</td></tr>
+        <tr><td><kbd>Esc Esc</kbd></td><td>Open rewind / checkpoint menu</td></tr>
+        <tr><td><kbd>Ctrl+C</kbd></td><td>Cancel input or exit on empty prompt</td></tr>
+        <tr><td><kbd>Ctrl+R</kbd></td><td>Reverse search prompt history</td></tr>
+        <tr><td><kbd>@ + path</kbd></td><td>Reference a file/directory in prompt</td></tr>
+        <tr><td><kbd>/</kbd></td><td>Open the command menu</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1.1rem;margin-bottom:.75rem">Headless / non-interactive mode</h3>
+  <pre><code># Pipe data into Claude
+git diff main | claude -p "Review for security issues and breaking changes"
+cat error.log | claude -p "Find the root cause"
+
+# Structured JSON output for scripts and pipelines
+claude -p "Analyze this PR" --output-format json
+
+# Streaming JSON for real-time processing
+claude -p "Generate report" --output-format stream-json
+
+# One-shot prompt and exit
+claude -p "Quick fix for this bug" --max-turns 1
+
+# Resume last session
+claude --resume  # alias: claude -c
+
+# Skip permission prompts (trusted/isolated environments only)
+claude --dangerously-skip-permissions</code></pre>
+</div>
+
+<!-- ====== 35 TRICKS ====== -->
+<div id="tricks" class="wrap section-gap">
+  <span class="sec-eyebrow">Power user reference</span>
+  <h2 class="sec-title">35 Claude Code Secrets</h2>
+  <p class="sec-sub">Most developers use Claude Code only for snippets and bug fixes. Power users build repeatable systems around it. These 35 tricks unlock the full platform — applying even 5 will measurably improve your workflow.</p>
+  <hr class="sec-rule">
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:.5rem 0 .6rem;color:var(--ink-3)">Session control</h3>
+  <div class="trick-grid">
+    <div class="trick-card"><div class="trick-num">01</div><h4>/clear between tasks</h4><p>Clears old context so Claude does not mix unrelated details. The single most important context hygiene habit for clean results.</p></div>
+    <div class="trick-card"><div class="trick-num">02</div><h4>/compact during long sessions</h4><p>Summarizes heavy conversations while preserving development direction. Use when context exceeds 80% — preserves key decisions.</p></div>
+    <div class="trick-card"><div class="trick-num">03</div><h4>claude --resume</h4><p>Reopens the previous session to continue without repeating project context. Alias: <code>claude -c</code>. Pairs with CLAUDE.md for full project continuity.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:1.5rem 0 .6rem;color:var(--ink-3)">Permission &amp; effort control</h3>
+  <div class="trick-grid">
+    <div class="trick-card"><div class="trick-num">04</div><h4>--dangerously-skip-permissions</h4><p>Lets Claude edit files and run commands without approval prompts. Use only in isolated or trusted environments — never production.</p></div>
+    <div class="trick-card"><div class="trick-num">05</div><h4>/effort [low|medium|high|max]</h4><p>Adjusts reasoning depth. Use <strong>low</strong> for quick fixes and <strong>max</strong> for architecture decisions and security reviews. Controls token cost directly.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:1.5rem 0 .6rem;color:var(--ink-3)">Project memory — CLAUDE.md</h3>
+  <div class="trick-grid">
+    <div class="trick-card"><div class="trick-num">06</div><h4>Add a CLAUDE.md file</h4><p>Gives Claude your project structure, coding rules, commands, and preferences. Include: tech stack, commands, testing process, folder structure, coding rules, naming conventions.</p></div>
+    <div class="trick-card"><div class="trick-num">07</div><h4>Add global CLAUDE.md (~/.claude/)</h4><p>Stores personal coding preferences so Claude follows them across ALL projects. Your persistent engineering identity across every codebase.</p></div>
+    <div class="trick-card"><div class="trick-num">08</div><h4>Include anti-patterns in CLAUDE.md</h4><p>Tell Claude what to avoid: "Don't use Axios, use fetch. Avoid class components, use hooks only." Reduces repeated mistakes significantly across sessions.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:1.5rem 0 .6rem;color:var(--ink-3)">Parallel development</h3>
+  <div class="trick-grid">
+    <div class="trick-card"><div class="trick-num">09</div><h4>Run multiple Claude sessions</h4><p>Use separate git worktrees to run parallel Claude sessions: one fixing a bug, another reviewing code, another building a feature — simultaneously without conflicts.</p></div>
+    <div class="trick-card"><div class="trick-num">10</div><h4>Git worktree command</h4><p>Creates an isolated branch folder for conflict-free parallel work:<br><code>git worktree add ../myapp-review -b review/cleanup</code></p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:1.5rem 0 .6rem;color:var(--ink-3)">Hooks — automate repetitive checks</h3>
+  <div class="trick-grid">
+    <div class="trick-card"><div class="trick-num">11</div><h4>PostToolUse hooks</h4><p>Auto-runs tests, linting, or quality checks after Claude edits files. Quality gates that fire without you asking — reliably, every time.</p></div>
+    <div class="trick-card"><div class="trick-num">12</div><h4>PreToolUse hooks</h4><p>Blocks risky commands before Claude runs destructive or unsafe actions. Your safety net. Use scripts here — code is deterministic, language is not.</p></div>
+    <div class="trick-card"><div class="trick-num">13</div><h4>/hooks command</h4><p>Configures workflow hooks interactively without manually editing JSON settings files. Hooks make Claude safer and more trustworthy during development.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:1.5rem 0 .6rem;color:var(--ink-3)">Subagents — specialized AI helpers</h3>
+  <div class="trick-grid">
+    <div class="trick-card"><div class="trick-num">14</div><h4>Add agents in .claude/agents/</h4><p>Creates focused agents for reviews, security checks, documentation, or frontend work. Each runs in isolation, preventing context pollution of the main session.</p></div>
+    <div class="trick-card"><div class="trick-num">15</div><h4>Limit tool access per agent</h4><p>Restricts each agent to relevant project areas only. Archetypes: Code Reviewer, Security Scanner, Docs Writer, Frontend Helper, DevOps Assistant.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:1.5rem 0 .6rem;color:var(--ink-3)">Model selection</h3>
+  <div class="trick-grid">
+    <div class="trick-card" style="border-left-color:var(--purple-dk)"><div class="trick-num">16</div><h4>Match model to task complexity</h4><p><strong>Opus:</strong> Architecture, deep reasoning, security decisions.<br><strong>Sonnet:</strong> Implementation, refactoring, feature work.<br><strong>Haiku:</strong> Quick fixes, tests, repetitive tasks. Smart routing saves cost without sacrificing quality where it matters.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:1.5rem 0 .6rem;color:var(--ink-3)">Underused slash commands</h3>
+  <div class="trick-grid">
+    <div class="trick-card"><div class="trick-num">17</div><h4>/install-github-app</h4><p>Enables Claude to review pull requests automatically inside GitHub Actions workflows — no manual trigger needed per PR.</p></div>
+    <div class="trick-card"><div class="trick-num">18</div><h4>/doctor</h4><p>Diagnoses setup, installation, and configuration issues without manual guesswork. Run this first whenever anything behaves unexpectedly.</p></div>
+    <div class="trick-card"><div class="trick-num">19</div><h4>/cost</h4><p>Shows token usage and session cost. Combine with <code>/effort low</code> and <code>/model haiku</code> to control spend on large or repetitive projects.</p></div>
+    <div class="trick-card"><div class="trick-num">20</div><h4>/ide</h4><p>Connects Claude Code directly with VS Code or JetBrains — see diffs, edits, and output inline in your editor without switching to terminal.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:1.5rem 0 .6rem;color:var(--ink-3)">Headless mode flags</h3>
+  <div class="trick-grid">
+    <div class="trick-card"><div class="trick-num">21</div><h4>Pipe data into Claude</h4><p>Send logs, diffs, errors, or command outputs directly into Claude:<br><code>cat error.log | claude -p "find the root cause"</code></p></div>
+    <div class="trick-card"><div class="trick-num">22</div><h4>--output-format json</h4><p>Returns structured responses parseable by scripts, dashboards, and automation pipelines. No regex — clean JSON every time.</p></div>
+    <div class="trick-card"><div class="trick-num">23</div><h4>--output-format stream-json</h4><p>Streams Claude's output live for real-time processing. Ideal for CI/CD display pipelines and progress dashboards in automation.</p></div>
+    <div class="trick-card"><div class="trick-num">24</div><h4>--max-turns 1</h4><p>One-shot prompt and exits after one answer. No interactive back-and-forth. Perfect for scripted automation, cron jobs, and CI/CD steps.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:1.5rem 0 .6rem;color:var(--ink-3)">Custom commands → now Skills</h3>
+  <div class="trick-grid">
+    <div class="trick-card"><div class="trick-num">25</div><h4>Create commands in .claude/commands/</h4><p>Turns repeated prompts into reusable slash commands: <code>/review</code>, <code>/deploy</code>, <code>/document</code>, <code>/commit</code>. Note: <code>.claude/skills/</code> is now preferred — Skills win on name collision.</p></div>
+    <div class="trick-card"><div class="trick-num">26</div><h4>Use !bash inside commands</h4><p>Injects live git status, diffs, logs, or test results automatically into command context before Claude sees it — dynamic, no manual pasting.</p></div>
+    <div class="trick-card"><div class="trick-num">27</div><h4>Add allowed-tools to commands</h4><p>Limits what each command can access. Makes workflows safer and controlled by design. Pair with PreToolUse hooks for maximum safety.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:1.5rem 0 .6rem;color:var(--ink-3)">Planning workflows</h3>
+  <div class="trick-grid">
+    <div class="trick-card"><div class="trick-num">28</div><h4>Write tests first</h4><p>Define expected behavior before Claude writes any implementation code. Catches logic gaps, edge cases, and security issues before they compound.</p></div>
+    <div class="trick-card"><div class="trick-num">29</div><h4>Plan → approve → execute</h4><p>Use <code>/plan</code> to have Claude propose an approach, discuss it with you, then execute only after your explicit approval. Fewer wrong changes on large refactors.</p></div>
+    <div class="trick-card"><div class="trick-num">30</div><h4>Run reviewer agents after implementation</h4><p>Catches logic gaps, bugs, edge cases, and security issues right after the build phase — while context is fresh. Use the <code>code-review-agents</code> skill.</p></div>
+  </div>
+
+  <h3 style="font-family:var(--serif);font-size:1rem;margin:1.5rem 0 .6rem;color:var(--ink-3)">MCP, navigation &amp; file access</h3>
+  <div class="trick-grid">
+    <div class="trick-card"><div class="trick-num">31</div><h4>Configure MCP servers per project</h4><p>Connects Claude with project-specific APIs, databases, and cloud tools via <code>.mcp.json</code>. Each project gets its own service connections automatically on session start.</p></div>
+    <div class="trick-card"><div class="trick-num">32</div><h4>/mcp mid-session</h4><p>Manages connected MCP servers without leaving your active session. Add, remove, or reconnect services without restarting Claude.</p></div>
+    <div class="trick-card"><div class="trick-num">33</div><h4>Press Esc + Esc</h4><p>Opens rewind history to restore previous file states safely — your undo button for Claude's changes across file edits within the session.</p></div>
+    <div class="trick-card"><div class="trick-num">34</div><h4>Use @filename</h4><p>Reference <code>@src/handler.go</code> in your prompt to let Claude read that file directly without pasting code — precise, zero bloat.</p></div>
+    <div class="trick-card"><div class="trick-num">35</div><h4>Use --add-dir</h4><p>Gives Claude access to multiple folders, repositories, or monorepo sections beyond the current working directory — essential for large workspaces.</p></div>
+  </div>
+
+  <div class="callout green" style="margin-top:2rem">
+    <div class="callout-label">Proven feature workflow — use before every feature</div>
+    <p><code>/init</code> → review CLAUDE.md → <code>/plan</code> → discuss → <kbd>Shift+Tab</kbd> acceptEdits → execute → <code>/diff</code> → <code>/security-review</code> → commit. Run <code>/compact</code> between logical chunks. Check <code>/cost</code> periodically. Eliminates most surprises on large refactors.</p>
+  </div>
+</div>
+
+<!-- ====== COWORKER ====== -->
+<div id="coworker" class="wrap section-gap">
+  <span class="sec-eyebrow">Product 3 of 3</span>
+  <h2 class="sec-title">Claude Coworker <span class="badge badge-agent" style="vertical-align:middle;font-size:.7rem">Desktop Agent</span></h2>
+  <p class="sec-sub">Desktop-level agentic AI for knowledge workers — Claude Code without the terminal. Autonomous multi-step task execution with a visual approval flow. Zero coding required. Runs only in the desktop app (Mac/Windows). Supports scheduled overnight tasks via the /schedule plugin.</p>
+  <hr class="sec-rule">
+  <div class="g2" style="margin-bottom:1.5rem">
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#e0f5f0">📁</span>File-centric workflows</div><p>Point Coworker at a folder: "Organize these downloads into categories", "Draft summaries from these meeting notes", "Rename all files by date." Plans and executes autonomously.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#e8f0fd">✅</span>Visual plan + approval</div><p>Before any sensitive action (moving, renaming, deleting), Coworker shows a clear GUI plan. Approve or modify each step before anything irreversible executes. Full audit trail.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#fdf3dc">🌐</span>Browser &amp; app integration</div><p>Connects Chrome, Asana, Notion, and other apps — pulling data from web applications and synthesizing it locally into reports, structured documents, and dashboards.</p></div>
+    <div class="card"><div class="card-title"><span class="card-icon" style="background:#fdecea">⏰</span>Scheduled automated tasks</div><p>Use the <code>/schedule</code> plugin to set recurring Cowork tasks. Write your full prompt — Claude runs it before you wake up and saves a briefing doc to Claude Outputs. Claude works while you sleep.</p></div>
+  </div>
+  <div class="g2">
+    <div>
+      <h3 style="font-family:var(--serif);font-size:1.1rem;margin-bottom:.75rem">Recommended workspace structure</h3>
+      <div class="folder-tree">
+        <span class="dir">Claude-Cowork/</span><br>
+        ├── <span class="dir">About Me/</span>         <span class="cmt"># identity + writing rules</span><br>
+        │   ├── <span class="file">about-me.md</span>   <span class="cmt"># who you are, priorities</span><br>
+        │   └── <span class="file">anti-patterns.md</span> <span class="cmt"># phrases to NEVER use</span><br>
+        ├── <span class="dir">Projects/</span>         <span class="cmt"># one subfolder per live project</span><br>
+        │   └── <span class="dir">project-name/</span>  <span class="cmt"># brief + drafts + references</span><br>
+        ├── <span class="dir">Templates/</span>        <span class="cmt"># best past work as reusable structure</span><br>
+        └── <span class="dir">Claude Outputs/</span>   <span class="cmt"># ONLY folder Claude writes to</span>
+      </div>
+      <p style="font-size:.8rem;color:var(--ink-3);margin-top:.5rem">Everything outside Claude Outputs is read-only. Name work files clearly: <code>project_sent_v1.md</code>. On Mac, create a Text Shortcut (e.g. <code>/prompt</code>) to expand your master template anywhere.</p>
+    </div>
+    <div>
+      <div class="callout" style="margin:0 0 .75rem">
+        <div class="callout-label">Reverse prompting — the Cowork superpower</div>
+        <p>Instead of writing paragraphs of instructions, flip the script. Say: <em>"We're getting sidetracked. Generate an AskUserQuest."</em> Claude generates a structured multi-select questionnaire. You click answers in under a minute. Claude plans, you approve, it executes. This is what good AI-assisted planning feels like.</p>
+      </div>
+      <div class="callout amber" style="margin:0">
+        <div class="callout-label">Plugins — start with one, master before expanding</div>
+        <p>Browse plugins in the desktop app to add a sidebar matching your workflow. Types: Marketing (<code>/marketing:draft-content</code>), Data (CSV + dashboard explore), Legal (contract review in sidebar). Master one — then expand.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== DECISION MATRIX ====== -->
+<div id="decision" class="wrap section-gap">
+  <span class="sec-eyebrow">Decision guide</span>
+  <h2 class="sec-title">Which tool for which task?</h2>
+  <p class="sec-sub">The most common mistake: using Claude Chat for tasks that Claude Code handles better, or Coworker for tasks that Chat resolves faster. Use this matrix to route correctly every time.</p>
+  <hr class="sec-rule">
+  <div class="table-wrap">
+    <table>
+      <tr><th>Scenario</th><th>Best tool</th><th>Reasoning</th></tr>
+      <tr><td>Draft an email, brainstorm architecture, summarize a PDF</td><td><span class="badge badge-ui">Claude Chat</span></td><td>Fast, visual, isolated from file system — no risk, instant output</td></tr>
+      <tr><td>Refactor a 10,000-line Go service and fix failing tests</td><td><span class="badge badge-cli">Claude Code</span></td><td>Full codebase context, autonomous test execution, git integration</td></tr>
+      <tr><td>Extract data from 50 PDFs into an Excel dashboard</td><td><span class="badge badge-agent">Coworker</span></td><td>File management, multi-step planning, zero coding required</td></tr>
+      <tr><td>Automate code review in a CI/CD pipeline</td><td><span class="badge badge-cli">Claude Code</span></td><td>Non-interactive headless flags, fully pipeable, composable with bash</td></tr>
+      <tr><td>Organize 200 downloaded files into categorized folders</td><td><span class="badge badge-agent">Coworker</span></td><td>Desktop-level file operations with visual approval flow and audit trail</td></tr>
+      <tr><td>Build an interactive React dashboard from scratch</td><td><span class="badge badge-ui">Claude Chat</span></td><td>Artifacts render live in the browser panel — instant preview and iteration</td></tr>
+      <tr><td>Security audit on a PR before merging</td><td><span class="badge badge-cli">Claude Code</span></td><td><code>/security-review</code> + <code>/diff</code> provide git-aware structured analysis</td></tr>
+      <tr><td>Search Gmail, Calendar, and Notion in one workflow</td><td><span class="badge badge-ui">Chat + MCP</span></td><td>MCP connectors natively available in the chat interface with one-click OAuth</td></tr>
+      <tr><td>Deep research across 15+ sources — competitive analysis</td><td><span class="badge badge-ui">Claude Chat</span></td><td>Deep Research mode runs 10–20 searches and synthesizes a comprehensive report</td></tr>
+      <tr><td>Build a SKILL.md workflow package for your team</td><td><span class="badge badge-cli">Claude Code</span></td><td>skill-creator skill, git-tracked, team-shareable via <code>.claude/skills/</code></td></tr>
+      <tr><td>Overnight report from Notion + Slack + Drive</td><td><span class="badge badge-agent">Coworker</span></td><td>/schedule plugin runs multi-connector tasks overnight — briefing doc on wakeup</td></tr>
+      <tr><td>Generate a DOCX, PPTX, or XLSX file</td><td><span class="badge badge-ui">Claude Chat</span></td><td>Built-in document skills (docx, pptx, xlsx) activate automatically via skill system</td></tr>
+    </table>
+  </div>
+  <div class="callout" style="margin-top:1.5rem">
+    <div class="callout-label">Problem-first vs. tool-first (from the Anthropic Skills guide)</div>
+    <p><strong>Problem-first:</strong> "I need to set up a project workspace" → your skill orchestrates the right MCP calls. Users describe outcomes; the skill handles the tools. <strong>Tool-first:</strong> "I have Notion MCP connected" → your skill teaches Claude the optimal workflows. Users have access; the skill provides expertise. Knowing which framing fits your use case helps you choose the right skill pattern.</p>
+  </div>
+</div>
+
+<!-- ====== 1-WEEK PLAN ====== -->
+<div id="oneweek" class="wrap section-gap">
+  <span class="sec-eyebrow">Onboarding</span>
+  <h2 class="sec-title">The 10-Step Master Plan</h2>
+  <p class="sec-sub">Based on the "How to Master Claude in One Week" guide. Follow these 10 steps in sequence to transition from basic chatting to advanced workflow automation with scheduled autonomous tasks.</p>
+  <hr class="sec-rule">
+  <div class="g2">
+    <div class="steps" style="margin:0">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Download the Desktop App</strong><span>Go to claude.com/download. Cowork only runs inside the desktop app — not the web version. Mac/Windows only. Pro account required ($20/mo or $17/mo billed annually).</span></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Know Your Four Modes</strong><span><strong>Chat:</strong> Quick questions, nothing serious. <strong>Projects:</strong> Team use and recurring deliverables. <strong>Cowork:</strong> Solo deep work with actual files. <strong>Code:</strong> Developers only — skip if not dev.</span></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Build Your 4 Folders</strong><span>Create "Claude-Cowork" parent with subfolders: About Me, Projects, Templates, Claude Outputs. The Outputs folder is the ONLY place Claude ever writes to.</span></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Write Your 2 Core Files</strong><span><strong>about-me.md</strong> — who you are, what you do, priorities. <strong>anti-patterns.md</strong> — words Claude must NEVER use (delve, certainly!, it's worth noting). One great file beats 50 random uploads.</span></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Stop Writing Prompts</strong><span>Use one master template loaded with your About Me context. On Mac, create a Text Shortcut (e.g. <code>/prompt</code>) that expands it anywhere. Name work files clearly: <code>project_sent_v1.md</code>.</span></div></div>
+    </div>
+    <div class="steps" style="margin:0">
+      <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Let Claude Prompt You</strong><span>Flip the script — say "Generate an AskUserQuest." Claude produces a structured questionnaire with multi-select options and drag-to-rank priorities. You click answers in under a minute.</span></div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-body"><strong>Install One Plugin</strong><span>Browse plugins to add a sidebar matching your workflow — Marketing, Data (CSV explore), or Legal contract review. Start with ONE — master it before expanding to others.</span></div></div>
+      <div class="step"><div class="step-num">8</div><div class="step-body"><strong>Connect Your Tools</strong><span>Settings → Connectors → Browse → Add. Connect Google, Notion, Slack. Claude can search your Slack, pull from Docs, reference Notion mid-task. It becomes a coworker who knows your stack.</span></div></div>
+      <div class="step"><div class="step-num">9</div><div class="step-body"><strong>Build One Team Project</strong><span>Create a shared Project with global instructions — include brief + drafts + references subfolders per live project. Claude now works for your whole team. One well-structured project is a team multiplier.</span></div></div>
+      <div class="step"><div class="step-num">10</div><div class="step-body"><strong>Schedule Your First Automated Task</strong><span>Use the <code>/schedule</code> plugin. Write your Cowork prompt in full. Set it to run before you wake up. You open your laptop to a completed briefing doc. Claude works while you sleep.</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PROMPTING ====== -->
+<div id="prompting" class="wrap section-gap">
+  <span class="sec-eyebrow">Advanced interaction</span>
+  <h2 class="sec-title">Prompting architecture</h2>
+  <p class="sec-sub">The best strategy shifts from manual prompt writing to systemic context alignment. These principles apply across all three products and compound over time with consistent use.</p>
+  <hr class="sec-rule">
+  <div class="g2" style="margin-bottom:1.5rem">
+    <div class="card" style="border-top:3px solid var(--purple)">
+      <div class="card-title">Role → Task → Format</div>
+      <p style="margin-bottom:.5rem">Lead every prompt with who Claude should be, then what it should do, then how to present output.</p>
+      <div style="background:var(--paper-2);border-radius:var(--r);padding:.75rem;font-size:.8rem;color:var(--ink-2);font-family:var(--mono);line-height:1.7">As a Go security engineer, review this handler for injection vulnerabilities. Output as a numbered list with inline code snippets and CVSS severity ratings.</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--teal)">
+      <div class="card-title">XML tags for structured input</div>
+      <p style="margin-bottom:.5rem">Wrap inputs with XML tags — Claude parses them reliably and produces outputs matching your schema exactly.</p>
+      <div style="background:var(--paper-2);border-radius:var(--r);padding:.75rem;font-size:.8rem;color:var(--ink-2);font-family:var(--mono);line-height:1.7">&lt;context&gt;AEGIS Go gateway&lt;/context&gt;<br>&lt;task&gt;Add Prometheus metrics&lt;/task&gt;<br>&lt;constraints&gt;No external libs&lt;/constraints&gt;<br>&lt;format&gt;Code diff + explanation&lt;/format&gt;</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--amber)">
+      <div class="card-title">The master template approach</div>
+      <p>Use one master template that reads your about-me.md before every task. Set an OS-level text shortcut (<code>/prompt</code> on Mac) to expand it instantly anywhere. Guarantees context alignment without retyping. Pairs with the Cowork folder structure for maximum consistency.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--blue)">
+      <div class="card-title">Step-by-step reasoning</div>
+      <p>Add "think through the tradeoffs first, then give your recommendation" — triggers deeper reasoning especially for architecture decisions and debugging. Particularly effective with Opus on complex security or system design tasks.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--green)">
+      <div class="card-title">Iterate, don't restart</div>
+      <p>Claude holds full context across a conversation. "Now refactor that for production Go" or "add ClickHouse integration to the previous example" — no need to re-paste code. In Claude Code, use <code>claude --resume</code> to continue across terminal sessions.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--red)">
+      <div class="card-title">Context hygiene rules</div>
+      <p>Add only files necessary for the current task. Run <code>/compact</code> when context exceeds 80% and <code>/clear</code> when switching tasks entirely. Always review <code>/diff</code> before applying destructive changes. Bloated context = drift, higher cost, lower quality.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ACADEMY ====== -->
+<div id="academy" class="wrap section-gap" style="padding-bottom:5rem">
+  <span class="sec-eyebrow">Official learning platform</span>
+  <h2 class="sec-title">Anthropic Academy &amp; Certifications</h2>
+  <p class="sec-sub">Anthropic's official free learning platform, launched March 2026. All 17 courses are self-paced, include video lessons and quizzes, and award an official completion certificate ready for LinkedIn. No Anthropic account required to enroll — sign up at <a href="https://anthropic.skilljar.com" style="color:var(--purple);text-decoration:none;font-weight:500">anthropic.skilljar.com</a> with any email.</p>
+  <hr class="sec-rule">
+
+  <div class="callout teal" style="margin-bottom:2rem">
+    <div class="callout-label">100% Free · Official Anthropic Certificates · Self-Paced</div>
+    <p>Every course awards an official Anthropic completion certificate. These credentials carry weight in job applications — they prove structural understanding of Claude, not just casual familiarity. No paywall. No prerequisites for the non-technical track. Certificates are shareable directly on LinkedIn.</p>
+  </div>
+
+  <!-- NON-TECHNICAL TRACK -->
+  <div class="course-track">
+    <div class="track-label"><span class="badge badge-free">For Everyone · No coding required · 8 courses</span></div>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/claude-101" target="_blank">
+      <div class="course-icon" style="background:var(--purple-lt)">1️⃣</div>
+      <div class="course-card-body">
+        <strong>Claude 101 — START HERE</strong>
+        <p>If you take only one course, take this one. Teaches everyday use: writing emails, organizing data, analyzing documents, drafting content. No technical background needed. The definitive first step — after this, you know which direction to go deeper.</p>
+        <div class="course-meta"><span class="badge badge-free">Everyone</span><span class="badge" style="background:var(--paper-2);color:var(--ink-3)">No prerequisites</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/ai-fluency-framework-foundations" target="_blank">
+      <div class="course-icon" style="background:var(--teal-lt)">🧭</div>
+      <div class="course-card-body">
+        <strong>AI Fluency: Framework &amp; Foundations</strong>
+        <p>Co-developed with academic partners around the "4E Framework": Effective, Efficient, Ethical, Safe. Teaches thinking frameworks — where AI capability boundaries lie, which tasks to delegate, and when human judgment cannot be replaced. Taught by Prof. Joseph Feller (UCC) and Prof. Rick Dakan (Ringling College).</p>
+        <div class="course-meta"><span class="badge badge-free">Everyone</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/ai-fluency-for-students" target="_blank">
+      <div class="course-icon" style="background:var(--amber-lt)">🎓</div>
+      <div class="course-card-body">
+        <strong>AI Fluency for Students</strong>
+        <p>Academic research, career planning, and learning strategies using Claude. Practical guidance for responsible AI use in coursework, professional preparation, and academic integrity. Designed for undergrad and graduate learners.</p>
+        <div class="course-meta"><span class="badge badge-free">Students</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/ai-fluency-for-educators" target="_blank">
+      <div class="course-icon" style="background:var(--blue-lt)">📚</div>
+      <div class="course-card-body">
+        <strong>AI Fluency for Educators</strong>
+        <p>Integrating AI into instruction, curriculum design, and assessment. For teachers and professors who want to guide students on responsible AI use — covers classroom strategies, assignment design, and academic integrity frameworks.</p>
+        <div class="course-meta"><span class="badge badge-free">Educators</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/teaching-ai-fluency" target="_blank">
+      <div class="course-icon" style="background:var(--purple-lt)">🧑‍🏫</div>
+      <div class="course-card-body">
+        <strong>Teaching AI Fluency</strong>
+        <p>How to teach others to use AI effectively. Covers scenario design, learning outcome evaluation, and instructional frameworks. For L&amp;D professionals, corporate trainers, and instructional designers building internal AI programs.</p>
+        <div class="course-meta"><span class="badge badge-free">L&amp;D / Trainers</span><span class="badge" style="background:var(--paper-2);color:var(--ink-3)">AI Fluency basics recommended first</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/ai-fluency-for-nonprofits" target="_blank">
+      <div class="course-icon" style="background:var(--green-lt)">🤝</div>
+      <div class="course-card-body">
+        <strong>AI Fluency for Nonprofits</strong>
+        <p>Co-developed with GivingTuesday. Practical AI adoption for mission-driven organizations with limited technical staff and constrained budgets. Covers fundraising, grant writing, program management, and volunteer coordination use cases.</p>
+        <div class="course-meta"><span class="badge badge-free">Nonprofits</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/" target="_blank">
+      <div class="course-icon" style="background:var(--amber-lt)">🖥️</div>
+      <div class="course-card-body">
+        <strong>Introduction to Claude Cowork &nbsp;<span class="badge badge-new">New — April 2026</span></strong>
+        <p>The first official course on Anthropic's agentic desktop agent. Designed for non-technical users — covers task delegation, approval flows, file automation, connector workflows, the 4-folder workspace structure, and scheduled task setup with the /schedule plugin.</p>
+        <div class="course-meta"><span class="badge badge-free">Everyone</span><span class="badge" style="background:var(--paper-2);color:var(--ink-3)">Desktop app required</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/" target="_blank">
+      <div class="course-icon" style="background:var(--teal-lt)">🧪</div>
+      <div class="course-card-body">
+        <strong>AI Capabilities and Limitations &nbsp;<span class="badge badge-new">New — April 2026</span></strong>
+        <p>How a generative model actually works — real capabilities, hallucination patterns, reasoning limits, context window mechanics, and operational boundaries. Recommended for all roles before going deeper into any technical track. Essential for setting correct expectations.</p>
+        <div class="course-meta"><span class="badge badge-free">Everyone</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+  </div>
+
+  <!-- DEVELOPER TRACK -->
+  <div class="course-track">
+    <div class="track-label"><span class="badge badge-dev">Developer Track · Python / CLI experience required · 9 courses</span></div>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/claude-with-the-anthropic-api" target="_blank">
+      <div class="course-icon" style="background:#f0e8ff">🔌</div>
+      <div class="course-card-body">
+        <strong>Building with the Claude API</strong>
+        <p>First API call through to production patterns — tool use, function calling, streaming, batch processing, prompt caching. Essential starting point for every Python developer building on Claude. Covers the full Messages API, current model strings, and SDK usage.</p>
+        <div class="course-meta"><span class="badge badge-dev">Developers</span><span class="badge" style="background:var(--paper-2);color:var(--ink-3)">Python · JSON basics</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/claude-code-in-action" target="_blank">
+      <div class="course-icon" style="background:var(--purple-lt)">⚡</div>
+      <div class="course-card-body">
+        <strong>Claude Code in Action &nbsp;★ Most popular developer course</strong>
+        <p>Flagship developer course. Installation through advanced integration: context management, CLAUDE.md setup, MCP server configuration, tool chaining, slash commands, CI/CD scripting, hooks, subagents, and custom skills. Official Anthropic certificate — a meaningful differentiator in 2026 hiring.</p>
+        <div class="course-meta"><span class="badge badge-dev">Developers</span><span class="badge" style="background:var(--paper-2);color:var(--ink-3)">CLI · Git basics</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/introduction-to-agent-skills" target="_blank">
+      <div class="course-icon" style="background:var(--blue-lt)">🛠️</div>
+      <div class="course-card-body">
+        <strong>Introduction to Agent Skills</strong>
+        <p>Design, write, and compose Claude Skills — reusable SKILL.md workflow packages with progressive disclosure loading. Covers auto-invocation rules, skill composability, YAML frontmatter, the 5 workflow patterns, the skill-creator skill, and Skills 2.0 executable format from Q1 2026.</p>
+        <div class="course-meta"><span class="badge badge-dev">Developers</span><span class="badge" style="background:var(--paper-2);color:var(--ink-3)">Markdown · Claude Code experience</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/introduction-to-model-context-protocol" target="_blank">
+      <div class="course-icon" style="background:var(--teal-lt)">🔗</div>
+      <div class="course-card-body">
+        <strong>Introduction to MCP</strong>
+        <p>Build your first MCP server from scratch — expose tools, resources, and prompts to Claude. Full protocol spec with Python implementations, OAuth-protected endpoints, and real integration examples. Covers <code>.mcp.json</code> per-project configuration and Claude Code integration.</p>
+        <div class="course-meta"><span class="badge badge-dev">Developers</span><span class="badge" style="background:var(--paper-2);color:var(--ink-3)">Python · JSON + HTTP basics</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/model-context-protocol-advanced-topics" target="_blank">
+      <div class="course-icon" style="background:var(--amber-lt)">🚀</div>
+      <div class="course-card-body">
+        <strong>MCP: Advanced Topics</strong>
+        <p>Async MCP patterns, OAuth-protected servers, dynamic client registration, multi-server orchestration (Multi-MCP coordination pattern), production deployment at scale. For builders moving MCP integrations from prototype to production.</p>
+        <div class="course-meta"><span class="badge badge-dev">Developers</span><span class="badge" style="background:var(--paper-2);color:var(--ink-3)">MCP intro + async Python required</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/" target="_blank">
+      <div class="course-icon" style="background:var(--green-lt)">🤖</div>
+      <div class="course-card-body">
+        <strong>Introduction to Subagents &nbsp;<span class="badge badge-new">New — April 2026</span></strong>
+        <p>Delegate tasks to isolated sub-agents — context isolation, coordination patterns, agent teams, and git worktree isolation for parallel development. For complex agentic architectures requiring parallel execution and specialized task handling via <code>.claude/agents/</code>.</p>
+        <div class="course-meta"><span class="badge badge-dev">Developers</span><span class="badge" style="background:var(--paper-2);color:var(--ink-3)">Claude Code experience required</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/claude-in-amazon-bedrock" target="_blank">
+      <div class="course-icon" style="background:var(--amber-lt)">☁️</div>
+      <div class="course-card-body">
+        <strong>Claude with Amazon Bedrock</strong>
+        <p>Deploy Claude via AWS — Bedrock API, IAM configuration, model invocation, knowledge bases, and production patterns for enterprise AWS environments. Covers Bedrock Agents and guardrails for regulated industry deployments.</p>
+        <div class="course-meta"><span class="badge badge-dev">Developers</span><span class="badge" style="background:var(--paper-2);color:var(--ink-3)">Python · AWS basics</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+
+    <a class="course-card" href="https://anthropic.skilljar.com/claude-with-google-vertex" target="_blank">
+      <div class="course-icon" style="background:var(--blue-lt)">☁️</div>
+      <div class="course-card-body">
+        <strong>Claude with Google Vertex AI</strong>
+        <p>Deploy Claude via GCP — Vertex AI integration, service accounts, regional endpoints, and production-grade deployment patterns for Google Cloud environments. Covers Vertex AI Extensions and enterprise security controls.</p>
+        <div class="course-meta"><span class="badge badge-dev">Developers</span><span class="badge" style="background:var(--paper-2);color:var(--ink-3)">Python · GCP basics</span><span class="badge badge-cert">🏅 Certificate</span></div>
+      </div>
+      <span class="course-card-arrow">›</span>
+    </a>
+  </div>
+
+  <!-- CERTIFICATION -->
+  <h3 style="font-family:var(--serif);font-size:1.2rem;margin:1rem 0 1rem">Professional certification</h3>
+  <div class="card" style="border-left:3px solid var(--amber)">
+    <div class="card-title"><span class="card-icon" style="background:var(--amber-lt);font-size:18px">🏆</span>Claude Certified Architect — Foundations</div>
+    <p style="margin-bottom:.75rem">Anthropic's first professional certification program. Covers Claude Code, Skills architecture, Cowork, agent automation patterns, MCP server design, and production deployment. Includes a 12-week study plan, 25 practice questions, and exam prep guide. Targeted at engineers and architects building production Claude systems.</p>
+    <div class="tags">
+      <span class="tag">Exam prep guide</span><span class="tag">25 practice questions</span>
+      <span class="tag">12-week study plan</span><span class="tag">LinkedIn credential</span>
+    </div>
+    <div style="margin-top:.75rem"><a href="https://claudecertifications.com" style="font-size:.85rem;color:var(--amber);text-decoration:none;font-weight:600">→ claudecertifications.com</a></div>
+  </div>
+
+  <!-- LEARNING PATHS -->
+  <h3 style="font-family:var(--serif);font-size:1.2rem;margin:2rem 0 1rem">Recommended learning paths by role</h3>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title"><span class="card-icon" style="background:var(--teal-lt)">👤</span>Business / Knowledge worker path</div>
+      <div class="steps" style="margin-top:.5rem">
+        <div class="step" style="padding:.7rem .9rem"><div class="step-num" style="width:22px;height:22px;font-size:10px">1</div><div class="step-body"><strong>Claude 101</strong><span>Practical everyday use — no prerequisites</span></div></div>
+        <div class="step" style="padding:.7rem .9rem"><div class="step-num" style="width:22px;height:22px;font-size:10px">2</div><div class="step-body"><strong>AI Fluency: Framework &amp; Foundations</strong><span>4E framework — when to use AI, when not to</span></div></div>
+        <div class="step" style="padding:.7rem .9rem"><div class="step-num" style="width:22px;height:22px;font-size:10px">3</div><div class="step-body"><strong>AI Capabilities &amp; Limitations</strong><span>Hallucination, reasoning boundaries, context mechanics</span></div></div>
+        <div class="step" style="padding:.7rem .9rem"><div class="step-num" style="width:22px;height:22px;font-size:10px">4</div><div class="step-body"><strong>Introduction to Claude Cowork</strong><span>Automate file workflows and schedule overnight tasks</span></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-icon" style="background:var(--purple-lt)">💻</span>Developer / Engineer path</div>
+      <div class="steps" style="margin-top:.5rem">
+        <div class="step" style="padding:.7rem .9rem"><div class="step-num" style="width:22px;height:22px;font-size:10px">1</div><div class="step-body"><strong>Building with the Claude API</strong><span>First API call → tool use → production patterns</span></div></div>
+        <div class="step" style="padding:.7rem .9rem"><div class="step-num" style="width:22px;height:22px;font-size:10px">2</div><div class="step-body"><strong>Claude Code in Action</strong><span>Terminal-native agentic coding — context, hooks, subagents</span></div></div>
+        <div class="step" style="padding:.7rem .9rem"><div class="step-num" style="width:22px;height:22px;font-size:10px">3</div><div class="step-body"><strong>Introduction to MCP</strong><span>Build external tool integrations and connect Claude to services</span></div></div>
+        <div class="step" style="padding:.7rem .9rem"><div class="step-num" style="width:22px;height:22px;font-size:10px">4</div><div class="step-body"><strong>Agent Skills + Subagents</strong><span>SKILL.md workflows, progressive disclosure, parallel agents</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESOURCES TABLE -->
+  <h3 style="font-family:var(--serif);font-size:1.2rem;margin:2rem 0 1rem">Official resources &amp; documentation</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Resource</th><th>URL</th><th>Best for</th></tr>
+      <tr><td><strong>Anthropic Academy</strong></td><td><a href="https://anthropic.skilljar.com" style="color:var(--purple);text-decoration:none">anthropic.skilljar.com</a></td><td>All 17 free courses with official completion certificates</td></tr>
+      <tr><td><strong>API documentation</strong></td><td><a href="https://docs.claude.com" style="color:var(--purple);text-decoration:none">docs.claude.com</a></td><td>Full API reference, models, tool use, streaming, prompt caching</td></tr>
+      <tr><td><strong>Claude Code overview</strong></td><td><a href="https://docs.claude.com/en/docs/claude-code/overview" style="color:var(--purple);text-decoration:none">docs.claude.com/claude-code</a></td><td>CLI install, slash commands, MCP, CLAUDE.md, skills, hooks</td></tr>
+      <tr><td><strong>Prompt engineering guide</strong></td><td><a href="https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview" style="color:var(--purple);text-decoration:none">docs.claude.com/prompt-engineering</a></td><td>XML tags, chain-of-thought, system prompts, tool use patterns</td></tr>
+      <tr><td><strong>MCP protocol spec</strong></td><td><a href="https://modelcontextprotocol.io/docs" style="color:var(--purple);text-decoration:none">modelcontextprotocol.io</a></td><td>Build custom MCP servers, OAuth, connector patterns</td></tr>
+      <tr><td><strong>Support center</strong></td><td><a href="https://support.claude.com" style="color:var(--purple);text-decoration:none">support.claude.com</a></td><td>Plans, billing, feature limits, account issues</td></tr>
+      <tr><td><strong>Claude Certifications</strong></td><td><a href="https://claudecertifications.com" style="color:var(--purple);text-decoration:none">claudecertifications.com</a></td><td>Certified Architect program, exam prep, 25 practice questions</td></tr>
+      <tr><td><strong>Anthropic news</strong></td><td><a href="https://www.anthropic.com/news" style="color:var(--purple);text-decoration:none">anthropic.com/news</a></td><td>Model launches, feature announcements, research papers</td></tr>
+      <tr><td><strong>Official skills repo</strong></td><td><a href="https://github.com/anthropics/claude-code" style="color:var(--purple);text-decoration:none">github.com/anthropics/claude-code</a></td><td>Official Anthropic skills — browse, fork, and customize</td></tr>
+      <tr><td><strong>Class Central</strong></td><td><a href="https://www.classcentral.com/subject/claude" style="color:var(--purple);text-decoration:none">classcentral.com/subject/claude</a></td><td>600+ community courses on Claude across all platforms</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ====== FOOTER ====== -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">Claude <span>Ecosystem</span></div>
+      <p class="footer-tagline">The complete onboarding reference for the Anthropic Claude platform — Chat, Claude Code, Coworker, Skills, MCP, and Anthropic Academy. Compiled May 2026.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <a href="https://claude.ai">Claude Chat</a>
+      <a href="https://claude.com/download">Claude Coworker</a>
+      <a href="https://docs.claude.com/en/docs/claude-code/overview">Claude Code</a>
+      <a href="https://docs.claude.com">Claude API</a>
+    </div>
+    <div class="footer-col">
+      <h4>Learning</h4>
+      <a href="https://anthropic.skilljar.com">Anthropic Academy</a>
+      <a href="https://anthropic.skilljar.com/claude-101">Claude 101</a>
+      <a href="https://anthropic.skilljar.com/claude-code-in-action">Code in Action</a>
+      <a href="https://claudecertifications.com">Certifications</a>
+    </div>
+    <div class="footer-col">
+      <h4>Docs &amp; Support</h4>
+      <a href="https://docs.claude.com">API Reference</a>
+      <a href="https://support.claude.com">Support Center</a>
+      <a href="https://modelcontextprotocol.io">MCP Protocol</a>
+      <a href="https://www.anthropic.com/news">Anthropic News</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Claude Ecosystem Guide · 2026 Edition · Content reflects Anthropic product state as of May 2026 &nbsp;·&nbsp; Sources: Anthropic Academy, official docs, "35 Claude Code Secrets" (A. Viramgama), "How to Master Claude in One Week", "Complete Guide to Building Skills for Claude" (Anthropic)</p>
+  </div>
+</footer>
+
+</body>
+</html>
