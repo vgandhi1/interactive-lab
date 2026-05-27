@@ -1474,7 +1474,7 @@ footer span { color: var(--orange); }
     <div>
       <div class="section-label">Security Architecture</div>
       <h2 class="section-title">Security Layer — Legacy &amp; Known Gaps</h2>
-      <p class="section-sub">What security controls were in place in 2020–21, and where the architecture fell short against modern OT/IT security standards. Understanding the gaps is the foundation for the next-generation redesign.</p>
+      <p class="section-sub">What security controls were in place in 2020–21, and where the architecture fell short against modern OT/IT security standards. The gaps directly shaped the next-generation redesign.</p>
     </div>
 
     <div class="security-grid">
@@ -1654,7 +1654,7 @@ footer span { color: var(--orange); }
       </tbody>
     </table>
     <div class="key-finding">
-      <strong>Key Finding:</strong> Inference (step 5, CPU-only EC2) and MES write (step 7) account for ~65% of total latency. GPU-enabled SageMaker endpoint would cut step 5 from 1.0–1.5s to ~200ms. Async MES write with retry queue would eliminate step 7 blocking entirely.
+      Inference (step 5, CPU-only EC2) and MES write (step 7) account for ~65% of total latency. A GPU-enabled SageMaker endpoint would cut step 5 from 1.0–1.5s to ~200ms. An async MES write with retry queue would eliminate step 7 blocking entirely.
     </div>
     <p class="section-sub" style="margin-top:12px; font-size:12px; color:var(--muted); font-style:italic;">Eight stages are listed here (including SCADA) to match the eight-step decision flow; some older materials group these as seven pipeline stages.</p>
 </section>
@@ -1733,7 +1733,7 @@ footer span { color: var(--orange); }
     <div>
       <div class="section-label">Engineering Honesty</div>
       <h2 class="section-title">Known Limitations — Legacy Architecture</h2>
-      <p class="section-sub">An honest assessment of the 2020–21 design decisions and their operational consequences. These limitations directly motivated the next-generation architecture.</p>
+      <p class="section-sub">An honest assessment of the 2020–21 design decisions and their operational consequences. Each one maps directly to a change in the next-generation design.</p>
     </div>
     <div class="limits-grid">
       <div class="limit-card" style="border-left-color:var(--red);">

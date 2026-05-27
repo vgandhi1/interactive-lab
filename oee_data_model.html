@@ -512,8 +512,7 @@ footer strong { color: var(--green); font-weight: 600; }
     <div class="hero-eyebrow">Manufacturing Intelligence Platform</div>
     <h1>OEE Data <em>Model</em><br>&amp; ETL Architecture</h1>
     <p class="hero-sub">
-      End-to-end reporting pipeline for Ag-Equipment manufacturing — 15-minute SLA,
-      end-of-shift OEE delivered on 100% on-premise infrastructure.
+      Reporting pipeline for Ag-Equipment manufacturing: end-of-shift OEE within a 15-minute SLA on 100% on-premise infrastructure.
     </p>
     <div class="hero-chips">
       <span class="chip chip-amber">Ignition SCADA</span>
@@ -532,7 +531,7 @@ footer strong { color: var(--green); font-weight: 600; }
 <section id="overview">
   <div class="sec-label"><span></span>01 &mdash; Engineering Objective</div>
   <h2 class="sec-title">15-Minute SLA, On-Premise</h2>
-  <p class="sec-sub">How do we calculate OEE within a 15-minute window using existing on-premise infrastructure — no cloud, no new licenses?</p>
+  <p class="sec-sub">How do we calculate OEE within a 15-minute window using existing on-premise infrastructure, without cloud dependencies or new licenses?</p>
 
   <div class="sla-card">
     <div>
@@ -542,8 +541,8 @@ footer strong { color: var(--green); font-weight: 600; }
     <div class="sla-desc">
       Windows Task Scheduler fires Python extraction scripts every <strong>10 minutes</strong>,
       feeding a T-SQL aggregation layer that completes well within the 15-minute SLA.
-      Pre-aggregated summary tables ensure Power BI loads in <strong>near-instant</strong> time
-      — no ad-hoc queries on raw PLC rows.
+      Pre-aggregated summary tables keep Power BI loads <strong>near-instant</strong>
+      — no ad-hoc queries hit the raw PLC rows.
     </div>
   </div>
 </section>

@@ -420,7 +420,7 @@
   <div class="section-label">Abstract</div>
   <h2 class="section-title">The <em>Problem</em> We Set Out to Solve</h2>
   <p style="color:var(--muted);max-width:700px;font-size:1rem;line-height:1.8;margin-bottom:2rem;">
-    Breast cancer affects roughly <strong style="color:var(--text)">10% of women worldwide</strong> at some stage of their lives, with a 5-year survival rate of 88% post-diagnosis. However, recurrence after treatment remains a serious and unpredictable threat — one that existing manual diagnostic methods fail to address reliably. This project applies machine learning to bridge that gap.
+    Breast cancer affects roughly <strong style="color:var(--text)">10% of women worldwide</strong> at some stage of their lives, with an 88% five-year survival rate post-diagnosis. Recurrence after treatment is harder to predict, and existing diagnostic methods don't address it reliably. This project tests whether machine learning can close that gap.
   </p>
   <div class="card-grid cols-3">
     <div class="card">
@@ -785,7 +785,7 @@
     <div class="winner-badge">🏆</div>
     <div class="winner-meta">
       <h3>Extreme Gradient Boosting Wins</h3>
-      <p>XGBoost outperformed all other techniques across every evaluation metric. Critically, it achieved <strong>perfect specificity (100%)</strong> — meaning it correctly identified every true non-recurrence case — while maintaining near-perfect sensitivity and accuracy. Its computational efficiency also exceeded that of competing algorithms.</p>
+      <p>XGBoost outperformed all other techniques across every evaluation metric. It hit 100% specificity — correctly identifying every true non-recurrence case — alongside 97.37% sensitivity and 99.37% accuracy. It also ran faster than the other algorithms.</p>
       <div class="winner-metrics">
         <div class="w-metric">
           <span class="wval">99.37%</span>
@@ -813,7 +813,7 @@
     <div class="card">
       <div class="card-icon" style="background:rgba(231,76,60,.1);">📊</div>
       <h3>Specificity Gap</h3>
-      <p>SVM, AdaBoost, and Random Forest all share an identical specificity of 22.22% — suggesting they struggle to correctly classify the minority "recurrence" class. This is a direct consequence of class imbalance (151 vs 47). XGBoost's regularisation and sequential correction mechanism resolves this completely.</p>
+      <p>SVM, AdaBoost, and Random Forest all land at 22.22% specificity, meaning they struggle to correctly classify the minority "recurrence" class. Class imbalance explains it (151 vs 47). XGBoost's regularisation and sequential correction mechanism handles it.</p>
     </div>
     <div class="card">
       <div class="card-icon" style="background:rgba(0,200,160,.1);">🎯</div>
@@ -828,7 +828,7 @@
     <div class="card">
       <div class="card-icon" style="background:rgba(247,193,94,.1);">⚡</div>
       <h3>Computational Efficiency</h3>
-      <p>XGBoost also demonstrated superior computational speed compared to the other algorithms. This is significant for real-world clinical deployment where timely predictions from large patient databases are required at scale.</p>
+      <p>XGBoost also ran faster than the other algorithms, which matters in clinical deployment where predictions need to come quickly across large patient databases.</p>
     </div>
   </div>
 
@@ -880,7 +880,7 @@
     <div class="conc-item">
       <div class="icon">✅</div>
       <h4>XGBoost Validated for Medical Prediction</h4>
-      <p>With 99.37% accuracy and perfect specificity, XGBoost is demonstrated as the superior algorithm for this recurrence prediction task — both in accuracy and computational speed.</p>
+      <p>With 99.37% accuracy and 100% specificity, XGBoost outperformed every other algorithm on this task — in accuracy, specificity, sensitivity, and speed.</p>
     </div>
     <div class="conc-item">
       <div class="icon">🔬</div>
@@ -890,7 +890,7 @@
     <div class="conc-item">
       <div class="icon">🏥</div>
       <h4>Clinical Deployment Potential</h4>
-      <p>An automatic, reliable recurrence prediction system built on this framework could directly assist oncologists in follow-up planning and early intervention, reducing late-stage recurrence deaths.</p>
+      <p>An automatic recurrence prediction system built on this framework could help oncologists plan follow-up and catch recurrences earlier, before they progress.</p>
     </div>
     <div class="conc-item">
       <div class="icon">🔭</div>
@@ -902,7 +902,7 @@
   <div style="margin-top:2.5rem;padding:2rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;">
     <div class="section-label" style="margin-bottom:1rem;">Key Takeaway</div>
     <p style="font-family:'DM Serif Display',serif;font-size:1.5rem;font-weight:400;line-height:1.5;color:var(--text);">
-      Machine learning — specifically <em style="color:var(--accent);">Extreme Gradient Boosting</em> — can serve as the automatic, reliable recurrence prediction system that clinical practice urgently needs, achieving <em style="color:var(--accent);">99.37% accuracy</em> on real-world tumour data.
+      <em style="color:var(--accent);">Extreme Gradient Boosting</em> achieved <em style="color:var(--accent);">99.37% accuracy</em> on real-world tumour data — the kind of performance clinical recurrence prediction actually needs.
     </p>
   </div>
 </section>

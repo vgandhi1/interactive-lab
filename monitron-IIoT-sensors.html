@@ -849,35 +849,35 @@ body {
       <div class="eyebrow">What is Amazon Monitron?</div>
       <div class="slide-title">End-to-End <span class="hi">Condition Monitoring</span></div>
       <div class="slide-desc">
-        A purpose-built AWS IIoT solution combining wireless sensors, a gateway, and a managed cloud service — designed to detect abnormal machine behavior without requiring deep ML expertise from the plant team.
+        An AWS IIoT solution combining wireless sensors, a gateway, and a managed cloud service. It detects abnormal machine behaviour without requiring deep ML expertise from the plant team.
       </div>
       <div class="content-cols">
         <div class="info-card">
           <div class="info-card-icon">📡</div>
           <div class="info-card-title">The Sensor (TE1A001)</div>
           <div class="info-card-body">
-            A small <strong>wireless sensor</strong> that attaches magnetically or with adhesive directly to industrial equipment. Continuously measures <strong>vibration and temperature</strong>, transmitting data over Bluetooth Low Energy (BLE) to the Monitron Gateway.
+            A small <strong>wireless sensor</strong> that attaches magnetically or with adhesive directly to industrial equipment. Continuously measures <strong>vibration and temperature</strong> and sends the data over Bluetooth Low Energy (BLE) to the Monitron Gateway.
           </div>
         </div>
         <div class="info-card">
           <div class="info-card-icon">🌐</div>
           <div class="info-card-title">The Gateway (G1A001)</div>
           <div class="info-card-body">
-            A network hub that collects BLE data from up to <strong>20 sensors</strong> simultaneously and securely forwards telemetry to AWS IoT Core over TLS. Zero-code provisioning via the Monitron mobile app.
+            A network hub that collects BLE data from up to <strong>20 sensors</strong> simultaneously and securely forwards telemetry to AWS IoT Core over TLS. Provisioned via the Monitron mobile app with no manual network configuration.
           </div>
         </div>
         <div class="info-card">
           <div class="info-card-icon">☁️</div>
           <div class="info-card-title">The Cloud Service</div>
           <div class="info-card-body">
-            AWS Monitron service runs <strong>built-in ML models</strong> in the cloud to classify machine health as Normal, Warning, or Alarm — based on ISO 20816 vibration standards. Sends alerts to operators via mobile app or email.
+            AWS Monitron service runs <strong>built-in ML models</strong> in the cloud to classify machine health as Normal, Warning, or Alarm based on ISO 20816 vibration standards. Alerts go to operators via mobile app or email.
           </div>
         </div>
         <div class="info-card">
           <div class="info-card-icon">🔗</div>
           <div class="info-card-title">Why It Fit the Pilot</div>
           <div class="info-card-body">
-            <strong>No embedded firmware required.</strong> The sensor, gateway, and cloud connection are provisioned entirely through the app — letting the data engineering team focus on the AWS pipeline integration, not hardware bring-up.
+            <strong>No embedded firmware to flash.</strong> The sensor, gateway, and cloud connection provision entirely through the app, so the data engineering team can focus on the AWS pipeline rather than hardware bring-up.
           </div>
         </div>
       </div>
@@ -1077,14 +1077,14 @@ body {
             <div class="uc-icon">🏭</div>
             <div>
               <div class="uc-title">The Asset</div>
-              <div class="uc-body">Hydraulic fluid fill station pump supplying heavy equipment units on the assembly line. Pump feeds critical systems — low fluid levels cause cavitation and immediate line stoppage risk.</div>
+              <div class="uc-body">Hydraulic fluid fill station pump supplying heavy equipment units on the assembly line. Pump feeds critical systems; low fluid levels cause cavitation and immediate line stoppage.</div>
             </div>
           </div>
           <div class="uc-card">
             <div class="uc-icon">⚠️</div>
             <div>
               <div class="uc-title">The Problem</div>
-              <div class="uc-body">Manual inspection was the only monitoring method — operators physically checked fluid levels on shift rounds, leaving gaps of 30–60 minutes and introducing response latency.</div>
+              <div class="uc-body">Manual inspection was the only monitoring method. Operators physically checked fluid levels on shift rounds, with gaps of 30–60 minutes between checks.</div>
             </div>
           </div>
           <div class="uc-card">
@@ -1098,7 +1098,7 @@ body {
             <div class="uc-icon">✅</div>
             <div>
               <div class="uc-title">Result</div>
-              <div class="uc-body">Real-time automated condition monitoring achieved. A dedicated level sensor triggers the threshold event; Monitron provides the pump health context layer to diagnose the root cause immediately.</div>
+              <div class="uc-body">Automated condition monitoring is now in place. A dedicated level sensor triggers the threshold event; Monitron provides the pump health context to diagnose the root cause immediately.</div>
             </div>
           </div>
         </div>
@@ -1177,7 +1177,7 @@ body {
           </div>
           <div class="feature-list">
             <div class="feature-item">Collects BLE telemetry from up to <strong>20 TE1A001 sensors</strong> simultaneously per zone. Gateways scale horizontally.</div>
-            <div class="feature-item"><strong>Resilient Backhaul:</strong> Relies on Wi-Fi for the pilot, but future deployments require hardwired Ethernet fallbacks to mitigate plant floor EMI and physical obstructions.</div>
+            <div class="feature-item">The pilot runs on Wi-Fi, but future deployments will need hardwired Ethernet fallbacks to handle plant floor EMI and physical obstructions.</div>
             <div class="feature-item">Provisioned via Amazon Monitron mobile app using NFC tap — zero manual network configuration required on the edge.</div>
             <div class="feature-item">Local buffering ensures no data loss during transient cloud connectivity interruptions.</div>
             <div class="feature-item">All outbound traffic encrypted with <strong>TLS 1.2+</strong>; device identity securely managed via X.509 certificates.</div>
@@ -1192,11 +1192,11 @@ body {
             </div>
           </div>
           <div class="feature-list">
-            <div class="feature-item">IoT Core acts as the <strong>authenticated MQTT broker</strong> — evaluating every incoming message via the Rules Engine SQL filter.</div>
-            <div class="feature-item"><strong>Kinesis Data Streams:</strong> Routes threshold-breach events downstream with ordered, durable delivery and a 24h replay window for fault tolerance.</div>
-            <div class="feature-item">Parallel IoT Rule action writes <strong>100% of raw telemetry to S3</strong> — building a Data Lake to preserve full history for analytics and ML training.</div>
+            <div class="feature-item">IoT Core is the <strong>authenticated MQTT broker</strong>, evaluating every incoming message via the Rules Engine SQL filter.</div>
+            <div class="feature-item">Kinesis Data Streams routes threshold-breach events downstream with ordered, durable delivery and a 24-hour replay window.</div>
+            <div class="feature-item">A parallel IoT Rule action writes <strong>100% of raw telemetry to S3</strong> to preserve full history for analytics and ML training.</div>
             <div class="feature-item">Shard partitioned by <strong>asset_id</strong> — guarantees ordering of events per individual tank or machine unit across the assembly line.</div>
-            <div class="feature-item">SCADA monitors <strong>Sensor Fleet Health</strong>, tracking battery degradation to group replacements into scheduled maintenance windows.</div>
+            <div class="feature-item">SCADA monitors <strong>Sensor Fleet Health</strong> to track battery degradation and group replacements into scheduled maintenance windows.</div>
           </div>
         </div>
       </div>
@@ -1214,13 +1214,13 @@ body {
     <div class="slide-body">
       <div class="eyebrow">From Reactive Alerts → Predictive Intelligence</div>
       <div class="slide-title">Sensor Data as <span class="hi">AI Foundation</span></div>
-      <div class="slide-desc">The S3 telemetry archive built during the pilot serves as the labeled training dataset for the next three horizons of integrated capability.</div>
+      <div class="slide-desc">The S3 telemetry archive built during the pilot is the labeled training dataset for the next three capability horizons.</div>
       <div class="horizon-row">
         <div class="horizon-card h1">
           <div class="horizon-num">Horizon 1 — Near Term</div>
           <div class="horizon-title">Anomaly Detection</div>
           <ul class="horizon-items">
-            <li><strong>Data Quality Gate:</strong> Implement strict data cleaning/imputation pipeline to filter network dropouts before ML training.</li>
+            <li>Implement a strict data cleaning and imputation pipeline to filter network dropouts before ML training.</li>
             <li>Train unsupervised model (Isolation Forest / Autoencoder) on cleaned S3 historical sensor telemetry.</li>
             <li>Deploy as a secondary Kinesis consumer to surface anomaly scores in SCADA before alarms fire.</li>
           </ul>
@@ -1235,7 +1235,7 @@ body {
           <div class="horizon-title">Predictive Maintenance</div>
           <ul class="horizon-items">
             <li>Supervised model predicts failure probability N hours ahead using vibration decay rate.</li>
-            <li><strong>Human-in-the-Loop Integration:</strong> Model suggests condition-based maintenance triggers to a supervisor before automating ERP (SAP PM) work orders.</li>
+            <li>The model suggests condition-based maintenance triggers to a supervisor before any ERP (SAP PM) work orders are automated.</li>
             <li>MTTR reduction: proactive dispatch vs. reactive repair.</li>
           </ul>
           <div class="horizon-tags">
@@ -1250,7 +1250,7 @@ body {
           <ul class="horizon-items">
             <li>Ingest real-time telemetry into AWS IoT TwinMaker to construct a 3D visual replica of the fill station.</li>
             <li>Physics-based simulation models fluid consumption behavior under varying assembly line speeds.</li>
-            <li>Provides operators with spatial context and a single pane of glass for all overlapping asset telemetry.</li>
+            <li>Gives operators spatial context and a unified view of all overlapping asset telemetry.</li>
           </ul>
           <div class="horizon-tags">
             <span class="htag">IoT TwinMaker</span>
@@ -1306,7 +1306,7 @@ body {
         </div>
       </div>
       <div class="closing-line">
-        One small sensor on a pump motor — the <strong>first node in the Smart Manufacturing network</strong>, establishing the resilient edge-to-cloud architecture that scales to every asset on the plant floor.
+        One small sensor on a pump motor — the first node in a plant-wide monitoring network that can scale to every asset on the floor.
       </div>
     </div>
   </div>

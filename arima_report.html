@@ -241,7 +241,7 @@ footer{background:var(--surface2);border-top:1px solid var(--border);
   <div class="s-tag">01 · Executive Summary</div>
   <div class="s-h">Why retailers <em>miss demand</em> — and how ARIMA solves it</div>
   <div class="rule"></div>
-  <p class="body-text">A UK eCommerce retailer facing chronic inventory misalignment — overstocking slow SKUs while stocking out during demand peaks — needed a statistical demand signal. This analysis applies ARIMA(2,1,1) to 12 weeks of cleaned weekly data, producing a 4-week forward forecast with 95% confidence intervals.</p>
+  <p class="body-text">A UK eCommerce retailer had chronic inventory misalignment: overstocking slow SKUs while stocking out during demand peaks. This analysis applies ARIMA(2,1,1) to 12 weeks of cleaned weekly data, producing a 4-week forward forecast with 95% confidence intervals.</p>
   <div class="g4">
     <div class="metric"><div class="m-n g">9.6%</div><div class="m-l">MAPE</div><div class="m-s">vs 10% target ✓</div></div>
     <div class="metric"><div class="m-n b">307</div><div class="m-l">RMSE (units)</div><div class="m-s">vs 308 naive</div></div>
@@ -250,9 +250,9 @@ footer{background:var(--surface2);border-top:1px solid var(--border);
   </div>
   <div class="g2" style="margin-top:12px;">
     <div class="card"><div class="c-tag">Business Context</div><div class="c-h">Inventory Misalignment</div><div class="c-b">18–22% of orders per quarter faced stockout delays. Overstock carrying costs ~$42,000/month. Reactive purchasing on 2-week lead times caused cascading delays.</div></div>
-    <div class="card"><div class="c-tag">Solution</div><div class="c-h">Statistical Demand Signal</div><div class="c-b">ARIMA(2,1,1) captures autocorrelation in weekly demand and trend direction. Walk-forward validation proves generalization to unseen data before production deployment.</div></div>
-    <div class="card"><div class="c-tag">Key Result</div><div class="c-h">W13–W16 Forecast Horizon</div><div class="c-b">Cumulative 4-week forecast: 11,332 units. W16 estimate of 2,840 is -1.8% vs W12 actuals — enabling proactive purchase orders.</div></div>
-    <div class="card"><div class="c-tag">Improvement vs Baseline</div><div class="c-h">MAPE 9.6% vs 9.7% Naive</div><div class="c-b">ARIMA reduces MAPE by 0.1pp over the naive last-value baseline. RMSE improves by 1 units per week.</div></div>
+    <div class="card"><div class="c-tag">Solution</div><div class="c-h">Statistical Demand Signal</div><div class="c-b">ARIMA(2,1,1) captures autocorrelation in weekly demand and trend direction. Walk-forward validation confirms generalisation to unseen data before going into production.</div></div>
+    <div class="card"><div class="c-tag">Key Result</div><div class="c-h">W13–W16 Forecast Horizon</div><div class="c-b">Cumulative 4-week forecast: 11,332 units. The W16 estimate of 2,840 is 1.8% below W12 actuals, giving enough lead time for proactive purchase orders.</div></div>
+    <div class="card"><div class="c-tag">Improvement vs Baseline</div><div class="c-h">MAPE 9.6% vs 9.7% Naive</div><div class="c-b">ARIMA reduces MAPE by 0.1pp over the naive last-value baseline. RMSE improves by 1 unit per week.</div></div>
   </div>
 </section>
 
@@ -414,7 +414,7 @@ weekly.<span class="fn">to_csv</span>(<span class="str">"data/weekly_sales.csv"<
   <div class="s-tag">07 · Forecast Results</div>
   <div class="s-h">4-week forward <em>prediction</em></div>
   <div class="rule"></div>
-  <p class="body-text">ARIMA(2,1,1) fitted on all 12 weeks and projected 4 weeks forward. The shaded band is the 95% confidence interval, which widens with forecast horizon as uncertainty compounds.</p>
+  <p class="body-text">ARIMA(2,1,1) fitted on all 12 weeks and projected 4 weeks forward. The shaded band is the 95% confidence interval, which widens as the forecast horizon extends.</p>
   <div class="chart-wrap">
     <div class="chart-title">Historical + Forecast — Weekly Units Sold</div>
     <div class="chart-leg">
@@ -516,9 +516,9 @@ sw    <span class="op">=</span> stats.<span class="fn">shapiro</span>(resid)
   <div class="tk-grid">
     <div class="tk"><div class="tk-num">01</div><div class="tk-txt"><strong>9.6% MAPE on held-out data</strong> — well below the 10% procurement threshold. ARIMA(2,1,1) generalised to 4 unseen weeks, validating the walk-forward design.</div></div>
     <div class="tk"><div class="tk-num">02</div><div class="tk-txt"><strong>4/4 hold-out actuals within 95% CI</strong> — 100% empirical coverage. Confidence intervals are correctly calibrated for purchase-order commitments.</div></div>
-    <div class="tk"><div class="tk-num">03</div><div class="tk-txt"><strong>SQL pipeline: 541,909 → 12 weekly obs</strong> — nulls, cancellations, and negatives removed in one CTE pass. Min-Max normalization applied via OVER() window functions.</div></div>
-    <div class="tk"><div class="tk-num">04</div><div class="tk-txt"><strong>-1.8% projected demand uplift by W16</strong> — 2,840 units vs W12 actuals of 2,892. Enables proactive purchasing 4 weeks ahead of demand realisation.</div></div>
-    <div class="tk"><div class="tk-num">05</div><div class="tk-txt"><strong>Residuals: Ljung-Box p=0.996</strong> — white noise confirmed. Further parameterisation would risk overfitting on 12 observations.</div></div>
+    <div class="tk"><div class="tk-num">03</div><div class="tk-txt"><strong>SQL pipeline: 541,909 → 12 weekly obs.</strong> Nulls, cancellations, and negatives removed in one CTE pass; Min-Max normalization via OVER() window functions.</div></div>
+    <div class="tk"><div class="tk-num">04</div><div class="tk-txt"><strong>W16 forecast: 2,840 units</strong> — 1.8% below W12 actuals of 2,892. The four-week lead time supports proactive purchasing ahead of demand realisation.</div></div>
+    <div class="tk"><div class="tk-num">05</div><div class="tk-txt"><strong>Residuals: Ljung-Box p=0.996,</strong> white noise confirmed. Further parameterisation would risk overfitting on 12 observations.</div></div>
     <div class="tk"><div class="tk-num">06</div><div class="tk-txt"><strong>Data pipeline fully reproducible</strong> — <code>prepare_data.py</code> generates <code>data/weekly_sales.csv</code> from either UCI download or synthetic seed. All downstream scripts read from this single CSV.</div></div>
   </div>
   <hr class="divider">
