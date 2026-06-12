@@ -1,13 +1,13 @@
 # Web Interactive Collection
 
-**Live hub:** [https://vgandhi1.github.io/web-interactive-collection/](https://vgandhi1.github.io/web-interactive-collection/)
+**Live hub:** [https://vgandhi1.github.io/interactive-lab/](https://vgandhi1.github.io/interactive-lab/)
 
 A curated library of **static HTML** slide decks, EV/SDV reference pages, homelab documentation, and browser-based learning tools. The main portfolio ([vgandhi1.github.io](https://vgandhi1.github.io/)) holds the career narrative and GitHub project grid; **this repo** publishes demos and deep-dive material only.
 
 | Site | Repository | URL |
 |------|------------|-----|
 | Portfolio | [vgandhi1/vgandhi1.github.io](https://github.com/vgandhi1/vgandhi1.github.io) | `https://vgandhi1.github.io/` |
-| Interactive lab (this repo) | [vgandhi1/web-interactive-collection](https://github.com/vgandhi1/web-interactive-collection) | `https://vgandhi1.github.io/web-interactive-collection/` |
+| Interactive lab (this repo) | [vgandhi1/interactive-lab](https://github.com/vgandhi1/interactive-lab) | `https://vgandhi1.github.io/interactive-lab/` |
 
 ---
 
@@ -18,14 +18,14 @@ The landing page groups artifacts into three areas (in-page anchors):
 | Section | Anchor | Purpose |
 |---------|--------|---------|
 | **Repositories** | `#repos` | Points to portfolio flagship projects and [all GitHub repos](https://github.com/vgandhi1?tab=repositories) |
-| **Decks & EV references** | `#decks` | Slide-style pages, manufacturing/ML research, homelab, vehicle protocols & cybersecurity |
+| **Case studies** | `#case-studies` | Academic & professional project deep-dives, manufacturing/ML research, homelab, vehicle protocols & cybersecurity |
 | **Tools & simulators** | `#tools` | Interactive glossaries, DSA guide, Git lab, financial/education simulators, calculator |
 
 ---
 
 ## Artifacts in this repository
 
-### Decks & EV (`#decks`)
+### Case studies (`#case-studies`)
 
 | Page | File | Summary |
 |------|------|---------|
@@ -82,7 +82,7 @@ These are linked from the [main portfolio](https://vgandhi1.github.io/) rather t
 | Charts / viz | [Chart.js](https://www.chartjs.org/), [Plotly.js](https://plotly.com/javascript/) where used |
 | Logic | Vanilla JavaScript (ES6+); React 18 (browser CDN) on [ai-guide.html](ai-guide.html) |
 | Fonts | Inter (hub), per-page fonts elsewhere |
-| Hosting | GitHub Pages (project site under `/web-interactive-collection/`) |
+| Hosting | GitHub Pages (project site under `/interactive-lab/`) |
 
 **No build step** — clone, open `index.html` via a local server, or push to GitHub Pages. Pages that use Tailwind load it from jsDelivr at runtime.
 
@@ -91,7 +91,7 @@ These are linked from the [main portfolio](https://vgandhi1.github.io/) rather t
 ## Local preview
 
 ```bash
-cd web-interactive-collection   # or your clone path
+cd interactive-lab   # or your clone path
 python3 -m http.server 8000
 ```
 
@@ -101,9 +101,9 @@ Open [http://localhost:8000/](http://localhost:8000/) for the hub. Open individu
 
 ## Deploying to GitHub Pages
 
-1. Push to the default branch of **`vgandhi1/web-interactive-collection`**.
+1. Push to the default branch of **`vgandhi1/interactive-lab`**.
 2. **Settings → Pages** → deploy from branch, folder `/ (root)`.
-3. The site is served at **`https://<user>.github.io/web-interactive-collection/`** (project Pages URL).
+3. The site is served at **`https://<user>.github.io/interactive-lab/`** (project Pages URL).
 
 Ensure the portfolio repo links to this path (already wired on [vgandhi1.github.io](https://vgandhi1.github.io/)).
 
